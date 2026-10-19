@@ -468,3 +468,21 @@ Also reflect these changes in `flows.md`.
 - **Checks:** logic tests for the by-item and even messages; in headless Chrome, the clipboard held "Dinner with Josh and Julie (Oct 19) / $90.00 split 3 ways / Your total: $30.00". All 17 end-to-end checks pass.
 
 **Pushed back:** "You owe me $X" was too blunt.
+
+## Step 13: Cohesive money type, Who owes you first (2026-10-19)
+
+**Asked:** Make the style more cohesive, e.g. money in one font (right now "$100" looks very different from "33.33"). Move Who owes you above Latest bill.
+
+**Made:**
+- **Why amounts looked different:** big amounts (the share on each card, the Latest bill total) and the bill page's headline ("Josh owes you $58.16") were in Marcellus. Its numerals look nothing like Manrope's, which every other amount used.
+- **One money style:**
+  - New `type-money` (Manrope semibold, even-width lining digits) for every amount: share cards, the Latest bill total, the bill rows, Who owes you / You owe totals, and the form's live summary.
+  - New `type-lead` (Manrope, 20px, semibold) for the bill page's headline.
+  - Even-width digits on the whole page, so amounts line up in lists.
+  - Marcellus is now only for names and titles. `flows.md`'s Look rule says so.
+- **Home order:** new-bill cards → Who owes you → You owe → Latest bill → Recurring bills → Recent bills. I kept You owe next to Who owes you so the two balance lists stay together. Updated the `flows.md` wireframe and hierarchy rule, and the comment in `home-view.tsx`.
+- **Checks:** lint, a clean build, all 17 end-to-end checks (the Home order check now expects Who owes you before Latest bill), and screenshots of the returning Home and a bill page.
+
+**Pushed back:**
+- Money in two different fonts looked inconsistent.
+- Who owes you should come before Latest bill.

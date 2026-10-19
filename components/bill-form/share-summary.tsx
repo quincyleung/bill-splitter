@@ -29,7 +29,7 @@ export function ShareSummary({ draft, people, warnings }: ShareSummaryProps) {
           {draft.ticked.map((id) => (
             <li key={id} className="flex justify-between gap-3 py-2">
               <span className="text-ink">{id === ME ? "Your items" : name(id)}</span>
-              <span className="font-semibold text-ink">{money(preview.itemTotals.get(id) ?? 0)}</span>
+              <span className="type-money text-ink">{money(preview.itemTotals.get(id) ?? 0)}</span>
             </li>
           ))}
         </ul>
@@ -64,7 +64,7 @@ export function ShareSummary({ draft, people, warnings }: ShareSummaryProps) {
                 {name(id)}
                 {breakdown(id) && <span className="block type-small text-ink-muted">{breakdown(id)}</span>}
               </span>
-              <span className="font-semibold text-ink">{money(share(id))}</span>
+              <span className="type-money text-ink">{money(share(id))}</span>
             </li>
           ))}
         </ul>

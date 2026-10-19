@@ -16,7 +16,7 @@ export function LatestBill({ bill, people }: { bill: Bill; people: Person[] }) {
       >
         <span className="flex items-baseline justify-between gap-3">
           <span className="type-title text-ink">{bill.title}</span>
-          <span className="type-title text-ink">{formatMoney(bill.total, bill.currency)}</span>
+          <span className="type-money text-[1.25rem] text-ink">{formatMoney(bill.total, bill.currency)}</span>
         </span>
         <span className="type-small block text-ink-muted">{formatDate(bill.date)}</span>
         <span className="mt-2 block font-semibold text-ink">{billHeadline(bill, people)}</span>

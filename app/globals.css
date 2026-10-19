@@ -68,6 +68,8 @@
     color: var(--ink);
     font-size: 1.0625rem;
     line-height: 1.6;
+    /* Even-width digits everywhere, so amounts line up and $100.00 looks like $33.33. */
+    font-variant-numeric: tabular-nums;
   }
 
   :focus-visible {
@@ -108,6 +110,24 @@
   font-size: 0.9375rem;
   font-weight: 600;
   line-height: 1.2;
+}
+
+/*
+ * Money is always Manrope semibold, never Marcellus (whose numerals look very different),
+ * so every amount in the app matches. Marcellus is for names and titles only.
+ */
+@utility type-money {
+  font-family: var(--nf-manrope);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* A one-line statement with an amount in it, e.g. "Josh owes you $58.16". */
+@utility type-lead {
+  font-family: var(--nf-manrope);
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.35;
 }
 
 /* For controls whose real input is visually hidden (chips, segments, tick rows, money field). */

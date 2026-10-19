@@ -20,7 +20,7 @@ export function BalanceList({ id, title, balances, people, today }: BalanceListP
             <li key={balance.personId} className="px-5 py-3">
               <div className="flex items-baseline justify-between gap-3">
                 <span className="font-semibold text-ink">{personName(balance.personId, people)}</span>
-                <span className="font-semibold text-ink">
+                <span className="type-money text-ink">
                   {balance.totals.map((t) => formatMoney(t.amount, t.currency)).join(" · ")}
                 </span>
               </div>

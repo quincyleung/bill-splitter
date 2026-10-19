@@ -85,7 +85,7 @@ function BillDetails({ bill, people, series }: { bill: Bill; people: Person[]; s
         {series && ` · Repeats ${frequencyLabel(series.frequency)}`}
       </p>
 
-      <p className="type-title mt-6 text-ink">{headline}</p>
+      <p className="type-lead mt-6 text-ink">{headline}</p>
       {owed.length > 0 && (
         <p className="type-small mt-1 text-ink-muted">
           {owed.length - unpaid.length} of {owed.length} paid
@@ -154,7 +154,7 @@ function ShareCard({ bill, share, title, status, onPaid, onCopy }: ShareCardProp
     <Card as="section">
       <div className="flex items-baseline justify-between gap-3">
         <h2 className="type-title text-ink">{title}</h2>
-        <p className={`type-title ${settled ? "text-ink-muted line-through" : "text-ink"}`}>{money(share.amount)}</p>
+        <p className={`type-money text-[1.25rem] ${settled ? "text-ink-muted line-through" : "text-ink"}`}>{money(share.amount)}</p>
       </div>
       {status && <p className="type-small text-ink-muted">{status}</p>}
 

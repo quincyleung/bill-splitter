@@ -44,7 +44,7 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 - **Currency:** shown next to the amount field with a **Change** button. The picker lists my recent currencies first, then every other one from the browser's built-in list. Amounts in different currencies are never added together or converted.
 - **Loading state:** saved data can only be read in the browser, so each page shows a neutral shell until it has loaded. A returning user never sees a flash of the empty first-visit screen.
 - **Number fields** open the decimal keypad and accept `12`, `12.5` or `$12.50`.
-- **Look:** the Greek Summer design system from the recipe-book project: Marcellus headings, Manrope text, small uppercase field labels, navy on warm white, Aegean blue only for the main action, light-blue fill for anything selected, pill buttons and chips, 12px fields, 20px cards with a thin limestone line and no shadows. Light only. Home has its arches.
+- **Look:** the Greek Summer design system from the recipe-book project: Marcellus headings, Manrope text, small uppercase field labels, navy on warm white, Aegean blue only for the main action, light-blue fill for anything selected, every amount of money in Manrope semibold with even-width digits (never Marcellus, whose numerals look different), pill buttons and chips, 12px fields, 20px cards with a thin limestone line and no shadows. Light only. Home has its arches.
 - **Labels:** no question marks ("Who paid", not "Who paid?"), and no "(optional)": every field on a bill is needed, including each item's name.
 - **Hints:** fields show an example under their label, such as "Like Dinner at Nopa" or "Like 12.50". Placeholders never stand in for labels. There are no sample bills, because fake bills would mix into real balances.
 - **On Save:** errors appear next to their fields, focus moves to the first one, and nothing typed is cleared.
@@ -393,11 +393,6 @@ You're owed $133.56. You owe $60.00. 1 recurring bill is due.
 [ One-time    A meal, ride, or anything once               ]  ← the big cards lead
 [ Recurring   Rent, subscription, or anything that repeats ]
 
-LATEST BILL
-┌ Uber home                                       $24.80 ┐
-│ Oct 19 · Sam owes you $12.40                           │
-└────────────────────────────────────────────────────────┘
-
 WHO OWES YOU
   Jo     $63.00   Unpaid for 2 weeks · For Electricity (Oct 1, $63.00)
   Josh   $58.16   Unpaid for 2 weeks · For Dinner at Aba (Oct 5, $58.16)
@@ -406,6 +401,11 @@ WHO OWES YOU
 YOU OWE
   Jo     $60.00   Unpaid for 2 months · For Internet (Aug 15, $30.00),
                   Internet (Sep 15, $30.00)
+
+LATEST BILL
+┌ Uber home                                       $24.80 ┐
+│ Oct 19 · Sam owes you $12.40                           │
+└────────────────────────────────────────────────────────┘
 
 RECURRING BILLS
   Internet · Monthly · Jo pays · Due Oct 15        [Add Oct 15]
@@ -419,8 +419,8 @@ See all 6 bills                    (→ /bills, by month)
 ```
 
 - **First visit or coming back:** with no bills saved, Home is the first-visit screen (Flow 1). With any bill, it's this one. Until saved data is read, it shows the neutral shell, never the wrong one.
-- **Hierarchy:** "Welcome back" sums things up in one line. Next come the two big new-bill cards (the same as on a first visit; One-time is the Aegean-blue main action), so starting a bill always comes first. The sections below have quiet small-uppercase labels.
-- **Latest bill:** the most recent bill gets its own card near the top, with who still owes on it ("Sam owes you $12.40"). The whole card opens the bill.
+- **Hierarchy:** "Welcome back" sums things up in one line. Next come the two big new-bill cards (the same as on a first visit; One-time is the Aegean-blue main action), so starting a bill always comes first. The sections below have quiet small-uppercase labels, in this order: Who owes you and You owe (kept together), Latest bill, Recurring bills, Recent bills.
+- **Latest bill:** the most recent bill gets its own card, after the two balance lists, with who still owes on it ("Sam owes you $12.40"). The whole card opens the bill.
 - **Recent bills:** the next 4, newest first, near the bottom. If there are more than 5 bills in all, **See all N bills** opens `/bills`, every bill grouped by month.
 - **Who owes you:** one row per person: what they owe across all bills I paid, **how long** it's been unpaid (from their oldest unpaid bill: "since today", "for 3 days", "for 2 weeks", "for 2 months"; a month or more is in bold), and the bills it's for, as links with dates. Paid shares drop off.
 - **You owe:** the same, for bills someone else paid where my share isn't paid back yet.

@@ -2,7 +2,7 @@
 
 // Home has two faces. A first visit gets the welcome and the two quick starts.
 // Coming back gets "Welcome back", then, in order of weight: the big new-bill cards,
-// the latest bill, who still owes me and for how long, whom I owe, recurring bills
+// who still owes me and for how long, whom I owe, the latest bill, recurring bills
 // that are due, and the next few recent bills. Saved data decides which, so until
 // it's read the page shows the neutral loading shell, never the wrong one.
 
@@ -82,11 +82,11 @@ function Returning({ data }: { data: AppData }) {
       <div className="mt-6">
         <QuickStarts />
       </div>
-      {latest && <LatestBill bill={latest} people={data.people} />}
       {owed.length > 0 && (
         <BalanceList id="owed-to-me" title="Who owes you" balances={owed} people={data.people} today={today} />
       )}
       {owe.length > 0 && <BalanceList id="i-owe" title="You owe" balances={owe} people={data.people} today={today} />}
+      {latest && <LatestBill bill={latest} people={data.people} />}
       {recurring.length > 0 && <RecurringList statuses={recurring} people={data.people} />}
       {recent.length > 0 && <RecentBills bills={recent} total={data.bills.length} />}
     </>

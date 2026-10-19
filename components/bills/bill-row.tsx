@@ -14,7 +14,7 @@ export function BillRow({ bill }: { bill: Bill }) {
           {formatDate(bill.date)} · {paidStatus(bill)}
         </span>
       </span>
-      <span className="font-semibold text-ink">{formatMoney(bill.total, bill.currency)}</span>
+      <span className="type-money text-ink">{formatMoney(bill.total, bill.currency)}</span>
     </Link>
   );
 }
