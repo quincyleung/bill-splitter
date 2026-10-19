@@ -5,21 +5,22 @@ import { formatDate } from "@/lib/dates";
 import type { Bill, Person } from "@/lib/model";
 import { formatMoney } from "@/lib/money";
 
-/** The most recent bill, up top, with who still owes on it. The whole card opens the bill. */
+/** The most recent bill, as a compact row with who still owes on it, so it doesn't compete with the new-bill cards. */
 export function LatestBill({ bill, people }: { bill: Bill; people: Person[] }) {
   return (
     <section aria-labelledby="latest-bill" className="mt-8">
       <SectionLabel id="latest-bill">Latest bill</SectionLabel>
       <Link
         href={`/bills/${bill.id}`}
-        className="press mt-3 block rounded-card border border-line bg-surface p-5 hover:border-field hover:bg-accent-soft"
+        className="press mt-3 flex items-center justify-between gap-3 rounded-card border border-line bg-surface px-5 py-3 hover:border-field hover:bg-accent-soft"
       >
-        <span className="flex items-baseline justify-between gap-3">
-          <span className="type-title text-ink">{bill.title}</span>
-          <span className="type-money text-[1.25rem] text-ink">{formatMoney(bill.total, bill.currency)}</span>
+        <span>
+          <span className="block font-semibold text-ink">{bill.title}</span>
+          <span className="type-small block text-ink-muted">
+            {formatDate(bill.date)} · {billHeadline(bill, people)}
+          </span>
         </span>
-        <span className="type-small block text-ink-muted">{formatDate(bill.date)}</span>
-        <span className="mt-2 block font-semibold text-ink">{billHeadline(bill, people)}</span>
+        <span className="type-money text-ink">{formatMoney(bill.total, bill.currency)}</span>
       </Link>
     </section>
   );

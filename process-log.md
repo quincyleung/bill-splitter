@@ -501,3 +501,16 @@ Also reflect these changes in `flows.md`.
 - **Checks:** lint, a clean build, all 17 end-to-end checks, and a first-visit screenshot. The end-to-end checks now confirm a first visit has no header and no illustration, and that the header (no bar, no border, "Bill Splitter, home") is back once there's a bill.
 
 **Pushed back:** The app name and illustration were too much for the first screen.
+
+## Step 14, continued: Lighter lists for a clearer hierarchy (2026-10-19)
+
+**Asked:** Make Latest bill smaller, and Who owes you smaller and less bold, so the hierarchy is clearer. Push these changes.
+
+**Made:**
+- **Latest bill** is now a compact row like the recent bills: the name, then the date and who still owes ("Oct 19 · Sam owes you $12.40") underneath, and the total on the right. It used to be a big card with a Marcellus title.
+- **Who owes you and You owe:** rows are 15px with tighter spacing, regular-weight names and medium-weight amounts (were semibold). "Unpaid for 2 months" is medium instead of semibold.
+- **The result:** "Welcome back" and the two quick-start cards clearly lead, and the lists read as detail.
+- **`flows.md`:** the hierarchy rule, the Latest bill rule and the wireframe.
+- **Checks:** lint, a clean build, all 17 end-to-end checks, and a screenshot of the returning Home. Then pushed.
+
+**Pushed back:** Latest bill and Who owes you were still too heavy next to the new-bill cards.

@@ -8,7 +8,10 @@ import { personName } from "@/lib/people";
 
 type BalanceListProps = { id: string; title: string; balances: Balance[]; people: Person[]; today: string };
 
-/** One row per person: how much, how long it's been unpaid, and the bills it's for. */
+/**
+ * One row per person: how much, how long it's been unpaid, and the bills it's for.
+ * Smaller and lighter than the new-bill cards above, so the hierarchy is clear.
+ */
 export function BalanceList({ id, title, balances, people, today }: BalanceListProps) {
   return (
     <section aria-labelledby={id} className="mt-8">
@@ -17,15 +20,15 @@ export function BalanceList({ id, title, balances, people, today }: BalanceListP
         {balances.map((balance) => {
           const days = daysBetween(balance.since, today);
           return (
-            <li key={balance.personId} className="px-5 py-3">
-              <div className="flex items-baseline justify-between gap-3">
-                <span className="font-semibold text-ink">{personName(balance.personId, people)}</span>
-                <span className="type-money text-ink">
+            <li key={balance.personId} className="px-5 py-2.5">
+              <div className="flex items-baseline justify-between gap-3 text-[0.9375rem]">
+                <span className="text-ink">{personName(balance.personId, people)}</span>
+                <span className="font-medium text-ink">
                   {balance.totals.map((t) => formatMoney(t.amount, t.currency)).join(" · ")}
                 </span>
               </div>
               <p className="type-small text-ink-muted">
-                <span className={days >= 30 ? "font-semibold text-ink" : undefined}>Unpaid {durationLabel(days)}</span>
+                <span className={days >= 30 ? "font-medium text-ink" : undefined}>Unpaid {durationLabel(days)}</span>
                 {" · For "}
                 {balance.bills.map(({ bill, amount }, index) => (
                   <span key={bill.id}>

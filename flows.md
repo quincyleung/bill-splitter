@@ -399,10 +399,8 @@ YOU OWE
   Jo     $60.00   Unpaid for 2 months · For Internet (Aug 15, $30.00),
                   Internet (Sep 15, $30.00)
 
-LATEST BILL
-┌ Uber home                                       $24.80 ┐
-│ Oct 19 · Sam owes you $12.40                           │
-└────────────────────────────────────────────────────────┘
+LATEST BILL                        (a compact row)
+  Uber home · Oct 19 · Sam owes you $12.40        $24.80
 
 RECURRING BILLS
   Internet · Monthly · Jo pays · Due Oct 15        [Add Oct 15]
@@ -416,8 +414,8 @@ See all 6 bills                    (→ /bills, by month)
 ```
 
 - **First visit or coming back:** with no bills saved, Home is the first-visit screen (Flow 1). With any bill, it's this one. Until saved data is read, it shows the neutral shell, never the wrong one.
-- **Hierarchy:** "Welcome back" sums things up in one line. Next come the two big new-bill cards (the same as on a first visit; One-time is the Aegean-blue main action), so starting a bill always comes first. The sections below have quiet small-uppercase labels, in this order: Who owes you and You owe (kept together), Latest bill, Recurring bills, Recent bills.
-- **Latest bill:** the most recent bill gets its own card, after the two balance lists, with who still owes on it ("Sam owes you $12.40"). The whole card opens the bill.
+- **Hierarchy:** "Welcome back" sums things up in one line. Next come the two big new-bill cards (the same as on a first visit; One-time is the Aegean-blue main action), so starting a bill always comes first. The sections below have quiet small-uppercase labels and lighter, smaller rows (Who owes you and You owe use regular-weight names and medium-weight amounts), in this order: Who owes you and You owe (kept together), Latest bill, Recurring bills, Recent bills.
+- **Latest bill:** the most recent bill gets its own compact row (like the recent bills, so it doesn't compete with the cards), after the two balance lists, with who still owes on it ("Sam owes you $12.40"). The whole card opens the bill.
 - **Recent bills:** the next 4, newest first, near the bottom. If there are more than 5 bills in all, **See all N bills** opens `/bills`, every bill grouped by month.
 - **Who owes you:** one row per person: what they owe across all bills I paid, **how long** it's been unpaid (from their oldest unpaid bill: "since today", "for 3 days", "for 2 weeks", "for 2 months"; a month or more is in bold), and the bills it's for, as links with dates. Paid shares drop off.
 - **You owe:** the same, for bills someone else paid where my share isn't paid back yet.
