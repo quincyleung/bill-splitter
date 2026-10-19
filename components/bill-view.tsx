@@ -10,13 +10,13 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { AlertIcon } from "@/components/ui/icons";
 import { PageTitle } from "@/components/ui/page-title";
 import { showToast } from "@/components/ui/toast";
-import { trackedShares, withPaid } from "@/lib/bills";
+import { billHeadline, trackedShares, withPaid } from "@/lib/bills";
 import { breakdownFor } from "@/lib/breakdown";
 import { copyText } from "@/lib/clipboard";
 import { formatDate } from "@/lib/dates";
 import { type Bill, ME, type Person, type RecurringBill, type Share } from "@/lib/model";
 import { formatMoney } from "@/lib/money";
-import { listNames, personName } from "@/lib/people";
+import { personName } from "@/lib/people";
 import { frequencyLabel } from "@/lib/recurring";
 import { updateData, useAppData } from "@/lib/store";
 
@@ -74,14 +74,7 @@ function BillDetails({ bill, people, series }: { bill: Bill; people: Person[]; s
     showToast(copied ? `Copied a message for ${name(share.personId)}.` : "Couldn't copy. Try again.");
   }
 
-  let headline: string;
-  if (!youPaid) headline = myShare?.paid ? `You've paid ${name(bill.payerId)} back` : `You owe ${name(bill.payerId)} ${money(myShare?.amount ?? 0)}`;
-  else if (owed.length === 0) headline = "Nobody owes you on this bill";
-  else if (unpaid.length === 0) headline = "All paid up";
-  else {
-    const total = unpaid.reduce((sum, s) => sum + s.amount, 0);
-    headline = `${listNames(unpaid.map((s) => name(s.personId)))} ${unpaid.length === 1 ? "owes" : "owe"} you ${money(total)}`;
-  }
+  const headline = billHeadline(bill, people);
 
   return (
     <>

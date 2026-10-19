@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SectionLabel } from "@/components/home/section-label";
 import type { Balance } from "@/lib/balances";
 import { daysBetween, durationLabel, formatDate } from "@/lib/dates";
 import type { Person } from "@/lib/model";
@@ -11,9 +12,7 @@ type BalanceListProps = { id: string; title: string; balances: Balance[]; people
 export function BalanceList({ id, title, balances, people, today }: BalanceListProps) {
   return (
     <section aria-labelledby={id} className="mt-8">
-      <h2 id={id} className="type-title text-ink">
-        {title}
-      </h2>
+      <SectionLabel id={id}>{title}</SectionLabel>
       <ul className="mt-3 divide-y divide-line overflow-hidden rounded-card border border-line bg-surface">
         {balances.map((balance) => {
           const days = daysBetween(balance.since, today);

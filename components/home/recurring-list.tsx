@@ -1,3 +1,4 @@
+import { SectionLabel } from "@/components/home/section-label";
 import { ButtonLink } from "@/components/ui/button-link";
 import { formatDate } from "@/lib/dates";
 import { ME, type Person } from "@/lib/model";
@@ -8,9 +9,7 @@ import { frequencyLabel, type RecurringStatus } from "@/lib/recurring";
 export function RecurringList({ statuses, people }: { statuses: RecurringStatus[]; people: Person[] }) {
   return (
     <section aria-labelledby="recurring" className="mt-8">
-      <h2 id="recurring" className="type-title text-ink">
-        Recurring bills
-      </h2>
+      <SectionLabel id="recurring">Recurring bills</SectionLabel>
       <ul className="mt-3 divide-y divide-line overflow-hidden rounded-card border border-line bg-surface">
         {statuses.map(({ series, nextDue, due }) => {
           const frequency = frequencyLabel(series.frequency);

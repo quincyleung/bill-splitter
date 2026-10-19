@@ -1,4 +1,6 @@
-import { type Bill, ME, type Share } from "./model";
+import { type Bill, ME, type Person, type Share } from "./model";
+import { formatMoney } from "./money";
+import { listNames, personName } from "./people";
 
 /**
  * The shares that are actually debts: when I paid, everyone else's; when someone
@@ -28,4 +30,25 @@ export function withPaid(bill: Bill, personId: string, paid: boolean, now: Date)
     updatedAt: now.toISOString(),
     shares: bill.shares.map((s) => (s.personId === personId ? { ...s, paid } : s)),
   };
+}
+
+/** Newest first, by when the bill was added. */
+export function newestFirst(bills: Bill[]): Bill[] {
+  return [...bills].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+}
+
+/** One line about who owes what on a bill: "Josh and Julie owe you $60.00", "All paid up", "You owe Sam $42.00". */
+export function billHeadline(bill: Bill, people: Person[]): string {
+  const name = (id: string) => personName(id, people);
+  const money = (amount: number) => formatMoney(amount, bill.currency);
+  if (bill.payerId !== ME) {
+    const mine = bill.shares.find((s) => s.personId === ME);
+    return mine?.paid ? `You've paid ${name(bill.payerId)} back` : `You owe ${name(bill.payerId)} ${money(mine?.amount ?? 0)}`;
+  }
+  const owed = trackedShares(bill);
+  const unpaid = owed.filter((s) => !s.paid);
+  if (owed.length === 0) return "Nobody owes you on this bill";
+  if (unpaid.length === 0) return "All paid up";
+  const total = unpaid.reduce((sum, s) => sum + s.amount, 0);
+  return `${listNames(unpaid.map((s) => name(s.personId)))} ${unpaid.length === 1 ? "owes" : "owe"} you ${money(total)}`;
 }

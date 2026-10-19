@@ -1,20 +1,22 @@
 "use client";
 
 // Home has two faces. A first visit gets the welcome and the two quick starts.
-// Coming back gets "Welcome back": who still owes me and for how long, whom I owe,
-// recurring bills that are due, then my bills. Saved data decides which, so until
+// Coming back gets "Welcome back", then, in order of weight: the big new-bill cards,
+// the latest bill, who still owes me and for how long, whom I owe, recurring bills
+// that are due, and the next few recent bills. Saved data decides which, so until
 // it's read the page shows the neutral loading shell, never the wrong one.
 
 import { ArchArt } from "@/components/home/arch-art";
 import { BalanceList } from "@/components/home/balance-list";
 import { QuickStarts } from "@/components/home/quick-starts";
 import { RecurringList } from "@/components/home/recurring-list";
-import { SavedBills } from "@/components/home/saved-bills";
+import { LatestBill } from "@/components/home/latest-bill";
+import { RecentBills } from "@/components/home/recent-bills";
 import { LoadingShell } from "@/components/loading-shell";
 import { UnreadableNotice } from "@/components/unreadable-notice";
-import { ButtonLink } from "@/components/ui/button-link";
 import { PageTitle } from "@/components/ui/page-title";
 import { iOwe, owedToMe, totalOf } from "@/lib/balances";
+import { newestFirst } from "@/lib/bills";
 import { todayIso } from "@/lib/dates";
 import type { AppData } from "@/lib/model";
 import { formatMoney } from "@/lib/money";
@@ -44,9 +46,6 @@ function FirstVisit() {
       <div className="mt-6">
         <PageTitle>Split a bill</PageTitle>
       </div>
-      <p className="mt-2 text-ink-muted">
-        Pick one to start. Everything stays on this phone, and your friends don&apos;t need the app.
-      </p>
       <div className="mt-6">
         <QuickStarts />
       </div>
@@ -60,6 +59,8 @@ function Returning({ data }: { data: AppData }) {
   const owe = iOwe(data);
   const recurring = recurringStatuses(data, today);
   const due = recurring.filter((r) => r.due).length;
+  const [latest, ...older] = newestFirst(data.bills);
+  const recent = older.slice(0, 4);
   const money = (balances: typeof owed) =>
     totalOf(balances)
       .map((t) => formatMoney(t.amount, t.currency))
@@ -78,18 +79,16 @@ function Returning({ data }: { data: AppData }) {
     <>
       <PageTitle>Welcome back</PageTitle>
       <p className="mt-1 text-ink-muted">{summary}</p>
-      <div className="mt-4 flex flex-wrap gap-2">
-        <ButtonLink href="/new/one-time">New one-time bill</ButtonLink>
-        <ButtonLink href="/new/recurring" variant="secondary">
-          New recurring bill
-        </ButtonLink>
+      <div className="mt-6">
+        <QuickStarts />
       </div>
+      {latest && <LatestBill bill={latest} people={data.people} />}
       {owed.length > 0 && (
         <BalanceList id="owed-to-me" title="Who owes you" balances={owed} people={data.people} today={today} />
       )}
       {owe.length > 0 && <BalanceList id="i-owe" title="You owe" balances={owe} people={data.people} today={today} />}
       {recurring.length > 0 && <RecurringList statuses={recurring} people={data.people} />}
-      <SavedBills />
+      {recent.length > 0 && <RecentBills bills={recent} total={data.bills.length} />}
     </>
   );
 }

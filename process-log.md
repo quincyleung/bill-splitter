@@ -415,3 +415,35 @@ Also reflect these changes in `flows.md`.
   - a screenshot of the returning Home with realistic data.
 
 **Pushed back:** Nothing.
+
+## Step 11: Hierarchy, recent bills, a seamless header, quick-start copy (2026-10-19)
+
+**Asked:**
+- Create more of a hierarchy: highlight new one-time and new recurring bills over Who owes you.
+- Replace "Your bills" with recent bills: the most recent one up top, the rest moved down, about 5 shown, and a See all page.
+- Integrate "Bill Splitter" into the page instead of a separate bar at the top.
+- On the first visit, remove "Pick one to start…" (it's redundant).
+- Change the card text to "A meal, ride, or anything once" and "Rent, subscription, or anything that repeats".
+
+**Made:**
+- **Hierarchy on the returning Home:**
+  - "Welcome back" and its summary.
+  - The two big quick-start cards, the same as on a first visit: One-time is the Aegean-blue main action, Recurring is a white card. They replace the two small buttons.
+  - The section headings below (Latest bill, Who owes you, You owe, Recurring bills, Recent bills) became quiet small-uppercase labels, so the cards lead.
+- **Latest bill:** the most recent bill sits in its own card right under the quick starts. It shows the name, total, date and who still owes on it ("Sam owes you $12.40"), and the whole card opens the bill.
+- **Recent bills:** the next 4, newest first, at the bottom (5 in all with the latest). "See all N bills" appears when there are more, and opens a new `/bills` page (All bills) grouped by month. A shared BillRow / BillList now serves both lists, and a shared `billHeadline` serves the bill page and the Latest bill card.
+- **Header:** the white bar and its border are gone. "Bill Splitter" now sits at the top of the page on the same warm white, in Marcellus, with a small arch (light-blue arch, Aegean-blue door), and still links Home. The private-browsing banner became a rounded notice in the same column.
+- **First visit:** the arches, "Split a bill" and the two cards, with no explanation line.
+- **Copy:** "A meal, ride, or anything once" and "Rent, subscription, or anything that repeats", on both the first visit and the returning Home.
+- **`flows.md`:** Decision 1, the routes (`/bills` added), the navigation rule, the Flow 1 wireframe and Empty state, and a rewritten Flow 3 (the order, Latest bill, Recent bills, See all). Diagram labels updated in both `flows.md` and `README.md`.
+- **Checks:**
+  - lint and a clean build;
+  - all 17 end-to-end checks, now also covering the header (no bar, no border), Home's order, exactly 4 recent bills, See all opening all 6 bills newest first, and the new copy. Text matching is now case-insensitive, because the section labels are uppercase in CSS;
+  - screenshots of the returning Home, All bills and the first visit.
+
+**Pushed back:**
+- The new-bill buttons were too small next to the lists.
+- "Your bills" became Latest bill plus Recent bills.
+- The header bar felt separate from the page.
+- The first-visit line was redundant.
+- New card text.

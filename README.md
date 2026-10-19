@@ -16,7 +16,7 @@ flowchart TD
   loading --> canSave{"Can this browser save data?"}
   canSave -->|No| errStorage["Error: banner 'This browser isn't saving data,<br/>so bills will disappear when you close it.'"]
   errStorage --> welcome
-  canSave -->|Yes| welcome["Empty: Home with welcome text<br/>and three start buttons"]
+  canSave -->|Yes| welcome["Empty: Home with the arches<br/>and two quick starts"]
   welcome --> mode{"Which quick start?"}
   mode -->|One-time| once["One-time form, Evenly<br/>/new/one-time"]
   mode -->|Recurring| rec["Recurring form, Monthly<br/>/new/recurring"]
@@ -114,7 +114,7 @@ flowchart TD
   readData -->|Nothing saved, e.g. Safari cleared it| firstVisit
   readData -->|Yes| dash["Home dashboard"]
   dash --> anyOwed{"Does anyone owe anyone?"}
-  anyOwed -->|No| allClear["Empty: 'Nobody owes anyone right now.'<br/>Add buttons and Settled list stay"]
+  anyOwed -->|No| allClear["Empty: 'Nobody owes anyone right now.'<br/>New-bill cards and recent bills stay"]
   anyOwed -->|Yes| balances["Owed to you and You owe,<br/>net per person, per currency"]
   balances --> person["Person page /people/[id]:<br/>open bills both ways"]
   person --> settleUp{"Settle up?"}

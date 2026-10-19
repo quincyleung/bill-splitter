@@ -1,8 +1,8 @@
 import Link from "next/link";
 
 const QUICK_STARTS = [
-  { href: "/new/one-time", title: "One-time", detail: "A meal, a ride, anything once", primary: true },
-  { href: "/new/recurring", title: "Recurring", detail: "Repeats, like utilities", primary: false },
+  { href: "/new/one-time", title: "One-time", detail: "A meal, ride, or anything once", primary: true },
+  { href: "/new/recurring", title: "Recurring", detail: "Rent, subscription, or anything that repeats", primary: false },
 ];
 
 /**
