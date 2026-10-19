@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Manrope, Marcellus } from "next/font/google";
-import Link from "next/link";
-import { ArchMark } from "@/components/arch-mark";
+import { Suspense } from "react";
+import { HeaderBar, SiteHeader } from "@/components/site-header";
 import { StorageBanner } from "@/components/storage-banner";
 import { Toaster } from "@/components/ui/toast";
 import "./globals.css";
@@ -25,14 +25,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         >
           Skip to main content
         </a>
-        {/* No bar: the app name sits at the top of the page, on the same background, and goes back to Home. */}
-        <header className="mx-auto w-full max-w-xl px-4 pt-5">
-          <Link href="/" className="inline-flex min-h-11 items-center gap-2 text-ink hover:text-accent">
-            <ArchMark />
-            <span className="type-title">Bill Splitter</span>
-            <span className="sr-only">, home</span>
-          </Link>
-        </header>
+        <Suspense fallback={<HeaderBar />}>
+          <SiteHeader />
+        </Suspense>
         <StorageBanner />
         <main id="main" tabIndex={-1} className="mx-auto w-full max-w-xl flex-1 px-4 pt-4 pb-12 outline-none">
           {children}

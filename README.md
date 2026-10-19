@@ -12,11 +12,11 @@ States are named in the box text, and each kind also has its own outline: **Erro
 
 ```mermaid
 flowchart TD
-  start(["Open the app for the first time"]) --> loading["Loading: app name only"]
+  start(["Open the app for the first time"]) --> loading["Loading: a blank page"]
   loading --> canSave{"Can this browser save data?"}
   canSave -->|No| errStorage["Error: banner 'This browser isn't saving data,<br/>so bills will disappear when you close it.'"]
   errStorage --> welcome
-  canSave -->|Yes| welcome["Empty: Home with the arches<br/>and two quick starts"]
+  canSave -->|Yes| welcome["Empty: just 'Split a bill'<br/>and two quick starts"]
   welcome --> mode{"Which quick start?"}
   mode -->|One-time| once["One-time form, Evenly<br/>/new/one-time"]
   mode -->|Recurring| rec["Recurring form, Monthly<br/>/new/recurring"]

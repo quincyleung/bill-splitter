@@ -35,7 +35,7 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 | `/bills/[id]/edit` | Edit a bill |
 | `/people/[id]` | One person: bills both ways, net balance, Settle up |
 
-- **Navigation:** no tabs and no header bar. The app name, with a small arch, sits at the top of every page on the same background and goes back to Home. Home's quick starts are how a bill starts, and each page's title says where you are.
+- **Navigation:** no tabs and no header bar. The app name, with a small arch, sits at the top of every page on the same background and goes back to Home, except on the first-visit Home, which has nothing above "Split a bill". Home's quick starts are how a bill starts, and each page's title says where you are.
 - **Who paid:** every bill has one payer, picked with radio dots so it doesn't look like the tick-many people chips. It defaults to Me, and can be anyone ticked on the bill.
 - **Debts:** if I paid, everyone else on the bill owes me their share. If someone else paid, I owe them my share. What the others owe them is shown for reference but not tracked.
 - **Me:** I'm in every split by default, with my own items. I can untick myself only on a bill I paid.
@@ -44,7 +44,7 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 - **Currency:** shown next to the amount field with a **Change** button. The picker lists my recent currencies first, then every other one from the browser's built-in list. Amounts in different currencies are never added together or converted.
 - **Loading state:** saved data can only be read in the browser, so each page shows a neutral shell until it has loaded. A returning user never sees a flash of the empty first-visit screen.
 - **Number fields** open the decimal keypad and accept `12`, `12.5` or `$12.50`.
-- **Look:** the Greek Summer design system from the recipe-book project: Marcellus headings, Manrope text, small uppercase field labels, navy on warm white, Aegean blue only for the main action, light-blue fill for anything selected, every amount of money in Manrope semibold with even-width digits (never Marcellus, whose numerals look different), pill buttons and chips, 12px fields, 20px cards with a thin limestone line and no shadows. Light only. Home has its arches.
+- **Look:** the Greek Summer design system from the recipe-book project: Marcellus headings, Manrope text, small uppercase field labels, navy on warm white, Aegean blue only for the main action, light-blue fill for anything selected, every amount of money in Manrope semibold with even-width digits (never Marcellus, whose numerals look different), pill buttons and chips, 12px fields, 20px cards with a thin limestone line and no shadows. Light only. A small arch sits beside the app name.
 - **Labels:** no question marks ("Who paid", not "Who paid?"), and no "(optional)": every field on a bill is needed, including each item's name.
 - **Hints:** fields show an example under their label, such as "Like Dinner at Nopa" or "Like 12.50". Placeholders never stand in for labels. There are no sample bills, because fake bills would mix into real balances.
 - **On Save:** errors appear next to their fields, focus moves to the first one, and nothing typed is cleared.
@@ -59,11 +59,11 @@ Each flow starts with a Mermaid diagram. States are named in the box text, and e
 
 ```mermaid
 flowchart TD
-  start(["Open the app for the first time"]) --> loading["Loading: app name only"]
+  start(["Open the app for the first time"]) --> loading["Loading: a blank page"]
   loading --> canSave{"Can this browser save data?"}
   canSave -->|No| errStorage["Error: banner 'This browser isn't saving data,<br/>so bills will disappear when you close it.'"]
   errStorage --> welcome
-  canSave -->|Yes| welcome["Empty: Home with the arches<br/>and two quick starts"]
+  canSave -->|Yes| welcome["Empty: just 'Split a bill'<br/>and two quick starts"]
   welcome --> mode{"Which quick start?"}
   mode -->|One-time| once["One-time form, Evenly<br/>/new/one-time"]
   mode -->|Recurring| rec["Recurring form, Monthly<br/>/new/recurring"]
@@ -87,10 +87,7 @@ flowchart TD
 ```
 
 ```
-Bill Splitter              (app name, top of the page)
-[ arches drawing ]
-
-Split a bill
+Split a bill                (nothing above it)
 
 [ One-time    A meal, ride, or anything once               ]
 [ Recurring   Rent, subscription, or anything that repeats ]
@@ -98,8 +95,8 @@ Split a bill
 
 | State | What I see |
 |---|---|
-| Loading | Just the app name, with no buttons yet. |
-| Empty | The arches, "Split a bill" and the two quick starts above, with no extra explanation. No sign-up, no tutorial, no asking for my name. |
+| Loading | A blank page until saved data is read, with no app name and no buttons. |
+| Empty | Just "Split a bill" and the two quick starts: no app name, no illustration, no explanation. No sign-up, no tutorial, no asking for my name. |
 | Partly filled | On the first form, "Who was there" shows only **Me** plus a name field with an **Add person** button on its right, because nobody is saved yet. Anyone I add is ticked straight away. |
 | Error | Storage blocked (private browsing, or storage turned off) → banner: "This browser isn't saving data, so bills will disappear when you close it. Turn off private browsing to keep them." The app still works for this session. |
 | Success | The first bill saves and opens `/bills/[id]` with a "Saved" message. **On hold (see Decision 12):** below the amounts, a one-time tip: "Add Bill Splitter to your Home Screen so your bills are kept. On iPhone: Share, then Add to Home Screen." It has a **Dismiss** button, and Dismiss hides it for good. It never appears before or during the first bill, and not at all if the app is already on the Home Screen. From then on, Home is the dashboard (Flow 3). |

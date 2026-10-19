@@ -486,3 +486,18 @@ Also reflect these changes in `flows.md`.
 **Pushed back:**
 - Money in two different fonts looked inconsistent.
 - Who owes you should come before Latest bill.
+
+## Step 14: A bare first visit (2026-10-19)
+
+**Asked:** On the first-visit page, remove "Bill Splitter" and the illustration, leaving just "Split a bill".
+
+**Made:**
+- The first-visit Home is now only "Split a bill" and the two quick-start cards. The arch illustration is gone (component deleted).
+- **Header:** it moved into a small client component, SiteHeader.
+  - It hides itself on Home until saved data is read, and stays hidden if there are no bills. So a first visit never shows the app name, and a returning visit shows it together with the rest of the page, with no pop-in.
+  - Every other page always shows it. It sits in Suspense with the plain header as its fallback, because `usePathname` needs that on pages with an id under Cache Components.
+  - The small arch beside the name stays.
+- **`flows.md`:** the navigation and look rules, the Flow 1 wireframe and its Loading / Empty states, and the Flow 1 diagram in both `flows.md` and `README.md`.
+- **Checks:** lint, a clean build, all 17 end-to-end checks, and a first-visit screenshot. The end-to-end checks now confirm a first visit has no header and no illustration, and that the header (no bar, no border, "Bill Splitter, home") is back once there's a bill.
+
+**Pushed back:** The app name and illustration were too much for the first screen.

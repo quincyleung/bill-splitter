@@ -1,12 +1,11 @@
 "use client";
 
-// Home has two faces. A first visit gets the welcome and the two quick starts.
+// Home has two faces. A first visit gets just "Split a bill" and the two quick starts.
 // Coming back gets "Welcome back", then, in order of weight: the big new-bill cards,
 // who still owes me and for how long, whom I owe, the latest bill, recurring bills
 // that are due, and the next few recent bills. Saved data decides which, so until
 // it's read the page shows the neutral loading shell, never the wrong one.
 
-import { ArchArt } from "@/components/home/arch-art";
 import { BalanceList } from "@/components/home/balance-list";
 import { QuickStarts } from "@/components/home/quick-starts";
 import { RecurringList } from "@/components/home/recurring-list";
@@ -39,11 +38,11 @@ export function HomeView() {
   return state.data.bills.length === 0 ? <FirstVisit /> : <Returning data={state.data} />;
 }
 
+/** Just "Split a bill" and the two cards: no app name, no illustration, no explanation. */
 function FirstVisit() {
   return (
     <>
-      <ArchArt />
-      <div className="mt-6">
+      <div className="pt-6">
         <PageTitle>Split a bill</PageTitle>
       </div>
       <div className="mt-6">
