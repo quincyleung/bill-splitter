@@ -296,3 +296,27 @@ Then commit.
 - Optional names looked cluttered.
 - The single-payer control looked like a multi-select.
 - Meal and Even split were really the same form, so Home is now One-time and Recurring.
+
+## Step 7: Tick off who's paid you back (2026-10-19)
+
+**Asked:** Let me check off who's paid me back. For example, after dinner with Josh and Julie, tick each of them off separately when they pay.
+
+**Made:**
+- **Bill page:**
+  - Each person who owes you has a tick box row with their name, "Owes you" or "Paid you back", and their amount, which is struck through once paid. It's a new shared CheckRow: a real checkbox with a square box, so it doesn't look like the round person chips.
+  - Untick to undo.
+  - The heading names only who still owes ("Josh owes you $30.00") with "1 of 2 paid" under it. Once the last person is ticked it becomes "All paid up", with the toast "Everyone's paid you back."
+  - On a bill someone else paid, the one tick box is "I paid Sam back".
+  - If saving fails, the tick stays as it was, with "Couldn't save that. Try again."
+- **Copy amounts** lists only people who haven't paid yet, and disappears when nobody owes.
+- **Home's "Your bills"** shows each bill's status: "1 of 2 paid", "All paid up", "Not paid back yet" or "Paid back".
+- `lib/bills.ts` decides which shares count as debts, whether a bill is settled, and its status. `flows.md` replaces the "Mark paid / Paid · Undo" buttons with tick boxes.
+- **Checks:** lint, build, and a new end-to-end step that splits a dinner with Josh and Julie and then:
+  - ticks Julie, then Josh, then unticks Josh;
+  - checks the toast and that Copy amounts disappears;
+  - reloads to confirm the ticks were saved;
+  - checks Home shows "1 of 2 paid".
+
+  All 15 end-to-end checks pass.
+
+**Pushed back:** Nothing. This was the planned "Mark paid", built as tick boxes because you asked to check people off.

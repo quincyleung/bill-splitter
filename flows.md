@@ -235,11 +235,12 @@ Fields: name ("Electricity"), date of this bill, amount and currency, roommates,
 When I paid:
 
 ```
-Dinner at Nopa · Oct 18 · $102.20 · You paid
-Sam and Jo owe you $68.35 · 0 of 2 paid
+Dinner at Aba · Oct 18 · $102.20 · You paid
+Josh owes you $40.25
+1 of 2 paid. Tick each person when they pay you back.
 
-Sam   $40.25   [Mark paid]
-Jo    $28.10   [Mark paid]
+[ ] Josh    Owes you         $40.25
+[✓] Julie   Paid you back    $28.10   (struck through)
 Your share $33.85
 [Show breakdown]  (each person's items)
 
@@ -250,14 +251,16 @@ When someone else paid:
 
 ```
 Electricity · Oct 1 · $126.00 · Sam paid
-You owe Sam $42.00   [I paid Sam back]
+You owe Sam $42.00
+[ ] I paid Sam back   Not paid back yet   $42.00
 Others' shares (between them and Sam): Jo $42.00
 
 [Edit]  [Delete]
 ```
 
-- **Mark paid** switches to "Paid · Undo", and **I paid Sam back** switches to "Paid back · Undo". Paid status is just yes or no.
-- **Copy amounts** (only on bills I paid) puts text like "I paid for Dinner at Nopa (Oct 18). Sam $40.25, Jo $28.10." on the clipboard to paste into the group chat. It stands on its own, so friends never need the app.
+- **Tick off each person** when they pay you back, one at a time; untick to undo. The heading then names only who still owes you, with "1 of 2 paid" under it, and becomes "All paid up" (with a "Everyone's paid you back." message) once the last one is ticked. On a bill someone else paid, the one tick box is **I paid Sam back**. Paid is just yes or no.
+- **Home's list** shows each bill's status: "1 of 2 paid", "All paid up", "Not paid back yet" or "Paid back".
+- **Copy amounts** (only on bills I paid) puts text like "I paid for Dinner at Aba (Oct 18). Josh $40.25." on the clipboard, listing only people who haven't paid yet, to paste into the group chat. It stands on its own, so friends never need the app.
 - **Edit** opens `/bills/[id]/edit` with the same form, filled in. If a person already marked paid ends up with a different share, they go back to unpaid: "Sam's share changed from $40.25 to $43.10, so they're unpaid again."
 - **Delete** asks first: "Delete Dinner at Nopa? This can't be undone."
 
@@ -298,7 +301,7 @@ Others' shares (between them and Sam): Jo $42.00
 | Name | Blank | "Name this bill, like Dinner at Aba." On a recurring bill: "Name this bill, like Electricity." |
 | Repeats (custom) | Blank, or outside 1–52 weeks or 1–12 months | "Enter how often, like every 3 months." |
 | Save | Storage full or blocked | Shown near Save: "Couldn't save on this phone. Everything you typed is still here. Try again." |
-| Mark paid | Couldn't save | The toggle switches back, with "Couldn't save that. Try again." |
+| Paid tick box | Couldn't save | The tick stays as it was, with "Couldn't save that. Try again." |
 
 **Warnings that don't block Save:**
 - "Jo isn't on any item, so they owe $0. Tick them on an item or remove them."

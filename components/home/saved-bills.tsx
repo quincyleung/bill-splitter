@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { paidStatus } from "@/lib/bills";
 import { formatDate } from "@/lib/dates";
 import { formatMoney } from "@/lib/money";
 import { useAppData } from "@/lib/store";
@@ -21,7 +22,9 @@ export function SavedBills() {
             <Link href={`/bills/${bill.id}`} className="flex min-h-11 items-center justify-between gap-3 px-4 py-3">
               <span>
                 <span className="block font-semibold text-ink">{bill.title}</span>
-                <span className="block text-sm text-ink-muted">{formatDate(bill.date)}</span>
+                <span className="block text-sm text-ink-muted">
+                  {formatDate(bill.date)} · {paidStatus(bill)}
+                </span>
               </span>
               <span className="font-semibold text-ink">{formatMoney(bill.total, bill.currency)}</span>
             </Link>
