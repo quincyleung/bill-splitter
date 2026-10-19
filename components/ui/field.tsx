@@ -19,7 +19,7 @@ export function describedBy(...ids: (string | false | undefined)[]): string | un
 
 export function FieldHint({ id, children }: { id: string; children: ReactNode }) {
   return (
-    <p id={id} className="mt-1 text-sm text-ink-muted">
+    <p id={id} className="type-small mt-1 text-ink-muted">
       {children}
     </p>
   );
@@ -27,14 +27,15 @@ export function FieldHint({ id, children }: { id: string; children: ReactNode })
 
 export function FieldError({ id, children }: { id: string; children: ReactNode }) {
   return (
-    <p id={id} className="mt-2 flex items-start gap-2 text-sm font-semibold text-danger">
+    <p id={id} className="type-small mt-2 flex items-start gap-2 font-semibold text-danger">
       <AlertIcon className="mt-0.5 size-4 shrink-0" />
       <span>{children}</span>
     </p>
   );
 }
 
-export const labelClass = "block text-base font-semibold text-ink";
+/** Greek Summer field labels: small uppercase, muted. */
+export const labelClass = "type-label block text-ink-muted";
 
 export function inputBorder(error?: string) {
   return error ? "border-danger" : "border-field";
@@ -42,5 +43,5 @@ export function inputBorder(error?: string) {
 
 /** The look of a plain text input, shared by TextField and AddField. */
 export function inputClass(error?: string) {
-  return `block min-h-11 w-full min-w-0 flex-1 rounded-lg border-2 bg-surface px-3 text-base text-ink placeholder:text-ink-muted ${inputBorder(error)}`;
+  return `block min-h-11 w-full min-w-0 flex-1 rounded-field border bg-surface px-3 text-[1.0625rem] text-ink transition-colors placeholder:text-ink-muted hover:border-ink focus:border-ink ${inputBorder(error)}`;
 }

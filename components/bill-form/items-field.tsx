@@ -68,7 +68,7 @@ export function ItemsField({ draft, people, errors, setDraft, requestFocus }: It
                     />
                     <FieldGroup legend="Who had it" error={errors[errorKey.who(item.key)]}>
                       {draft.ticked.length === 0 ? (
-                        <p className="text-base text-ink-muted">Tick people under Who was there first.</p>
+                        <p className="text-ink-muted">Tick people under Who was there first.</p>
                       ) : (
                         <div className="flex flex-wrap gap-2">
                           {draft.ticked.map((id) => (

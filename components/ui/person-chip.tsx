@@ -2,12 +2,12 @@
 
 // One person in "Who was there", "Who had it" or "Who paid". A real checkbox
 // underneath, so it's announced as "Sam, checkbox, checked": ticked shows a check mark
-// as well as the fill, so the state doesn't rely on colour. type="radio" is for
-// pick-one questions like "Who paid": it shows a radio dot and a light fill instead,
-// so it doesn't look like the tick-many chips. Put chips in a FieldGroup.
+// as well as the light blue fill and navy edge, so the state doesn't rely on colour.
+// type="radio" is for pick-one questions like "Who paid": it shows a Greek Summer radio
+// (a navy dot) and no fill, so it doesn't look like the tick-many chips. Put chips in a FieldGroup.
 
 import type { ComponentProps } from "react";
-import { CheckIcon, CircleIcon, RadioIcon } from "./icons";
+import { CheckIcon, RadioIcon } from "./icons";
 
 type PersonChipProps = Omit<ComponentProps<"input">, "type" | "className" | "checked" | "onChange"> & {
   /** The person's name as shown, e.g. "Me" or "Sam". */
@@ -20,8 +20,8 @@ type PersonChipProps = Omit<ComponentProps<"input">, "type" | "className" | "che
 export function PersonChip({ label, checked, onChange, type = "checkbox", ...inputProps }: PersonChipProps) {
   return (
     <label
-      className={`focus-ring-within inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full border-2 border-field bg-surface px-4 text-base font-semibold text-ink hover:bg-accent-soft has-[:checked]:border-accent ${
-        type === "radio" ? "has-[:checked]:bg-accent-soft" : "has-[:checked]:bg-accent has-[:checked]:text-on-accent"
+      className={`focus-ring-within press type-control inline-flex min-h-11 cursor-pointer items-center gap-2 rounded-full border border-field bg-surface px-4 text-ink hover:bg-accent-soft has-[:checked]:border-selected-border ${
+        type === "radio" ? "" : "has-[:checked]:bg-selected has-[:checked]:text-on-selected"
       }`}
     >
       <input
@@ -31,13 +31,7 @@ export function PersonChip({ label, checked, onChange, type = "checkbox", ...inp
         onChange={(event) => onChange(event.target.checked)}
         {...inputProps}
       />
-      {type === "radio" ? (
-        <RadioIcon checked={checked} className={`size-5 ${checked ? "text-accent" : ""}`} />
-      ) : checked ? (
-        <CheckIcon />
-      ) : (
-        <CircleIcon />
-      )}
+      {type === "radio" ? <RadioIcon checked={checked} /> : checked && <CheckIcon className="size-4" />}
       {label}
     </label>
   );

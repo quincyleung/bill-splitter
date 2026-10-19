@@ -16,7 +16,7 @@ export function HomeStatus() {
   }
   if (state.data.bills.length > 0) return null;
   return (
-    <p className="mt-2 text-base text-ink-muted">
+    <p className="mt-2 text-ink-muted">
       Pick one to start. Everything stays on this phone, and your friends don&apos;t need the app.
     </p>
   );

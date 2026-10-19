@@ -13,16 +13,16 @@ export function SavedBills() {
   const bills = [...state.data.bills].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   return (
     <section aria-labelledby="saved-bills" className="mt-8">
-      <h2 id="saved-bills" className="text-lg font-bold text-ink">
+      <h2 id="saved-bills" className="type-title text-ink">
         Your bills
       </h2>
-      <ul className="mt-3 divide-y divide-line rounded-2xl border border-line bg-surface">
+      <ul className="mt-3 divide-y divide-line overflow-hidden rounded-card border border-line bg-surface">
         {bills.map((bill) => (
           <li key={bill.id}>
-            <Link href={`/bills/${bill.id}`} className="flex min-h-11 items-center justify-between gap-3 px-4 py-3">
+            <Link href={`/bills/${bill.id}`} className="flex min-h-11 items-center justify-between gap-3 px-5 py-3 hover:bg-accent-soft">
               <span>
                 <span className="block font-semibold text-ink">{bill.title}</span>
-                <span className="block text-sm text-ink-muted">
+                <span className="type-small block text-ink-muted">
                   {formatDate(bill.date)} · {paidStatus(bill)}
                 </span>
               </span>

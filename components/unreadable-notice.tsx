@@ -42,8 +42,8 @@ export function UnreadableNotice({ raw }: { raw: string }) {
 
   return (
     <Card as="section">
-      <h2 className="text-lg font-bold text-ink">Couldn&apos;t read your saved bills</h2>
-      <p className="mt-2 text-base text-ink">
+      <h2 className="type-title text-ink">Couldn&apos;t read your saved bills</h2>
+      <p className="mt-2 text-ink">
         They may be damaged, or saved by a newer version of this app. Nothing has been deleted. Download a copy to keep
         it, or start fresh.
       </p>
@@ -56,7 +56,7 @@ export function UnreadableNotice({ raw }: { raw: string }) {
         </Button>
       </div>
       {confirming && (
-        <div ref={confirmRef} tabIndex={-1} className="mt-4 rounded-xl border-2 border-danger p-4 outline-none">
+        <div ref={confirmRef} tabIndex={-1} className="mt-4 rounded-field border border-danger p-4 outline-none">
           <p className="font-semibold text-ink">
             Delete everything saved on this phone and start fresh? This can&apos;t be undone.
           </p>

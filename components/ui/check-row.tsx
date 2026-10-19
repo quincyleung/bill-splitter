@@ -1,8 +1,8 @@
 "use client";
 
 // A full-width row you tick off, e.g. "Julie · $30.00" once she's paid you back.
-// A real checkbox underneath; the square box (not the round person chips) and the
-// "Paid" text show the state, so it doesn't rely on colour.
+// A real checkbox underneath, drawn as a Greek Summer checkbox (6px corners, navy when
+// ticked); the box, the struck-through amount and the status text show the state.
 
 import type { ComponentProps } from "react";
 
@@ -18,7 +18,7 @@ type CheckRowProps = Omit<ComponentProps<"input">, "type" | "className" | "check
 
 export function CheckRow({ label, detail, value, checked, onChange, ...inputProps }: CheckRowProps) {
   return (
-    <label className="focus-ring-within flex min-h-14 cursor-pointer items-center gap-3 rounded-xl px-3 py-2 hover:bg-accent-soft">
+    <label className="focus-ring-within press flex min-h-14 cursor-pointer items-center gap-3 rounded-field px-3 py-2 hover:bg-accent-soft">
       <input
         type="checkbox"
         className="sr-only"
@@ -26,32 +26,32 @@ export function CheckRow({ label, detail, value, checked, onChange, ...inputProp
         onChange={(event) => onChange(event.target.checked)}
         {...inputProps}
       />
-      <svg aria-hidden="true" viewBox="0 0 24 24" className="size-6 shrink-0">
+      <svg aria-hidden="true" viewBox="0 0 20 20" className="size-5 shrink-0">
         <rect
-          x="2"
-          y="2"
-          width="20"
-          height="20"
-          rx="5"
-          className={checked ? "fill-accent stroke-accent" : "fill-surface stroke-field"}
-          strokeWidth="2"
+          x="0.75"
+          y="0.75"
+          width="18.5"
+          height="18.5"
+          rx="6"
+          className={checked ? "fill-check stroke-check" : "fill-surface stroke-field"}
+          strokeWidth="1.5"
         />
         {checked && (
           <path
-            d="M7 12.5l3.5 3.5 6.5-8"
+            d="M5.5 10.5l3 3 6-6.5"
             fill="none"
-            strokeWidth="2.5"
+            strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="stroke-on-accent"
+            className="stroke-on-check"
           />
         )}
       </svg>
       <span className="flex-1">
-        <span className="block text-base font-semibold text-ink">{label}</span>
-        <span className="block text-sm text-ink-muted">{detail}</span>
+        <span className="block font-semibold text-ink">{label}</span>
+        <span className="type-small block text-ink-muted">{detail}</span>
       </span>
-      <span className={`text-base ${checked ? "text-ink-muted line-through" : "font-semibold text-ink"}`}>{value}</span>
+      <span className={checked ? "text-ink-muted line-through" : "font-semibold text-ink"}>{value}</span>
     </label>
   );
 }

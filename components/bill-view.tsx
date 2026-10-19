@@ -30,7 +30,7 @@ export function BillView({ params }: { params: Promise<{ id: string }> }) {
     return (
       <>
         <PageTitle>Bill not found</PageTitle>
-        <p className="mt-2 text-base text-ink">This bill isn&apos;t on this phone. It may have been deleted.</p>
+        <p className="mt-2 text-ink">This bill isn&apos;t on this phone. It may have been deleted.</p>
         <div className="mt-6">
           <ButtonLink href="/">Back to Home</ButtonLink>
         </div>
@@ -81,7 +81,7 @@ function BillDetails({ bill, people, series }: { bill: Bill; people: Person[]; s
   return (
     <>
       <PageTitle>{bill.title}</PageTitle>
-      <p className="mt-1 text-base text-ink-muted">
+      <p className="mt-1 text-ink-muted">
         {formatDate(bill.date)} · {money(bill.total)} · {youPaid ? "You paid" : `${name(bill.payerId)} paid`}
         {series && ` · Repeats ${frequencyLabel(series.frequency)}`}
       </p>
@@ -90,7 +90,7 @@ function BillDetails({ bill, people, series }: { bill: Bill; people: Person[]; s
         <Card as="section">
           {youPaid ? (
             <>
-              <h2 className="text-lg font-bold text-ink">
+              <h2 className="type-title text-ink">
                 {owed.length === 0
                   ? "Nobody owes you on this bill"
                   : unpaid.length === 0
@@ -98,7 +98,7 @@ function BillDetails({ bill, people, series }: { bill: Bill; people: Person[]; s
                     : `${listNames(unpaid.map((s) => name(s.personId)))} ${unpaid.length === 1 ? "owes" : "owe"} you ${money(unpaid.reduce((sum, s) => sum + s.amount, 0))}`}
               </h2>
               {owed.length > 0 && (
-                <p className="mt-1 text-sm text-ink-muted">
+                <p className="mt-1 type-small text-ink-muted">
                   {owed.length - unpaid.length} of {owed.length} paid. Tick each person when they pay you back.
                 </p>
               )}
@@ -115,11 +115,11 @@ function BillDetails({ bill, people, series }: { bill: Bill; people: Person[]; s
                   </li>
                 ))}
               </ul>
-              {myShare && <p className="mt-2 text-base text-ink-muted">Your share {money(myShare.amount)}</p>}
+              {myShare && <p className="mt-2 text-ink-muted">Your share {money(myShare.amount)}</p>}
             </>
           ) : (
             <>
-              <h2 className="text-lg font-bold text-ink">
+              <h2 className="type-title text-ink">
                 {myShare?.paid
                   ? `You've paid ${name(bill.payerId)} back`
                   : `You owe ${name(bill.payerId)} ${money(myShare?.amount ?? 0)}`}
@@ -136,7 +136,7 @@ function BillDetails({ bill, people, series }: { bill: Bill; people: Person[]; s
                 </div>
               )}
               {othersWithPayer.length > 0 && (
-                <p className="mt-2 text-base text-ink-muted">
+                <p className="mt-2 text-ink-muted">
                   Others&apos; shares, between them and {name(bill.payerId)}:{" "}
                   {othersWithPayer.map((s) => `${name(s.personId)} ${money(s.amount)}`).join(", ")}
                 </p>
@@ -144,7 +144,7 @@ function BillDetails({ bill, people, series }: { bill: Bill; people: Person[]; s
             </>
           )}
           {saveError && (
-            <p role="alert" className="mt-3 flex items-start gap-2 text-sm font-semibold text-danger">
+            <p role="alert" className="mt-3 flex items-start gap-2 type-small font-semibold text-danger">
               <AlertIcon className="mt-0.5 size-4 shrink-0" />
               {saveError}
             </p>

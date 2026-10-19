@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Manrope, Marcellus } from "next/font/google";
 import Link from "next/link";
 import { StorageBanner } from "@/components/storage-banner";
 import { Toaster } from "@/components/ui/toast";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+// Greek Summer type: Marcellus (carved Roman capitals) for headings, Manrope for everything else.
+const marcellus = Marcellus({ weight: "400", subsets: ["latin"], variable: "--nf-marcellus" });
+const manrope = Manrope({ subsets: ["latin"], variable: "--nf-manrope" });
 
 export const metadata: Metadata = {
   title: { template: "%s · Bill Splitter", default: "Bill Splitter" },
@@ -17,18 +16,18 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${geistSans.variable} h-full antialiased`}>
+    <html lang="en" className={`${marcellus.variable} ${manrope.variable} h-full antialiased`}>
       <body className="flex min-h-full flex-col bg-canvas font-sans text-ink">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-4 focus:z-50 focus:rounded-lg focus:bg-surface focus:px-4 focus:py-3 focus:font-semibold"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-4 focus:z-50 focus:rounded-full focus:bg-surface focus:px-4 focus:py-3 focus:font-semibold"
         >
           Skip to main content
         </a>
         <header className="border-b border-line bg-surface">
           <div className="mx-auto max-w-xl px-4 py-1">
             {/* No tabs: Home's quick starts cover them. The app name is the way back to Home. */}
-            <Link href="/" className="inline-flex min-h-11 items-center text-lg font-bold text-ink">
+            <Link href="/" className="type-title inline-flex min-h-11 items-center text-ink">
               Bill Splitter<span className="sr-only">, home</span>
             </Link>
           </div>

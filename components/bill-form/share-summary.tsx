@@ -21,19 +21,19 @@ export function ShareSummary({ draft, people, warnings }: ShareSummaryProps) {
 
   let body;
   if (preview.state === "incomplete") {
-    body = <p className="text-base text-ink-muted">{preview.message}</p>;
+    body = <p className="text-ink-muted">{preview.message}</p>;
   } else if (preview.state === "items-only") {
     body = (
       <>
         <ul className="divide-y divide-line">
           {draft.ticked.map((id) => (
-            <li key={id} className="flex justify-between gap-3 py-2 text-base">
+            <li key={id} className="flex justify-between gap-3 py-2">
               <span className="text-ink">{id === ME ? "Your items" : name(id)}</span>
               <span className="font-semibold text-ink">{money(preview.itemTotals.get(id) ?? 0)}</span>
             </li>
           ))}
         </ul>
-        <p className="mt-2 text-sm text-ink-muted">Plus tax and tip once you enter the total.</p>
+        <p className="mt-2 type-small text-ink-muted">Plus tax and tip once you enter the total.</p>
       </>
     );
   } else {
@@ -47,30 +47,30 @@ export function ShareSummary({ draft, people, warnings }: ShareSummaryProps) {
     body = (
       <>
         {!youPaid && meOnBill && (
-          <p className="text-base font-semibold text-ink">
+          <p className="font-semibold text-ink">
             You owe {name(draft.payerId)} {money(share(ME))}
           </p>
         )}
         {!youPaid && rows.length > 0 && (
-          <p className="mt-2 text-sm text-ink-muted">Others&apos; shares, between them and {name(draft.payerId)}:</p>
+          <p className="mt-2 type-small text-ink-muted">Others&apos; shares, between them and {name(draft.payerId)}:</p>
         )}
         {youPaid && rows.length === 0 && (
-          <p className="text-base text-ink-muted">Add someone to see what they owe you.</p>
+          <p className="text-ink-muted">Add someone to see what they owe you.</p>
         )}
         <ul className="divide-y divide-line">
           {rows.map((id) => (
-            <li key={id} className="flex justify-between gap-3 py-2 text-base">
+            <li key={id} className="flex justify-between gap-3 py-2">
               <span className="text-ink">
                 {name(id)}
-                {breakdown(id) && <span className="block text-sm text-ink-muted">{breakdown(id)}</span>}
+                {breakdown(id) && <span className="block type-small text-ink-muted">{breakdown(id)}</span>}
               </span>
               <span className="font-semibold text-ink">{money(share(id))}</span>
             </li>
           ))}
         </ul>
-        {youPaid && meOnBill && <p className="mt-2 text-base text-ink-muted">Your share {money(share(ME))}</p>}
+        {youPaid && meOnBill && <p className="mt-2 text-ink-muted">Your share {money(share(ME))}</p>}
         {preview.items && (
-          <p className="mt-2 text-sm text-ink-muted">
+          <p className="mt-2 type-small text-ink-muted">
             Items {money(preview.items.subtotal)} · tax and tip {money(preview.total - preview.items.subtotal)} (
             {Math.round(((preview.total - preview.items.subtotal) / preview.items.subtotal) * 100)}%)
           </p>
@@ -81,12 +81,12 @@ export function ShareSummary({ draft, people, warnings }: ShareSummaryProps) {
 
   return (
     <Card as="section">
-      <h2 className="mb-2 text-lg font-bold text-ink">{youPaid ? "Who owes you" : `What you owe ${name(draft.payerId)}`}</h2>
+      <h2 className="type-title mb-2 text-ink">{youPaid ? "Who owes you" : `What you owe ${name(draft.payerId)}`}</h2>
       {body}
       {preview.state === "ready" && warnings.length > 0 && (
         <ul className="mt-3 space-y-2">
           {warnings.map((warning) => (
-            <li key={warning} className="flex items-start gap-2 text-sm font-semibold text-ink">
+            <li key={warning} className="flex items-start gap-2 type-small font-semibold text-ink">
               <AlertIcon className="mt-0.5 size-4 shrink-0 text-danger" />
               {warning}
             </li>

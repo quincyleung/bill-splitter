@@ -7,12 +7,13 @@ type ButtonProps = Omit<ComponentProps<"button">, "className"> & {
   fullWidth?: boolean;
 };
 
+// Greek Summer: pill-shaped, no shadow. Aegean blue only for the main action.
 const base =
-  "inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-5 py-2 text-base font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-60";
+  "type-control press inline-flex min-h-11 items-center justify-center gap-2 rounded-full px-5 py-2.5 disabled:cursor-not-allowed disabled:opacity-60";
 
 const variants: Record<ButtonVariant, string> = {
-  primary: "bg-accent text-on-accent hover:bg-accent-hover",
-  secondary: "border-2 border-accent bg-surface text-accent hover:bg-accent-soft",
+  primary: "bg-accent text-on-accent hover:bg-accent-hover active:bg-accent-pressed",
+  secondary: "border border-field bg-surface text-ink hover:bg-accent-soft active:border-ink active:bg-soft-pressed",
 };
 
 /** Shared with ButtonLink so links that act like buttons look the same. */

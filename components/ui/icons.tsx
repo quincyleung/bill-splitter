@@ -10,20 +10,18 @@ export function CheckIcon({ className = "size-5" }: IconProps) {
   );
 }
 
-export function CircleIcon({ className = "size-5" }: IconProps) {
+/** A radio button: an empty ring, or a navy disc with a white dot when chosen. */
+export function RadioIcon({ checked, className = "size-5 shrink-0" }: IconProps & { checked: boolean }) {
   return (
-    <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
-      <circle cx="10" cy="10" r="7" />
-    </svg>
-  );
-}
-
-/** A radio button's ring, with a dot when chosen. */
-export function RadioIcon({ checked, className = "size-5" }: IconProps & { checked: boolean }) {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className={className}>
-      <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="2" />
-      {checked && <circle cx="10" cy="10" r="3.5" fill="currentColor" />}
+    <svg aria-hidden="true" viewBox="0 0 20 20" className={className}>
+      {checked ? (
+        <>
+          <circle cx="10" cy="10" r="9" className="fill-check" />
+          <circle cx="10" cy="10" r="3.5" className="fill-on-check" />
+        </>
+      ) : (
+        <circle cx="10" cy="10" r="8.25" fill="none" strokeWidth="1.5" className="stroke-field" />
+      )}
     </svg>
   );
 }

@@ -2,6 +2,7 @@
 
 // A row of options where exactly one is chosen, e.g. Repeats: Weekly / Every 2 weeks /
 // Monthly / Custom. Built on real radio buttons, so arrow keys and screen readers work.
+// Greek Summer chips: the chosen one gets the light blue "selected" fill, a navy edge and a tick.
 
 import { describedBy, FieldError, FieldHint, labelClass, useFieldIds } from "./field";
 import { CheckIcon } from "./icons";
@@ -32,15 +33,11 @@ export function SegmentedControl<T extends string>({
     <fieldset aria-describedby={describedBy(hint && hintId, error && errorId)} data-invalid={error ? "" : undefined}>
       <legend className={labelClass}>{legend}</legend>
       {hint && <FieldHint id={hintId}>{hint}</FieldHint>}
-      <div
-        className={`mt-2 grid auto-cols-fr grid-flow-col gap-1 rounded-xl border-2 bg-surface p-1 ${
-          error ? "border-danger" : "border-field"
-        }`}
-      >
+      <div className="mt-2 flex flex-wrap gap-2">
         {options.map((option) => (
           <label
             key={option.value}
-            className="focus-ring-within flex min-h-11 cursor-pointer items-center justify-center gap-1 rounded-lg px-2 py-1 text-center text-sm font-semibold text-ink hover:bg-accent-soft has-[:checked]:bg-accent has-[:checked]:text-on-accent"
+            className="focus-ring-within press type-control inline-flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border border-field bg-surface px-4 text-ink hover:bg-accent-soft has-[:checked]:border-selected-border has-[:checked]:bg-selected has-[:checked]:text-on-selected"
           >
             <input
               type="radio"

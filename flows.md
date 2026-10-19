@@ -43,6 +43,7 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 - **Currency:** shown next to the amount field with a **Change** button. The picker lists my recent currencies first, then every other one from the browser's built-in list. Amounts in different currencies are never added together or converted.
 - **Loading state:** saved data can only be read in the browser, so each page shows a neutral shell until it has loaded. A returning user never sees a flash of the empty first-visit screen.
 - **Number fields** open the decimal keypad and accept `12`, `12.5` or `$12.50`.
+- **Look:** the Greek Summer design system from the recipe-book project: Marcellus headings, Manrope text, small uppercase field labels, navy on warm white, Aegean blue only for the main action, light-blue fill for anything selected, pill buttons and chips, 12px fields, 20px cards with a thin limestone line and no shadows. Light only. Home has its arches.
 - **Labels:** no question marks ("Who paid", not "Who paid?"), and no "(optional)": every field on a bill is needed, including each item's name.
 - **Hints:** fields show an example under their label, such as "Like Dinner at Nopa" or "Like 12.50". Placeholders never stand in for labels. There are no sample bills, because fake bills would mix into real balances.
 - **On Save:** errors appear next to their fields, focus moves to the first one, and nothing typed is cleared.

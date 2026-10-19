@@ -23,9 +23,9 @@ export function MoneyField({ label, hint, error, id, currency, ...inputProps }: 
       </label>
       {hint && <FieldHint id={hintId}>{hint}</FieldHint>}
       <div
-        className={`focus-ring-within mt-2 flex min-h-11 items-center rounded-lg border-2 bg-surface ${inputBorder(error)}`}
+        className={`focus-ring-within mt-2 flex min-h-11 items-center rounded-field border bg-surface transition-colors hover:border-ink has-[:focus]:border-ink ${inputBorder(error)}`}
       >
-        <span aria-hidden="true" className="pl-3 text-base text-ink-muted">
+        <span aria-hidden="true" className="pl-3 text-[1.0625rem] text-ink-muted">
           {currencySymbol(currency)}
         </span>
         <span id={currencyId} className="sr-only">
@@ -38,7 +38,7 @@ export function MoneyField({ label, hint, error, id, currency, ...inputProps }: 
           id={fieldId}
           aria-describedby={describedBy(currencyId, hint && hintId, error && errorId)}
           aria-invalid={error ? true : undefined}
-          className="min-h-11 w-full rounded-lg bg-transparent px-2 text-base text-ink focus-visible:outline-none"
+          className="min-h-11 w-full rounded-field bg-transparent px-2 text-[1.0625rem] text-ink focus-visible:outline-none"
           {...inputProps}
         />
       </div>

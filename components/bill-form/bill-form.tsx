@@ -264,7 +264,7 @@ export function BillForm({ preset, people, onSaved }: BillFormProps) {
 
       <div>
         {saveError && (
-          <p role="alert" className="mb-3 flex items-start gap-2 text-sm font-semibold text-danger">
+          <p role="alert" className="mb-3 flex items-start gap-2 type-small font-semibold text-danger">
             <AlertIcon className="mt-0.5 size-4 shrink-0" />
             {saveError}
           </p>

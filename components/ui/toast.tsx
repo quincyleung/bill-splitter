@@ -63,7 +63,7 @@ export function Toaster() {
       <div
         className={
           toast
-            ? "pointer-events-auto flex w-full max-w-md items-center gap-3 rounded-xl bg-ink py-2 pr-2 pl-4 text-canvas shadow-lg"
+            ? "pointer-events-auto flex w-full max-w-md items-center gap-3 rounded-field bg-ink py-2 pr-2 pl-4 text-surface"
             : ""
         }
         onMouseEnter={pause}
@@ -71,14 +71,14 @@ export function Toaster() {
         onFocus={pause}
         onBlur={resume}
       >
-        <div role="status" className="flex-1 text-base">
+        <div role="status" className="flex-1">
           {toast?.message}
         </div>
         {toast && (
           <button
             type="button"
             onClick={() => dismissToast(toast.id)}
-            className="min-h-11 rounded-lg px-3 font-semibold underline focus-visible:outline-canvas"
+            className="type-control min-h-11 rounded-full px-3 underline focus-visible:outline-surface"
           >
             Dismiss
           </button>

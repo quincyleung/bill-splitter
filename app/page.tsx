@@ -1,3 +1,4 @@
+import { ArchArt } from "@/components/home/arch-art";
 import { HomeStatus } from "@/components/home/home-status";
 import { QuickStarts } from "@/components/home/quick-starts";
 import { SavedBills } from "@/components/home/saved-bills";
@@ -7,7 +8,10 @@ import { PageTitle } from "@/components/ui/page-title";
 export default function HomePage() {
   return (
     <>
-      <PageTitle>Split a bill</PageTitle>
+      <ArchArt />
+      <div className="mt-6">
+        <PageTitle>Split a bill</PageTitle>
+      </div>
       <HomeStatus />
       <div className="mt-6">
         <QuickStarts />

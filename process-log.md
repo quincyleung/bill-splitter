@@ -320,3 +320,31 @@ Then commit.
   All 15 end-to-end checks pass.
 
 **Pushed back:** Nothing. This was the planned "Mark paid", built as tick boxes because you asked to check people off.
+
+## Step 8: Greek Summer design system (2026-10-19)
+
+**Asked:** Use the Greek Summer design system from the recipe-book project (in the same projects folder) and make everything in that style.
+
+**Made:**
+- **Read the source:** recipe-book's `app/_ds/themes.ts` (colours, type roles, shape), `app/_ds/components.tsx`, `app/_fonts.ts` and `globals.css`, then carried them over:
+  - **Tokens in `app/globals.css`:** navy `#14305C` text on warm white `#F7F5F0`, a limestone `#E7DCC6` line, and Aegean blue `#1D4E9E` reserved for the main action. Light-blue `#BCD4EC` with a navy edge marks selected chips, a navy `check` fills checkboxes and radios, the gold badge, and a 2px focus ring. It's light only, like the source, so the dark mode is gone. Every pair was checked against AA: text 4.5:1, field outlines 3:1.
+  - **Type:** Marcellus (via `next/font`, no package) for page titles, card headings and the app name, and Manrope for everything else. Field labels are small uppercase, as in the recipe-book.
+  - **Shape:**
+    - pill-shaped buttons and chips;
+    - 12px fields;
+    - 20px cards with a thin limestone line and no shadow;
+    - 6px checkboxes;
+    - a slight shrink when pressed.
+- **Components:**
+  - Buttons: the primary is Aegean blue; the secondary is a white pill with a slate outline.
+  - Chips and How to split / Repeats: light-blue selected chips with a tick.
+  - Who paid: Greek Summer radios.
+  - Paid tick boxes: navy checkboxes.
+  - The toast is navy.
+  - Home: One-time is the one blue main action and Recurring is a white card, under a small arch drawing (whitewashed arches, blue doors, a gold sun) taken from the style's artwork.
+- **Docs:** added the look to `flows.md` and AGENTS.md.
+- **Checks:**
+  - A first build kept serving the old stylesheet because of a stale Turbopack cache in `.next`. Deleting `.next` fixed it. If old styles show up in `npm run dev`, do the same.
+  - Lint, build, all 15 end-to-end checks, and screenshots of Home, the form, the bill page and the error state.
+
+**Pushed back:** Nothing.
