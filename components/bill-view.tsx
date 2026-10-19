@@ -15,6 +15,7 @@ import { breakdownFor } from "@/lib/breakdown";
 import { copyText } from "@/lib/clipboard";
 import { formatDate } from "@/lib/dates";
 import { type Bill, ME, type Person, type RecurringBill, type Share } from "@/lib/model";
+import { shareMessage } from "@/lib/messages";
 import { formatMoney } from "@/lib/money";
 import { personName } from "@/lib/people";
 import { frequencyLabel } from "@/lib/recurring";
@@ -70,7 +71,7 @@ function BillDetails({ bill, people, series }: { bill: Bill; people: Person[]; s
   }
 
   async function copyMessage(share: Share) {
-    const copied = await copyText(`${bill.title}: you owe me ${money(share.amount)}`);
+    const copied = await copyText(shareMessage(bill, share.personId));
     showToast(copied ? `Copied a message for ${name(share.personId)}.` : "Couldn't copy. Try again.");
   }
 

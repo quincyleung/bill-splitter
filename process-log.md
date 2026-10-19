@@ -447,3 +447,24 @@ Also reflect these changes in `flows.md`.
 - The header bar felt separate from the page.
 - The first-visit line was redundant.
 - New card text.
+
+## Step 12: A friendlier copied message (2026-10-19)
+
+**Asked:** For the copied message, use the event's name, then what they had and how much each part was, to give a total, instead of "you owe me X", which feels blunt to send a friend.
+
+**Made:**
+- `lib/messages.ts` builds each person's message from the same breakdown as their card, so the two always match. By item:
+
+  ```
+  Dinner at Aba (Oct 5)
+  Lamb shoulder: $38.00
+  Mezze (shared by 3): $8.00
+  Tax and tip: $12.16
+  Your total: $58.16
+  ```
+
+  Evenly: "Uber home (Oct 19) / $24.80 split 2 ways / Your total: $12.40". The tax and tip line only appears when there was any.
+- `flows.md` updated (Decision 11 and the Copy message rule).
+- **Checks:** logic tests for the by-item and even messages; in headless Chrome, the clipboard held "Dinner with Josh and Julie (Oct 19) / $90.00 split 3 ways / Your total: $30.00". All 17 end-to-end checks pass.
+
+**Pushed back:** "You owe me $X" was too blunt.

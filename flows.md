@@ -18,7 +18,7 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 | 8 | Person page | Keep |
 | 9 | Edit a saved bill | Keep, built after the core flows |
 | 10 | Autosaved draft | Keep. One draft at a time. |
-| 11 | Copy message | One per person on bills I paid, short enough to paste anywhere: "Dinner at Aba: you owe me $40.25". |
+| 11 | Copy message | One per person on bills I paid: the bill's name and date, what they had and what each part came to, then their total. Friendlier than "you owe me $X". |
 | 12 | iPhone data loss | Installable to the Home Screen (web app manifest), suggested once after the first bill is saved. Export/Import backup later. **On hold:** on iPhone, a site added to the Home Screen gets its own storage, separate from Safari's, so bills saved before adding it wouldn't show up there. Decide how to handle that before building the tip. |
 | 13 | Recurring split | Even only |
 | 14 | New people and hints (from research.md) | Someone I've just added is ticked for this bill. Fields show example hints. No sample bills. |
@@ -281,7 +281,17 @@ Others' shares, between them and Sam: Jo $42.00
 - **Each person has a card** with their share and how it was worked out. By item: their items (shared ones say "shared by 3" and show their part), the items subtotal, then their share of tax and tip with the rate ("Tax and tip (26% of items) +$12.16"). The lines add up to their share. Evenly: "$90.00 split 3 ways". My own share gets a card too, without the controls.
 - **Mark paid** is a checkbox on each card. Tick it when that person pays you back, one at a time; untick to undo. Paid amounts are struck through. The heading names only who still owes you, with "1 of 2 paid" under it, and becomes "All paid up" (with "Everyone's paid you back.") once the last one is ticked. On a bill someone else paid, **Mark paid** on my card means I've paid them back. Paid is just yes or no.
 - **Home's list** shows each bill's status: "1 of 2 paid", "All paid up", "Not paid back yet" or "Paid back".
-- **Copy message** is on each unpaid person's card (only on bills I paid). It copies a short text to send them: "Dinner at Aba: you owe me $40.25". It stands on its own, so friends never need the app.
+- **Copy message** is on each unpaid person's card (only on bills I paid). It copies a short, friendly breakdown to send them, matching their card, so friends never need the app:
+
+  ```
+  Dinner at Aba (Oct 5)
+  Lamb shoulder: $38.00
+  Mezze (shared by 3): $8.00
+  Tax and tip: $12.16
+  Your total: $58.16
+  ```
+
+  An even split reads "Uber home (Oct 19) / $24.80 split 2 ways / Your total: $12.40".
 - **Home's "Who owes you"** adds up what each person owes across all bills I paid (per currency, never converted), with the bills it's for as links: "Josh $70.25. For Dinner at Aba ($40.25), Uber home ($30.00)".
 - **Edit** opens `/bills/[id]/edit` with the same form, filled in. If a person already marked paid ends up with a different share, they go back to unpaid: "Sam's share changed from $40.25 to $43.10, so they're unpaid again."
 - **Delete** asks first: "Delete Dinner at Nopa? This can't be undone."
