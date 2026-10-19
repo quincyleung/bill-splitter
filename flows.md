@@ -18,9 +18,10 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 | 8 | Person page | Keep |
 | 9 | Edit a saved bill | Keep, built after the core flows |
 | 10 | Autosaved draft | Keep. One draft at a time. |
-| 11 | Copy amounts | Keep, on bills I paid |
-| 12 | iPhone data loss | Installable to the Home Screen (web app manifest). Export/Import backup later. |
+| 11 | Copy amounts | Keep, on bills I paid. The text stands on its own: "I paid for Dinner at Nopa (Oct 18). Sam $40.25, Jo $28.10." |
+| 12 | iPhone data loss | Installable to the Home Screen (web app manifest), suggested once after the first bill is saved. Export/Import backup later. |
 | 13 | Recurring split | Even only |
+| 14 | New people and hints (from research.md) | Someone I've just added is ticked for this bill. Fields show example hints. No sample bills. |
 
 ## Rules every flow follows
 
@@ -37,11 +38,12 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 - **Who paid:** every bill has one payer. It defaults to Me, and can be anyone ticked on the bill.
 - **Debts:** if I paid, everyone else on the bill owes me their share. If someone else paid, I owe them my share. What the others owe them is shown for reference but not tracked.
 - **Me:** I'm in every split by default, with my own items. I can untick myself only on a bill I paid.
-- **People are saved automatically** the first time I type a name. The picker lists the people I used most recently first.
+- **People are saved automatically** the first time I type a name, and someone I've just added is ticked for this bill straight away. People saved from earlier bills stay unticked until I tap them. The picker lists the people I used most recently first.
 - **Money is stored in the currency's smallest unit** (cents; yen has none). Shares always add up to the exact total, and leftover units go to whoever paid.
 - **Currency:** shown next to the amount field with a **Change** button. The picker lists my recent currencies first, then every other one from the browser's built-in list. Amounts in different currencies are never added together or converted.
 - **Loading state:** saved data can only be read in the browser, so each page shows a neutral shell until it has loaded. A returning user never sees a flash of the empty first-visit screen.
 - **Number fields** open the decimal keypad and accept `12`, `12.5` or `$12.50`.
+- **Hints:** fields show an example under their label, such as "Like Dinner at Nopa" or "Like 12.50". Placeholders never stand in for labels. There are no sample bills, because fake bills would mix into real balances.
 - **On Save:** errors appear next to their fields, focus moves to the first one, and nothing typed is cleared.
 
 ## Reading the diagrams
@@ -69,10 +71,11 @@ flowchart TD
   noPeople["Empty: Who was there shows only Me<br/>and an Add a person field"] --> addName{"Type a name, press Add"}
   addName -->|Blank| errName["Error: 'Type a name, then press Add.'"]
   errName --> addName
-  addName -->|Name typed| savedPerson["Person added and saved for next time"]
+  addName -->|Name typed| savedPerson["Person added, ticked for this bill<br/>and saved for next time"]
   savedPerson --> mainTask[["Finish the bill: Flow 2"]]
   mainTask --> firstBill["Success: first bill saved,<br/>opens /bills/[id]"]
-  firstBill --> dashboard[["Home is now the dashboard: Flow 3"]]
+  firstBill --> homeTip["One-time tip: add to Home Screen<br/>so bills are kept. Dismiss hides it"]
+  homeTip --> dashboard[["Home is now the dashboard: Flow 3"]]
 
   classDef error stroke:#c62828,stroke-width:2px
   classDef empty stroke-dasharray:6 4
@@ -97,9 +100,9 @@ Friends don't need the app.
 |---|---|
 | Loading | Just the app name, with no buttons yet. |
 | Empty | The welcome text and three start buttons above. No sign-up, no tutorial, no asking for my name. |
-| Partly filled | On the first form, "Who was there" shows only **Me** plus an "Add a person" field, because nobody is saved yet. |
+| Partly filled | On the first form, "Who was there" shows only **Me** plus an "Add a person" field, because nobody is saved yet. Anyone I add is ticked straight away. |
 | Error | Storage blocked (private browsing, or storage turned off) → banner: "This browser isn't saving data, so bills will disappear when you close it. Turn off private browsing to keep them." The app still works for this session. |
-| Success | The first bill saves and opens `/bills/[id]`. From then on, Home is the dashboard (Flow 3). |
+| Success | The first bill saves and opens `/bills/[id]`. Below the amounts there's a one-time tip: "Add Bill Splitter to your Home Screen so your bills are kept. On iPhone: Share, then Add to Home Screen." It has a **Dismiss** button, and Dismiss hides it for good. It never appears before or during the first bill, and not at all if the app is already on the Home Screen. From then on, Home is the dashboard (Flow 3). |
 
 ## Flow 2: Main task (add → split → who owes whom → paid)
 
@@ -257,7 +260,7 @@ Others' shares (between them and Sam): Jo $42.00
 ```
 
 - **Mark paid** switches to "Paid · Undo", and **I paid Sam back** switches to "Paid back · Undo". Paid status is just yes or no.
-- **Copy amounts** (only on bills I paid) puts text like "Dinner at Nopa (Oct 18): Sam $40.25, Jo $28.10" on the clipboard to paste into the group chat.
+- **Copy amounts** (only on bills I paid) puts text like "I paid for Dinner at Nopa (Oct 18). Sam $40.25, Jo $28.10." on the clipboard to paste into the group chat. It stands on its own, so friends never need the app.
 - **Edit** opens `/bills/[id]/edit` with the same form, filled in. If a person already marked paid ends up with a different share, they go back to unpaid: "Sam's share changed from $40.25 to $43.10, so they're unpaid again."
 - **Delete** asks first: "Delete Dinner at Nopa? This can't be undone."
 
@@ -381,7 +384,7 @@ Bills
 
 - **Saved data can't be read** (damaged, or from an older version) → "Couldn't read your saved bills." The data isn't wiped silently. Instead there are two choices: **Download my data** (a file) or **Start fresh** (asks first).
 - **Bill or person not found** (deleted, or a link opened on another device) → "This bill isn't on this phone. It may have been deleted." plus a link to Home.
-- **iPhone risk:** Safari can delete a site's saved data after 7 days of using Safari without opening the site. Sites added to the Home Screen are exempt, so the app is installable to the Home Screen.
+- **iPhone risk:** Safari can delete a site's saved data after 7 days of using Safari without opening the site. Sites added to the Home Screen are exempt, so the app is installable to the Home Screen and suggests it once, after the first bill is saved.
 
 ## Cut
 

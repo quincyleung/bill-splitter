@@ -18,7 +18,7 @@ Researched 2026-10-19. Three agents worked in parallel, one per app: Splitwise, 
 | **Do friends need the app or an account?** | An account to view or add expenses (the website works). A new "Itemize" QR flow (US and UK, October 2026) lets guests join with neither. | Joining needs the app, but a friend can just be a name | A view-only web link: "They won't have to log in" |
 | **What reviews say** | **+** easy once everyone's on it. **−** everyone has to sign up, the daily cap, the paywall. | **+** fast, free, no ads. **−** the app is now required, the 2024 redesign removed features, worries about bunq. | **+** "fastest expense adding", view links. **−** slow to add people, unskippable ads, forced login. |
 
-**Our planned flow, for comparison** (`flows.md`, Flow 1 into Even split): tap **Even split**, type a friend's name, press **Add**, enter the amount, press **Save**. That's **about 5 steps**, if a person you've just added is ticked automatically.
+**Our planned flow, for comparison** (`flows.md`, Flow 1 into Even split): tap **Even split**, type a friend's name, press **Add**, enter the amount, press **Save**. That's **about 5 steps**, because a person you've just added is ticked automatically.
 
 ## Patterns worth using
 
@@ -41,12 +41,14 @@ Researched 2026-10-19. Three agents worked in parallel, one per app: Splitwise, 
 3. **Interrupting early use with limits, ads or promotions.** Splitwise has a daily cap, a countdown and a paywall after a few expenses. Settle Up shows an ad after every 3rd expense. Tricount pushes the bunq card.
    *For us:* none of these. Even our own "Add to Home Screen" tip should only appear after the first bill is saved, never before or during it.
 
-## Possible changes to flows.md (not made)
+## Changes made to flows.md
+
+All four were added to `flows.md` on 2026-10-19:
 
 - A person you've just added is ticked automatically.
-- Example hint text under fields.
-- The Home Screen tip appears after the first save, and can be dismissed.
-- The wording of the "Copy amounts" text.
+- Example hint text under fields, and no sample bills.
+- The Home Screen tip appears once, after the first save, and can be dismissed.
+- The "Copy amounts" text stands on its own: "I paid for Dinner at Nopa (Oct 18). Sam $40.25, Jo $28.10."
 
 ## Gaps and caveats
 

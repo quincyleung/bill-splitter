@@ -81,3 +81,19 @@
 - The app and `flows.md` are unchanged.
 
 **Pushed back:** Nothing.
+
+## Step 4, continued: Research changes added to the flows (2026-10-19)
+
+**Asked:** You liked suggested changes 2–4 from the research and asked what change 1 ("a person you've just added is ticked automatically") meant. After my explanation you kept it too, and asked me to commit and push.
+
+**Made:**
+- Explained change 1 with a before/after of the "Who was there" chips. Typing a name and pressing Add both saves the person and ticks them for this bill. People saved from earlier bills stay unticked.
+- Added all four changes to `flows.md`:
+  - new people ticked automatically;
+  - example hints under fields, and no sample bills;
+  - a one-time Home Screen tip after the first save, which can be dismissed;
+  - "Copy amounts" text that stands on its own.
+- Updated the Flow 1 diagram in both `flows.md` and `README.md` (still identical), and the decisions table.
+- Marked the suggestions in `research.md` as made.
+
+**Pushed back:** You asked what change 1 meant before agreeing to it. Once it was explained, you kept all four.

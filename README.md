@@ -27,10 +27,11 @@ flowchart TD
   noPeople["Empty: Who was there shows only Me<br/>and an Add a person field"] --> addName{"Type a name, press Add"}
   addName -->|Blank| errName["Error: 'Type a name, then press Add.'"]
   errName --> addName
-  addName -->|Name typed| savedPerson["Person added and saved for next time"]
+  addName -->|Name typed| savedPerson["Person added, ticked for this bill<br/>and saved for next time"]
   savedPerson --> mainTask[["Finish the bill: Flow 2"]]
   mainTask --> firstBill["Success: first bill saved,<br/>opens /bills/[id]"]
-  firstBill --> dashboard[["Home is now the dashboard: Flow 3"]]
+  firstBill --> homeTip["One-time tip: add to Home Screen<br/>so bills are kept. Dismiss hides it"]
+  homeTip --> dashboard[["Home is now the dashboard: Flow 3"]]
 
   classDef error stroke:#c62828,stroke-width:2px
   classDef empty stroke-dasharray:6 4
