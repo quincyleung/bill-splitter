@@ -1,6 +1,6 @@
 "use client";
 
-// One person in "Who was there", "Who had it" or "Who paid?". A real checkbox (or
+// One person in "Who was there", "Who had it" or "Who paid". A real checkbox (or
 // radio, when only one can be picked) underneath, so it's announced as "Sam,
 // checkbox, checked". Ticked shows a check mark as well as the fill, so the state
 // doesn't rely on colour. Put chips in a FieldGroup.

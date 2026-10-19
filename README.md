@@ -24,8 +24,8 @@ flowchart TD
   meal --> noPeople
   even --> noPeople
   rec --> noPeople
-  noPeople["Empty: Who was there shows only Me<br/>and an Add a person field"] --> addName{"Type a name, press Add"}
-  addName -->|Blank| errName["Error: 'Type a name, then press Add.'"]
+  noPeople["Empty: Who was there shows only Me<br/>and a name field with Add person"] --> addName{"Type a name, press Add person"}
+  addName -->|Blank| errName["Error: 'Type a name, then press Add person.'"]
   errName --> addName
   addName -->|Name typed| savedPerson["Person added, ticked for this bill<br/>and saved for next time"]
   savedPerson --> mainTask[["Finish the bill: Flow 2"]]

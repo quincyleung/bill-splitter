@@ -229,3 +229,38 @@ Then commit.
 **Pushed back:**
 - The tabs I added in Step 5 duplicated the quick starts.
 - The quick start names Dinner / Uber / Monthly bill were too narrow, so they're now Meal / Even split / Recurring.
+
+## Step 6, continued: Form wording and layout (2026-10-19)
+
+**Asked:**
+- On the Meal form, make the first question a name, like "Dinner at Aba".
+- Make Add person a button on the right so it looks like part of "Who was there".
+- Put each item's name before its price.
+- Use labels without question marks.
+- Push the earlier commits.
+
+**Made:**
+- Pushed `7efceec` and `3eb6253` to GitHub.
+- **Name first:** Meal and Even split now open with "Name (optional)", hinted "Like Dinner at Aba" for Meal and "Like Uber to the airport" for Even split. Recurring keeps the required "Name". Even split changed too, because "What was it" doesn't read well without its question mark.
+- **Add person** is now part of "Who was there":
+  - A new shared AddField puts the name input and an **Add person** button on its right in one row, under the chips, with no separate bold label.
+  - "New names are saved for next time." moved up as the group's hint.
+  - The button's text labels the input for screen readers (aria-labelledby, the standard pattern for search-style fields). Enter still adds.
+  - TextField's action slot is gone, since nothing uses it now.
+- **Items:** Name (optional), then Price, then Who had it. Add item now puts the cursor in the new item's name.
+- **No question marks:** "Who paid", "Who's splitting it", and "Repeat every" (was "Every how many?"). Messages now say "press Add person". `flows.md` has a new labels rule.
+- **Docs:** updated `flows.md` (rules, the Meal wireframe, the item order, the errors table) and the Flow 1 diagram in both files.
+- **Checks:** lint, build, the logic and storage tests, and the end-to-end checks in headless Chrome, which now also check that:
+  - Add person is to the right of the input in the same row and inside "Who was there";
+  - it labels the input;
+  - Name is the first question;
+  - item name comes before price;
+  - no label ends in "?".
+
+  I also took a screenshot of the Meal form.
+
+**Pushed back:**
+- Meal should start with a name.
+- "Add a person" looked like a separate question.
+- Items should ask for a name before the price.
+- Labels shouldn't use question marks.

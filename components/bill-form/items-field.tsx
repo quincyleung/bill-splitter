@@ -20,7 +20,7 @@ type ItemsFieldProps = {
   requestFocus: (selector: string) => void;
 };
 
-/** Typed-in items: a price, an optional name, and who had it. A shared item is split evenly. */
+/** Typed-in items: an optional name, a price, and who had it. A shared item is split evenly. */
 export function ItemsField({ draft, people, errors, setDraft, requestFocus }: ItemsFieldProps) {
   const updateItem = (key: string, change: Partial<DraftItem>) =>
     setDraft((current) => ({
@@ -31,7 +31,7 @@ export function ItemsField({ draft, people, errors, setDraft, requestFocus }: It
   function addItem() {
     const item = newItem(createId);
     setDraft((current) => ({ ...current, items: [...current.items, item] }));
-    requestFocus(`#price-${item.key}`);
+    requestFocus(`#name-${item.key}`);
   }
 
   function removeItem(key: string) {
@@ -49,6 +49,14 @@ export function ItemsField({ draft, people, errors, setDraft, requestFocus }: It
               <Card>
                 <FieldGroup legend={`Item ${index + 1}`}>
                   <div className="space-y-4">
+                    <TextField
+                      id={`name-${item.key}`}
+                      label="Name (optional)"
+                      hint="Like Burger"
+                      value={item.name}
+                      onChange={(event) => updateItem(item.key, { name: event.target.value })}
+                      autoComplete="off"
+                    />
                     <MoneyField
                       id={`price-${item.key}`}
                       label="Price"
@@ -56,13 +64,6 @@ export function ItemsField({ draft, people, errors, setDraft, requestFocus }: It
                       value={item.price}
                       onChange={(event) => updateItem(item.key, { price: event.target.value })}
                       error={errors[errorKey.price(item.key)]}
-                    />
-                    <TextField
-                      label="Name (optional)"
-                      hint="Like Burger"
-                      value={item.name}
-                      onChange={(event) => updateItem(item.key, { name: event.target.value })}
-                      autoComplete="off"
                     />
                     <FieldGroup legend="Who had it" error={errors[errorKey.who(item.key)]}>
                       {draft.ticked.length === 0 ? (

@@ -6,6 +6,7 @@
 
 import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useRef, useState } from "react";
+import { AddField } from "@/components/ui/add-field";
 import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field-group";
 import { AlertIcon } from "@/components/ui/icons";
@@ -37,7 +38,7 @@ import { ShareSummary } from "./share-summary";
 const FIRST_INVALID = '[aria-invalid="true"], [data-invalid] input';
 
 const TITLE_HINTS: Record<Preset, string> = {
-  meal: "Like Dinner at Nopa",
+  meal: "Like Dinner at Aba",
   even: "Like Uber to the airport",
   recurring: "Like Electricity",
 };
@@ -131,7 +132,7 @@ export function BillForm({ preset, people, onSaved }: BillFormProps) {
   return (
     <form ref={formRef} noValidate onSubmit={handleSubmit} className="space-y-6">
       <TextField
-        label={recurring ? "Name" : "What was it? (optional)"}
+        label={recurring ? "Name" : "Name (optional)"}
         hint={TITLE_HINTS[preset]}
         value={draft.title}
         onChange={(event) => update({ title: event.target.value })}
@@ -146,7 +147,7 @@ export function BillForm({ preset, people, onSaved }: BillFormProps) {
         error={errors.date}
       />
 
-      <FieldGroup legend={recurring ? "Who's splitting it?" : "Who was there"}>
+      <FieldGroup legend={recurring ? "Who's splitting it" : "Who was there"} hint="New names are saved for next time.">
         <div className="flex flex-wrap gap-2">
           {chips.map((id) => (
             <PersonChip
@@ -157,32 +158,22 @@ export function BillForm({ preset, people, onSaved }: BillFormProps) {
             />
           ))}
         </div>
-        <div className="mt-4">
-          <TextField
+        <div className="mt-3">
+          <AddField
             id="add-person"
-            label="Add a person"
-            hint="Saved for next time"
+            buttonLabel="Add person"
+            placeholder="Name"
             value={draft.pendingName}
             onChange={(event) => {
               update({ pendingName: event.target.value });
               setAddError(null);
             }}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                event.preventDefault();
-                addPerson();
-              }
-            }}
+            onAdd={addPerson}
             error={addError ?? errors.people}
             autoComplete="off"
             autoCapitalize="words"
             enterKeyHint="done"
             maxLength={40}
-            action={
-              <Button variant="secondary" onClick={addPerson}>
-                Add
-              </Button>
-            }
           />
         </div>
         <p role="status" className="sr-only">
@@ -190,7 +181,7 @@ export function BillForm({ preset, people, onSaved }: BillFormProps) {
         </p>
       </FieldGroup>
 
-      <FieldGroup legend="Who paid?" error={errors.payer}>
+      <FieldGroup legend="Who paid" error={errors.payer}>
         <div className="flex flex-wrap gap-2">
           {payerOptions.map((id) => (
             <PersonChip
@@ -248,7 +239,7 @@ export function BillForm({ preset, people, onSaved }: BillFormProps) {
           {draft.repeats === "custom" && (
             <>
               <TextField
-                label="Every how many?"
+                label="Repeat every"
                 hint={draft.unit === "week" ? "1 to 52 weeks" : "1 to 12 months"}
                 inputMode="numeric"
                 value={draft.every}

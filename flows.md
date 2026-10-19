@@ -39,11 +39,12 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 - **Who paid:** every bill has one payer. It defaults to Me, and can be anyone ticked on the bill.
 - **Debts:** if I paid, everyone else on the bill owes me their share. If someone else paid, I owe them my share. What the others owe them is shown for reference but not tracked.
 - **Me:** I'm in every split by default, with my own items. I can untick myself only on a bill I paid.
-- **People are saved automatically** with the bill: anyone typed in under "Add a person" who's still ticked when I press Save. Someone I've just added is ticked straight away, and Enter adds them and keeps the cursor there, so names can be typed one after another. People saved from earlier bills stay unticked until I tap them. The picker lists the people I used most recently first.
+- **People are saved automatically** with the bill: anyone typed in with **Add person** who's still ticked when I press Save. Someone I've just added is ticked straight away, and Enter adds them and keeps the cursor there, so names can be typed one after another. People saved from earlier bills stay unticked until I tap them. The picker lists the people I used most recently first.
 - **Money is stored in the currency's smallest unit** (cents; yen has none). Shares always add up to the exact total, and leftover units go to whoever paid.
 - **Currency:** shown next to the amount field with a **Change** button. The picker lists my recent currencies first, then every other one from the browser's built-in list. Amounts in different currencies are never added together or converted.
 - **Loading state:** saved data can only be read in the browser, so each page shows a neutral shell until it has loaded. A returning user never sees a flash of the empty first-visit screen.
 - **Number fields** open the decimal keypad and accept `12`, `12.5` or `$12.50`.
+- **Labels:** no question marks ("Who paid", not "Who paid?"). Optional fields say "(optional)".
 - **Hints:** fields show an example under their label, such as "Like Dinner at Nopa" or "Like 12.50". Placeholders never stand in for labels. There are no sample bills, because fake bills would mix into real balances.
 - **On Save:** errors appear next to their fields, focus moves to the first one, and nothing typed is cleared.
 
@@ -69,8 +70,8 @@ flowchart TD
   meal --> noPeople
   even --> noPeople
   rec --> noPeople
-  noPeople["Empty: Who was there shows only Me<br/>and an Add a person field"] --> addName{"Type a name, press Add"}
-  addName -->|Blank| errName["Error: 'Type a name, then press Add.'"]
+  noPeople["Empty: Who was there shows only Me<br/>and a name field with Add person"] --> addName{"Type a name, press Add person"}
+  addName -->|Blank| errName["Error: 'Type a name, then press Add person.'"]
   errName --> addName
   addName -->|Name typed| savedPerson["Person added, ticked for this bill<br/>and saved for next time"]
   savedPerson --> mainTask[["Finish the bill: Flow 2"]]
@@ -100,7 +101,7 @@ and your friends don't need the app.
 |---|---|
 | Loading | Just the app name, with no buttons yet. |
 | Empty | The welcome text and three start buttons above. No sign-up, no tutorial, no asking for my name. |
-| Partly filled | On the first form, "Who was there" shows only **Me** plus an "Add a person" field, because nobody is saved yet. Anyone I add is ticked straight away. |
+| Partly filled | On the first form, "Who was there" shows only **Me** plus a name field with an **Add person** button on its right, because nobody is saved yet. Anyone I add is ticked straight away. |
 | Error | Storage blocked (private browsing, or storage turned off) → banner: "This browser isn't saving data, so bills will disappear when you close it. Turn off private browsing to keep them." The app still works for this session. |
 | Success | The first bill saves and opens `/bills/[id]` with a "Saved" message. **On hold (see Decision 12):** below the amounts, a one-time tip: "Add Bill Splitter to your Home Screen so your bills are kept. On iPhone: Share, then Add to Home Screen." It has a **Dismiss** button, and Dismiss hides it for good. It never appears before or during the first bill, and not at all if the app is already on the Home Screen. From then on, Home is the dashboard (Flow 3). |
 
@@ -177,19 +178,21 @@ flowchart TD
 The most important form. One page, one column, in receipt order. People come before items because items need people to assign.
 
 ```
-What was it? (optional)   [ Dinner at Nopa ]
+Name (optional)           [ Dinner at Aba  ]
 Date                      [ Oct 18, 2026   ]
 
 Who was there
+New names are saved for next time.
 [✓ Me] [✓ Sam] [ Alex ] [✓ Jo]
-Add a person [ Name      ] [Add]
+[ Name                    ] [Add person]
 
-Who paid?   (•) Me  ( ) Sam  ( ) Jo
+Who paid   (•) Me  ( ) Sam  ( ) Jo
 
 How to split   [✓ By item] [ Evenly ]
 
 Items   [ Paste receipt text ]  [ Type items ]
-  1 × $18.00  Burger
+  Name (optional) [ Burger ]
+  Price           [ 18.00  ]
   Who had it  [Me] [Sam ✓] [Jo] [Everyone]
   [Remove item]
   [+ Add item]
@@ -207,7 +210,7 @@ Who owes you
 [ Save bill ]
 ```
 
-- **Type items** adds a blank row: price, optional name, and who had it.
+- **Type items** adds a blank item: name (optional), then price, then who had it.
 - **Paste receipt text** opens a box with help text: "On iPhone, open the receipt photo, long-press the text, tap Select All, then Copy." Then a **Read receipt** button. See "Reading a receipt" below.
 - A shared item (appetizer, a pitcher) gets ticked for several people, or for **Everyone**, and is split evenly between them.
 - Tax and tip (total paid minus the items) are spread in proportion to each person's item subtotal.
@@ -282,11 +285,11 @@ Others' shares (between them and Sam): Jo $42.00
 | Who was there | I paid and only Me is ticked | "Add at least one other person to split with." |
 | Who paid | Someone else paid and Me isn't ticked | "You're not on this bill, so you don't owe anything. Tick Me, or pick yourself as who paid." |
 | Who paid | The payer isn't ticked | "Sam paid, so tick Sam under Who was there, or choose who paid." |
-| Add a person | Blank | "Type a name, then press Add." |
-| Add a person | Name already saved | "Sam is already in the list. Tap their name to include them." |
-| Add a person | Name already on this bill | "Sam is already on this bill." |
-| Add a person | "Me" or "You" | "You're already on the list as Me." |
-| Add a person | A name typed but not added when Save is pressed | "Press Add to put Jo on this bill, or clear the name." |
+| Add person | Blank | "Type a name, then press Add person." |
+| Add person | Name already saved | "Sam is already in the list. Tap their name to include them." |
+| Add person | Name already on this bill | "Sam is already on this bill." |
+| Add person | "Me" or "You" | "You're already on the list as Me." |
+| Add person | A name typed but not added when Save is pressed | "Press Add person to put Jo on this bill, or clear the name." |
 | Paste box | Empty | "Paste the receipt text first, or type the items instead." |
 | Paste box | No prices found | "Couldn't find any prices in that text. Check you copied the receipt, or type the items instead." |
 | Item price | Blank or not a number | "Enter a price, like 12.50." |

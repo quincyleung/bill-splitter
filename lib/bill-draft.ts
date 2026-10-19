@@ -11,7 +11,7 @@ export type Preset = "meal" | "even" | "recurring";
 export type SplitMethod = "items" | "even";
 export type Repeats = "week" | "two-weeks" | "month" | "custom";
 
-/** What each quick start preselects, and the title used when "What was it?" is left blank. */
+/** What each quick start preselects, and the title used when the name is left blank. */
 export const PRESETS: Record<Preset, { split: SplitMethod; recurring: boolean; fallbackTitle: string }> = {
   meal: { split: "items", recurring: false, fallbackTitle: "Meal" },
   even: { split: "even", recurring: false, fallbackTitle: "Even split" },
@@ -23,7 +23,7 @@ export type DraftPerson = { id: string; name: string };
 
 export type Draft = {
   preset: Preset;
-  /** "What was it?" for one-time bills, "Name" for recurring ones. */
+  /** The bill's name: optional for one-time bills, required for recurring ones. */
   title: string;
   date: string;
   /** People typed in on this form. Saved with the bill, and only if they're ticked. */
@@ -38,7 +38,7 @@ export type Draft = {
   repeats: Repeats;
   every: string;
   unit: "week" | "month";
-  /** What's in "Add a person" right now. */
+  /** What's typed next to "Add person" right now. */
   pendingName: string;
 };
 
@@ -88,7 +88,7 @@ export function pickerIds(draft: Draft, people: Person[]): string[] {
 /** Why a name can't be added, or null if it can. */
 export function addPersonError(name: string, draft: Draft, people: Person[]): string | null {
   const trimmed = name.trim();
-  if (!trimmed) return "Type a name, then press Add.";
+  if (!trimmed) return "Type a name, then press Add person.";
   if (["me", "you"].includes(trimmed.toLowerCase())) return "You're already on the list as Me.";
   const match = [...draft.added, ...people].find((p) => p.name.toLowerCase() === trimmed.toLowerCase());
   if (match) {
@@ -152,7 +152,7 @@ export function checkDraft(draft: Draft, people: Person[]): { errors: Errors; wa
 
   const pending = draft.pendingName.trim();
   const others = draft.ticked.filter((id) => id !== ME);
-  if (pending) errors.people = `Press Add to put ${pending} on this bill, or clear the name.`;
+  if (pending) errors.people = `Press Add person to put ${pending} on this bill, or clear the name.`;
   else if (draft.payerId === ME && others.length === 0) errors.people = "Add at least one other person to split with.";
 
   if (draft.payerId !== ME) {
