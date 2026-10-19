@@ -16,9 +16,9 @@ const NAV_ITEMS: NavItem[] = [
     label: "Home",
     inSection: (pathname) => pathname === "/" || pathname.startsWith("/bills/") || pathname.startsWith("/people/"),
   },
-  { href: "/new/meal", label: "Meal", inSection: (pathname) => pathname === "/new/meal" },
-  { href: "/new/even", label: "Even split", inSection: (pathname) => pathname === "/new/even" },
-  { href: "/new/recurring", label: "Recurring", inSection: (pathname) => pathname === "/new/recurring" },
+  { href: "/new/meal", label: "Dinner", inSection: (pathname) => pathname === "/new/meal" },
+  { href: "/new/even", label: "Uber", inSection: (pathname) => pathname === "/new/even" },
+  { href: "/new/recurring", label: "Monthly bill", inSection: (pathname) => pathname === "/new/recurring" },
 ];
 
 /**

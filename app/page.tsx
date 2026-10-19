@@ -1,11 +1,18 @@
-import { PagePlaceholder } from "@/components/page-placeholder";
+import { HomeStatus } from "@/components/home/home-status";
+import { QuickStarts } from "@/components/home/quick-starts";
+import { SavedBills } from "@/components/home/saved-bills";
+import { PageTitle } from "@/components/ui/page-title";
 
 // No title of its own: Home uses the layout's default, "Bill Splitter".
 export default function HomePage() {
   return (
-    <PagePlaceholder title="Home">
-      Who owes whom, recurring bills that are due, your bills, and the three ways to start one. On a first visit, a
-      welcome and the three start buttons.
-    </PagePlaceholder>
+    <>
+      <PageTitle>Split a bill</PageTitle>
+      <HomeStatus />
+      <div className="mt-6">
+        <QuickStarts />
+      </div>
+      <SavedBills />
+    </>
   );
 }

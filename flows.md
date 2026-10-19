@@ -8,7 +8,7 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 
 | # | Decision | Chosen |
 |---|---|---|
-| 1 | Modes | Three: **Meal by item**, **Even split (one time)**, **Recurring**. Recurring uses the even-split fields. |
+| 1 | Modes | Three quick starts: **Dinner** (by item), **Uber** (evenly, one time) and **Monthly bill** (evenly, repeats). Dinner and Uber open the same form with a **How to split** choice (By item / Evenly) preselected, so a dinner everyone shared can switch to Evenly. Monthly bill is always even. |
 | 2 | Tax and tip input | One "Total paid, including tax and tip" field. Tax and tip are the difference from the items, shared in proportion to each person's items. |
 | 3 | Entering meal items | **Paste receipt text** (copied with the phone's built-in text recognition) **or type them in**. Both end up as the same editable item rows. |
 | 4 | Who paid | Me or anyone on the bill. Only debts between me and whoever paid are tracked. |
@@ -19,7 +19,7 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 | 9 | Edit a saved bill | Keep, built after the core flows |
 | 10 | Autosaved draft | Keep. One draft at a time. |
 | 11 | Copy amounts | Keep, on bills I paid. The text stands on its own: "I paid for Dinner at Nopa (Oct 18). Sam $40.25, Jo $28.10." |
-| 12 | iPhone data loss | Installable to the Home Screen (web app manifest), suggested once after the first bill is saved. Export/Import backup later. |
+| 12 | iPhone data loss | Installable to the Home Screen (web app manifest), suggested once after the first bill is saved. Export/Import backup later. **On hold:** on iPhone, a site added to the Home Screen gets its own storage, separate from Safari's, so bills saved before adding it wouldn't show up there. Decide how to handle that before building the tip. |
 | 13 | Recurring split | Even only |
 | 14 | New people and hints (from research.md) | Someone I've just added is ticked for this bill. Fields show example hints. No sample bills. |
 
@@ -28,9 +28,9 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 | Route | Screen |
 |---|---|
 | `/` | Home: empty on the first visit, a dashboard after that |
-| `/new/meal` | Meal by item |
-| `/new/even` | Even split (one time): Uber rides, or a meal split evenly |
-| `/new/recurring` | Recurring bill (`?from=<billId>` fills in the last one) |
+| `/new/meal` | Dinner: the bill form with By item preselected |
+| `/new/even` | Uber: the same form with Evenly preselected |
+| `/new/recurring` | Monthly bill: a recurring bill with Monthly preselected (`?from=<billId>` fills in the last one) |
 | `/bills/[id]` | One bill: who owes whom, mark paid, copy amounts, edit, delete |
 | `/bills/[id]/edit` | Edit a bill |
 | `/people/[id]` | One person: bills both ways, net balance, Settle up |
@@ -38,7 +38,7 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 - **Who paid:** every bill has one payer. It defaults to Me, and can be anyone ticked on the bill.
 - **Debts:** if I paid, everyone else on the bill owes me their share. If someone else paid, I owe them my share. What the others owe them is shown for reference but not tracked.
 - **Me:** I'm in every split by default, with my own items. I can untick myself only on a bill I paid.
-- **People are saved automatically** the first time I type a name, and someone I've just added is ticked for this bill straight away. People saved from earlier bills stay unticked until I tap them. The picker lists the people I used most recently first.
+- **People are saved automatically** with the bill: anyone typed in under "Add a person" who's still ticked when I press Save. Someone I've just added is ticked straight away, and Enter adds them and keeps the cursor there, so names can be typed one after another. People saved from earlier bills stay unticked until I tap them. The picker lists the people I used most recently first.
 - **Money is stored in the currency's smallest unit** (cents; yen has none). Shares always add up to the exact total, and leftover units go to whoever paid.
 - **Currency:** shown next to the amount field with a **Change** button. The picker lists my recent currencies first, then every other one from the browser's built-in list. Amounts in different currencies are never added together or converted.
 - **Loading state:** saved data can only be read in the browser, so each page shows a neutral shell until it has loaded. A returning user never sees a flash of the empty first-visit screen.
@@ -61,10 +61,10 @@ flowchart TD
   canSave -->|No| errStorage["Error: banner 'This browser isn't saving data,<br/>so bills will disappear when you close it.'"]
   errStorage --> welcome
   canSave -->|Yes| welcome["Empty: Home with welcome text<br/>and three start buttons"]
-  welcome --> mode{"Which kind of bill?"}
-  mode -->|Meal by item| meal["Meal form<br/>/new/meal"]
-  mode -->|Even split| even["Even split form<br/>/new/even"]
-  mode -->|Recurring| rec["Recurring form<br/>/new/recurring"]
+  welcome --> mode{"Which quick start?"}
+  mode -->|Dinner| meal["Bill form, By item<br/>/new/meal"]
+  mode -->|Uber| even["Bill form, Evenly<br/>/new/even"]
+  mode -->|Monthly bill| rec["Recurring form, Monthly<br/>/new/recurring"]
   meal --> noPeople
   even --> noPeople
   rec --> noPeople
@@ -74,7 +74,7 @@ flowchart TD
   addName -->|Name typed| savedPerson["Person added, ticked for this bill<br/>and saved for next time"]
   savedPerson --> mainTask[["Finish the bill: Flow 2"]]
   mainTask --> firstBill["Success: first bill saved,<br/>opens /bills/[id]"]
-  firstBill --> homeTip["One-time tip: add to Home Screen<br/>so bills are kept. Dismiss hides it"]
+  firstBill --> homeTip["On hold: one-time tip to add<br/>to Home Screen. Dismiss hides it"]
   homeTip --> dashboard[["Home is now the dashboard: Flow 3"]]
 
   classDef error stroke:#c62828,stroke-width:2px
@@ -86,14 +86,13 @@ flowchart TD
 ```
 
 ```
-Bill Splitter
-Split a bill, see who owes whom,
-mark it paid. Saved on this phone only.
-Friends don't need the app.
+Split a bill
+Pick one to start. Everything stays on this phone,
+and your friends don't need the app.
 
-[ Split a meal by item  ]
-[ Even split (one time) ]
-[ Recurring bill        ]
+[ Dinner        Split by what each person had ]
+[ Uber          Split evenly                  ]
+[ Monthly bill  Split evenly, every month     ]
 ```
 
 | State | What I see |
@@ -102,7 +101,7 @@ Friends don't need the app.
 | Empty | The welcome text and three start buttons above. No sign-up, no tutorial, no asking for my name. |
 | Partly filled | On the first form, "Who was there" shows only **Me** plus an "Add a person" field, because nobody is saved yet. Anyone I add is ticked straight away. |
 | Error | Storage blocked (private browsing, or storage turned off) → banner: "This browser isn't saving data, so bills will disappear when you close it. Turn off private browsing to keep them." The app still works for this session. |
-| Success | The first bill saves and opens `/bills/[id]`. Below the amounts there's a one-time tip: "Add Bill Splitter to your Home Screen so your bills are kept. On iPhone: Share, then Add to Home Screen." It has a **Dismiss** button, and Dismiss hides it for good. It never appears before or during the first bill, and not at all if the app is already on the Home Screen. From then on, Home is the dashboard (Flow 3). |
+| Success | The first bill saves and opens `/bills/[id]` with a "Saved" message. **On hold (see Decision 12):** below the amounts, a one-time tip: "Add Bill Splitter to your Home Screen so your bills are kept. On iPhone: Share, then Add to Home Screen." It has a **Dismiss** button, and Dismiss hides it for good. It never appears before or during the first bill, and not at all if the app is already on the Home Screen. From then on, Home is the dashboard (Flow 3). |
 
 ## Flow 2: Main task (add → split → who owes whom → paid)
 
@@ -110,7 +109,7 @@ Friends don't need the app.
 flowchart TD
   start(["Home: tap a start button"]) --> mode{"Which mode?"}
 
-  subgraph mealPath ["Meal by item, split by who had what"]
+  subgraph mealPath ["Dinner: By item, split by who had what"]
     meal["Empty: meal form, Me ticked and paying,<br/>Items offers Paste or Type"] --> mealPeople["Tick who was there, choose who paid"]
     mealPeople --> how{"Paste or type the items?"}
     how -->|Paste| paste["Paste receipt text, press Read receipt"]
@@ -125,22 +124,22 @@ flowchart TD
     mealSplit -.- mealWarn["Warnings that don't block Save:<br/>subtotal mismatch, ticked count vs quantity,<br/>high tax and tip"]
   end
 
-  subgraph evenPath ["Even split, one time"]
+  subgraph evenPath ["Uber: Evenly, one time"]
     even["Empty: even split form, amount blank"] --> evenPeople["Tick who was there, choose who paid"]
     evenPeople --> evenAmount["Enter amount and currency"]
     evenAmount --> evenSplit["Split evenly between everyone ticked"]
   end
 
-  subgraph recPath ["Recurring, split evenly"]
+  subgraph recPath ["Monthly bill: recurring, split evenly"]
     rec["Empty: recurring form, name,<br/>amount and Repeats blank"] --> recPeople["Tick roommates, choose who paid"]
     recPeople --> recDetails["Enter name, amount, currency<br/>and how often it repeats"]
     recDetails --> recSplit["Split evenly between roommates"]
     recSplit -.- recWarn["Warning that doesn't block Save:<br/>next one not due yet"]
   end
 
-  mode -->|Meal by item| meal
-  mode -->|Even split| even
-  mode -->|Recurring| rec
+  mode -->|Dinner| meal
+  mode -->|Uber| even
+  mode -->|Monthly bill| rec
   mealSplit --> partly["Partly filled: summary updates live,<br/>draft saved as I go"]
   evenSplit --> partly
   recSplit --> partly
@@ -172,7 +171,7 @@ flowchart TD
   class bill,settled success
 ```
 
-### Meal by item: `/new/meal`
+### Dinner, by item: `/new/meal`
 
 The most important form. One page, one column, in receipt order. People come before items because items need people to assign.
 
@@ -185,6 +184,8 @@ Who was there
 Add a person [ Name      ] [Add]
 
 Who paid?   (•) Me  ( ) Sam  ( ) Jo
+
+How to split   [✓ By item] [ Evenly ]
 
 Items   [ Paste receipt text ]  [ Type items ]
   1 × $18.00  Burger
@@ -221,11 +222,11 @@ Who owes you
 - **Read items are added below any items already there**, as normal rows I can edit, remove or add to. The pasted text stays in the box.
 - **Tested on one real receipt** (5 lines, with quantities, bilingual, gratuity included): every item and the subtotal came out right. Test a receipt without quantities before building the parser.
 
-### Even split (one time): `/new/even`
+### Uber, evenly: `/new/even`
 
 Fields: what was it (defaults to "Uber ride"), date (today), amount and currency, who was there, who paid. Shares are amount ÷ people, with leftover cents going to whoever paid.
 
-### Recurring: `/new/recurring`
+### Monthly bill, recurring: `/new/recurring`
 
 Fields: name ("Electricity"), date of this bill, amount and currency, roommates, who paid, and **Repeats**: Weekly, Every 2 weeks, Monthly, or Custom ("Every [N] [weeks / months]"). Split evenly.
 
@@ -282,6 +283,9 @@ Others' shares (between them and Sam): Jo $42.00
 | Who paid | The payer isn't ticked | "Sam paid, so tick Sam under Who was there, or choose who paid." |
 | Add a person | Blank | "Type a name, then press Add." |
 | Add a person | Name already saved | "Sam is already in the list. Tap their name to include them." |
+| Add a person | Name already on this bill | "Sam is already on this bill." |
+| Add a person | "Me" or "You" | "You're already on the list as Me." |
+| Add a person | A name typed but not added when Save is pressed | "Press Add to put Jo on this bill, or clear the name." |
 | Paste box | Empty | "Paste the receipt text first, or type the items instead." |
 | Paste box | No prices found | "Couldn't find any prices in that text. Check you copied the receipt, or type the items instead." |
 | Item price | Blank or not a number | "Enter a price, like 12.50." |
@@ -289,8 +293,11 @@ Others' shares (between them and Sam): Jo $42.00
 | Item | Nobody ticked | "Choose who had this item." |
 | Items | No items | "Add at least one item from the receipt." |
 | Total paid | Blank | "Enter the total you paid, including tax and tip." |
+| Total paid | Not a number | "Enter the total as a number, like 102.20." |
 | Total paid | Less than the items | "That's less than the items ($84.00). Check the total, or remove an item that isn't on the receipt." |
 | Amount (even split, recurring) | Blank or invalid | "Enter the amount, like 24.80." |
+| Amount (even split, recurring) | 0 | "Enter an amount above 0." |
+| Date | Blank or not a real date | "Enter the date of the bill." |
 | Name (recurring) | Blank | "Name this bill, like Electricity." |
 | Repeats (custom) | Blank, or outside 1–52 weeks or 1–12 months | "Enter how often, like every 3 months." |
 | Save | Storage full or blocked | Shown near Save: "Couldn't save on this phone. Everything you typed is still here. Try again." |
@@ -348,7 +355,7 @@ flowchart TD
 ```
 
 ```
-[ Split a meal ] [ Even split ] [ Recurring ]
+[ Dinner ] [ Uber ] [ Monthly bill ]
 
 Unfinished meal from Tue   [Continue] [Discard]
 

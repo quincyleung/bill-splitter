@@ -152,3 +152,61 @@ Then commit.
 - Reran the 21 storage, store and money tests, lint and the build. All pass.
 
 **Pushed back:** I had added groups to storage because you listed them, although `flows.md` had cut them. You decided to remove them for now.
+
+## Step 6: The first visit (2026-10-19)
+
+**Asked:** Build the first visit, with nothing saved. Goal: someone splits a real bill in under a minute without setting anything up.
+- Quick starts (Dinner, Uber, Monthly bill) that open the form with the right split method preselected.
+- Names typed inline and saved automatically for next time.
+- No tour, no empty screen, no sign-up.
+
+**Made:**
+- **Home:** "Split a bill", a one-line welcome on a first visit ("Pick one to start. Everything stays on this phone, and your friends don't need the app."), and three quick starts:
+  - Dinner: split by what each person had;
+  - Uber: split evenly;
+  - Monthly bill: split evenly, every month.
+
+  The quick starts are server-rendered, so they appear straight away. Once there are bills, a plain "Your bills" list replaces the welcome until the dashboard is built.
+- **One bill form behind all three quick starts:**
+  - Dinner preselects **By item**, Uber **Evenly**, and Monthly bill a recurring bill with **Monthly**.
+  - Dinner and Uber share a "How to split" switch, so a dinner everyone shared can be switched to Evenly without losing anything typed.
+  - Fields, in order: what was it, date, who was there, Add a person, who paid, how to split, items (price, optional name, who had it, Everyone), total paid or amount, repeats (Monthly bill only).
+  - A live "Who owes you" summary shows each person's items plus tax and tip.
+- **Names inline:**
+  - Type a name and press Add or Enter. The person is ticked, the cursor stays for the next name, and screen readers hear "Sam added to this bill."
+  - People are saved when the bill is saved, but only if they're still ticked, so a mistyped name that gets unticked isn't kept.
+  - Next time they appear first in the list, unticked.
+- **Validation:** every message from `flows.md`, shown next to its field after Save. Focus moves to the first problem, errors clear as fields are fixed, and nothing typed is cleared. New messages:
+  - a name typed but not added: "Press Add to put Jo on this bill, or clear the name.";
+  - the date;
+  - an amount of 0;
+  - a total that isn't a number.
+- **Splitting:** done in cents and always adding up to the exact total, with leftover cents going to whoever paid. For dinners, tax and tip are shared in proportion to each person's items.
+- **Bill page:** who owes what ("Sam and Jo owe you $44.64"), your share, or "You owe Sam $42.00" when someone else paid. Plus Copy amounts, which has a fallback for plain http on a phone, a "Saved" toast, and "This bill isn't on this phone" for unknown ids.
+- **Other states:**
+  - a banner when the browser won't save;
+  - the unreadable-data notice (Download my data, or Start fresh after confirming) on Home, the forms and the bill page.
+- **Shared components added:** ButtonLink, FieldGroup, PageTitle; radio-style PersonChip; an action slot on TextField (the Add button).
+- **Nav** now reads Home, Dinner, Uber, Monthly bill, to match the quick starts.
+- **`flows.md` and README diagrams** updated to match.
+
+**Checks:**
+- lint and a production build;
+- 18 new scratch tests of the split and form logic, including the real hot pot receipt (each friend owes $48.73, I absorb 4 cents, total exactly $341.15). The 21 storage tests still pass;
+- a throwaway end-to-end script driving headless Chrome at phone width over the DevTools protocol (no packages), 13 checks:
+  - first visit;
+  - Uber split saved in under a second of automated time;
+  - names saved for next time;
+  - Dinner by item with exact shares;
+  - errors and focus on Monthly bill;
+  - reload;
+  - unknown bill;
+  - corrupted storage;
+  - and no console errors or hydration warnings;
+- screenshots at phone size in light and dark mode.
+
+**Left for later steps:** pasting a receipt, Mark paid, Edit and Delete, the meal breakdown on the bill page, the currency picker (USD for now), the autosaved draft, and the dashboard.
+
+**On hold:** the "Add to Home Screen" tip. On iPhone a Home Screen web app gets its own storage, separate from Safari's, so bills saved before adding it wouldn't show up in the Home Screen app. That needs a decision first.
+
+**Pushed back:** Nothing.

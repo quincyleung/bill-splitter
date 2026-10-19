@@ -1,11 +1,12 @@
 import type { ReactNode } from "react";
 import { Card } from "@/components/ui/card";
+import { PageTitle } from "@/components/ui/page-title";
 
 /** Stand-in for a screen that a later step builds. Says what will go there, per flows.md. */
 export function PagePlaceholder({ title, children }: { title: string; children: ReactNode }) {
   return (
     <>
-      <h1 className="text-2xl font-bold text-ink">{title}</h1>
+      <PageTitle>{title}</PageTitle>
       <div className="mt-4">
         <Card>
           <p className="text-base text-ink">{children}</p>

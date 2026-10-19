@@ -1,13 +1,16 @@
 import type { Metadata } from "next";
-import { PagePlaceholder } from "@/components/page-placeholder";
+import { NewBill } from "@/components/bill-form/new-bill";
+import { PageTitle } from "@/components/ui/page-title";
 
-export const metadata: Metadata = { title: "Split a meal by item" };
+export const metadata: Metadata = { title: "Dinner" };
 
-export default function NewMealPage() {
+export default function NewDinnerPage() {
   return (
-    <PagePlaceholder title="Split a meal by item">
-      Who was there, who paid, the items (pasted from a receipt or typed in) and who had each one, then the total paid
-      including tax and tip.
-    </PagePlaceholder>
+    <>
+      <PageTitle>Dinner</PageTitle>
+      <div className="mt-6">
+        <NewBill preset="dinner" />
+      </div>
+    </>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { Suspense } from "react";
 import { NavLinks, SiteNav } from "@/components/site-nav";
+import { StorageBanner } from "@/components/storage-banner";
 import { Toaster } from "@/components/ui/toast";
 import "./globals.css";
 
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             </Suspense>
           </div>
         </header>
+        <StorageBanner />
         <main id="main" tabIndex={-1} className="mx-auto w-full max-w-xl flex-1 px-4 pt-6 pb-12 outline-none">
           {children}
         </main>

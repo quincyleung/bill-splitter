@@ -17,10 +17,10 @@ flowchart TD
   canSave -->|No| errStorage["Error: banner 'This browser isn't saving data,<br/>so bills will disappear when you close it.'"]
   errStorage --> welcome
   canSave -->|Yes| welcome["Empty: Home with welcome text<br/>and three start buttons"]
-  welcome --> mode{"Which kind of bill?"}
-  mode -->|Meal by item| meal["Meal form<br/>/new/meal"]
-  mode -->|Even split| even["Even split form<br/>/new/even"]
-  mode -->|Recurring| rec["Recurring form<br/>/new/recurring"]
+  welcome --> mode{"Which quick start?"}
+  mode -->|Dinner| meal["Bill form, By item<br/>/new/meal"]
+  mode -->|Uber| even["Bill form, Evenly<br/>/new/even"]
+  mode -->|Monthly bill| rec["Recurring form, Monthly<br/>/new/recurring"]
   meal --> noPeople
   even --> noPeople
   rec --> noPeople
@@ -30,7 +30,7 @@ flowchart TD
   addName -->|Name typed| savedPerson["Person added, ticked for this bill<br/>and saved for next time"]
   savedPerson --> mainTask[["Finish the bill: Flow 2"]]
   mainTask --> firstBill["Success: first bill saved,<br/>opens /bills/[id]"]
-  firstBill --> homeTip["One-time tip: add to Home Screen<br/>so bills are kept. Dismiss hides it"]
+  firstBill --> homeTip["On hold: one-time tip to add<br/>to Home Screen. Dismiss hides it"]
   homeTip --> dashboard[["Home is now the dashboard: Flow 3"]]
 
   classDef error stroke:#c62828,stroke-width:2px
@@ -47,7 +47,7 @@ flowchart TD
 flowchart TD
   start(["Home: tap a start button"]) --> mode{"Which mode?"}
 
-  subgraph mealPath ["Meal by item, split by who had what"]
+  subgraph mealPath ["Dinner: By item, split by who had what"]
     meal["Empty: meal form, Me ticked and paying,<br/>Items offers Paste or Type"] --> mealPeople["Tick who was there, choose who paid"]
     mealPeople --> how{"Paste or type the items?"}
     how -->|Paste| paste["Paste receipt text, press Read receipt"]
@@ -62,22 +62,22 @@ flowchart TD
     mealSplit -.- mealWarn["Warnings that don't block Save:<br/>subtotal mismatch, ticked count vs quantity,<br/>high tax and tip"]
   end
 
-  subgraph evenPath ["Even split, one time"]
+  subgraph evenPath ["Uber: Evenly, one time"]
     even["Empty: even split form, amount blank"] --> evenPeople["Tick who was there, choose who paid"]
     evenPeople --> evenAmount["Enter amount and currency"]
     evenAmount --> evenSplit["Split evenly between everyone ticked"]
   end
 
-  subgraph recPath ["Recurring, split evenly"]
+  subgraph recPath ["Monthly bill: recurring, split evenly"]
     rec["Empty: recurring form, name,<br/>amount and Repeats blank"] --> recPeople["Tick roommates, choose who paid"]
     recPeople --> recDetails["Enter name, amount, currency<br/>and how often it repeats"]
     recDetails --> recSplit["Split evenly between roommates"]
     recSplit -.- recWarn["Warning that doesn't block Save:<br/>next one not due yet"]
   end
 
-  mode -->|Meal by item| meal
-  mode -->|Even split| even
-  mode -->|Recurring| rec
+  mode -->|Dinner| meal
+  mode -->|Uber| even
+  mode -->|Monthly bill| rec
   mealSplit --> partly["Partly filled: summary updates live,<br/>draft saved as I go"]
   evenSplit --> partly
   recSplit --> partly

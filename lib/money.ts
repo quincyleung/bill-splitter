@@ -3,6 +3,9 @@
 
 const LOCALE = "en-US";
 
+/** Until the currency picker exists, every bill is in US dollars. */
+export const DEFAULT_CURRENCY = "USD";
+
 /** Decimal places for a currency: 2 for USD, 0 for JPY. */
 export function minorDigits(currency: string): number {
   return new Intl.NumberFormat(LOCALE, { style: "currency", currency }).resolvedOptions().maximumFractionDigits ?? 2;

@@ -29,7 +29,7 @@ export function SegmentedControl<T extends string>({
 }: SegmentedControlProps<T>) {
   const { hintId, errorId } = useFieldIds();
   return (
-    <fieldset aria-describedby={describedBy(hint && hintId, error && errorId)}>
+    <fieldset aria-describedby={describedBy(hint && hintId, error && errorId)} data-invalid={error ? "" : undefined}>
       <legend className={labelClass}>{legend}</legend>
       {hint && <FieldHint id={hintId}>{hint}</FieldHint>}
       <div

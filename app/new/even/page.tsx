@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
-import { PagePlaceholder } from "@/components/page-placeholder";
+import { NewBill } from "@/components/bill-form/new-bill";
+import { PageTitle } from "@/components/ui/page-title";
 
-export const metadata: Metadata = { title: "Even split" };
+export const metadata: Metadata = { title: "Uber" };
 
-export default function NewEvenPage() {
+export default function NewUberPage() {
   return (
-    <PagePlaceholder title="Even split">
-      A one-time bill split evenly, like an Uber ride: what it was, the amount, who was there and who paid.
-    </PagePlaceholder>
+    <>
+      <PageTitle>Uber</PageTitle>
+      <div className="mt-6">
+        <NewBill preset="uber" />
+      </div>
+    </>
   );
 }
