@@ -55,3 +55,14 @@ export function iOwe(data: AppData): Balance[] {
   });
   return collect(entries).sort((a, b) => b.totals[0].amount - a.totals[0].amount);
 }
+
+/** All balances in a list added up, one total per currency. */
+export function totalOf(balances: Balance[]): { currency: string; amount: number }[] {
+  const totals: { currency: string; amount: number }[] = [];
+  for (const { currency, amount } of balances.flatMap((b) => b.totals)) {
+    const total = totals.find((t) => t.currency === currency);
+    if (total) total.amount += amount;
+    else totals.push({ currency, amount });
+  }
+  return totals;
+}

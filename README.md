@@ -127,7 +127,7 @@ flowchart TD
   draftCard -->|Discard, after asking| dash
   dash --> recurring{"Recurring bill due?"}
   recurring -->|Not yet| nextDate["Row shows 'Next: Oct 29'"]
-  recurring -->|Due| addNext["Press 'Add Nov 1': /new/recurring?from=id<br/>with name, people, payer, currency<br/>and frequency filled in"]
+  recurring -->|Due| addNext["Press 'Add Nov 1': /new/recurring?series=id<br/>with name, people, payer, frequency<br/>and the due date filled in"]
   addNext --> form
   dash --> openBill["Open a bill or a saved link /bills/[id]"]
   openBill --> exists{"Is the bill on this phone?"}

@@ -23,3 +23,36 @@ export function formatDate(iso: string, now = new Date()): string {
     ...(year !== now.getFullYear() && { year: "numeric" }),
   }).format(new Date(year, month - 1, day));
 }
+
+function parse(iso: string): Date {
+  const [year, month, day] = iso.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
+export function addDays(iso: string, days: number): string {
+  const date = parse(iso);
+  date.setDate(date.getDate() + days);
+  return todayIso(date);
+}
+
+/** Months later, on `day` of that month, or its last day if the month is shorter (Jan 31 → Feb 28). */
+export function addMonths(iso: string, months: number, day: number): string {
+  const date = parse(iso);
+  const target = new Date(date.getFullYear(), date.getMonth() + months, 1);
+  const lastDay = new Date(target.getFullYear(), target.getMonth() + 1, 0).getDate();
+  target.setDate(Math.min(day, lastDay));
+  return todayIso(target);
+}
+
+export function daysBetween(fromIso: string, toIso: string): number {
+  return Math.round((parse(toIso).getTime() - parse(fromIso).getTime()) / 86_400_000);
+}
+
+/** How long something has been outstanding: "since today", "for 3 days", "for 2 weeks", "for 2 months". */
+export function durationLabel(days: number): string {
+  if (days <= 0) return "since today";
+  if (days === 1) return "for 1 day";
+  if (days < 14) return `for ${days} days`;
+  if (days < 60) return `for ${Math.floor(days / 7)} weeks`;
+  return `for ${Math.floor(days / 30)} months`;
+}

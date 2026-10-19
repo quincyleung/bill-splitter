@@ -13,7 +13,7 @@ import { BillForm } from "./bill-form";
  * Next keeps visited pages alive in the background, so without it the old
  * entries would still be there next time.
  */
-export function NewBill({ preset }: { preset: Preset }) {
+export function NewBill({ preset, seriesId }: { preset: Preset; seriesId?: string }) {
   const state = useAppData();
   const [formKey, setFormKey] = useState(0);
 
@@ -21,9 +21,11 @@ export function NewBill({ preset }: { preset: Preset }) {
   if (state.status === "unreadable") return <UnreadableNotice raw={state.raw} />;
   return (
     <BillForm
-      key={formKey}
+      // A different series (or none) is a different form, even if this page was kept alive.
+      key={`${formKey}-${seriesId ?? ""}`}
       preset={preset}
-      people={state.data.people}
+      data={state.data}
+      seriesId={seriesId}
       onSaved={() => setFormKey((key) => key + 1)}
     />
   );

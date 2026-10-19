@@ -18,10 +18,12 @@ type ItemsFieldProps = {
   errors: Errors;
   setDraft: Dispatch<SetStateAction<Draft>>;
   requestFocus: (selector: string) => void;
+  /** Unique to this form, so focus can return to "Add item" after a removal. */
+  addItemId: string;
 };
 
 /** Typed-in items: a name, a price, and who had it. A shared item is split evenly. */
-export function ItemsField({ draft, people, errors, setDraft, requestFocus }: ItemsFieldProps) {
+export function ItemsField({ draft, people, errors, setDraft, requestFocus, addItemId }: ItemsFieldProps) {
   const updateItem = (key: string, change: Partial<DraftItem>) =>
     setDraft((current) => ({
       ...current,
@@ -36,7 +38,7 @@ export function ItemsField({ draft, people, errors, setDraft, requestFocus }: It
 
   function removeItem(key: string) {
     setDraft((current) => ({ ...current, items: current.items.filter((item) => item.key !== key) }));
-    requestFocus("#add-item");
+    requestFocus(`[id="${addItemId}"]`);
   }
 
   return (
@@ -106,7 +108,7 @@ export function ItemsField({ draft, people, errors, setDraft, requestFocus }: It
         })}
       </ol>
       <div className="mt-3">
-        <Button id="add-item" variant="secondary" onClick={addItem}>
+        <Button id={addItemId} variant="secondary" onClick={addItem}>
           Add item
         </Button>
       </div>

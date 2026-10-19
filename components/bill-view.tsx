@@ -14,9 +14,10 @@ import { trackedShares, withPaid } from "@/lib/bills";
 import { breakdownFor } from "@/lib/breakdown";
 import { copyText } from "@/lib/clipboard";
 import { formatDate } from "@/lib/dates";
-import { type Bill, type Frequency, ME, type Person, type RecurringBill, type Share } from "@/lib/model";
+import { type Bill, ME, type Person, type RecurringBill, type Share } from "@/lib/model";
 import { formatMoney } from "@/lib/money";
 import { listNames, personName } from "@/lib/people";
+import { frequencyLabel } from "@/lib/recurring";
 import { updateData, useAppData } from "@/lib/store";
 
 export function BillView({ params }: { params: Promise<{ id: string }> }) {
@@ -41,11 +42,6 @@ export function BillView({ params }: { params: Promise<{ id: string }> }) {
 
   const series = bill.kind === "recurring" ? state.data.recurring.find((r) => r.id === bill.recurringId) : undefined;
   return <BillDetails bill={bill} people={state.data.people} series={series} />;
-}
-
-function frequencyLabel({ unit, every }: Frequency): string {
-  if (every === 1) return unit === "week" ? "weekly" : "monthly";
-  return `every ${every} ${unit}s`;
 }
 
 function BillDetails({ bill, people, series }: { bill: Bill; people: Person[]; series?: RecurringBill }) {

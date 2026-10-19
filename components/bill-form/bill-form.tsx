@@ -5,7 +5,7 @@
 // next to their field after Save, and nothing typed is ever cleared.
 
 import { useRouter } from "next/navigation";
-import { type FormEvent, useEffect, useRef, useState } from "react";
+import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { AddField } from "@/components/ui/add-field";
 import { Button } from "@/components/ui/button";
 import { FieldGroup } from "@/components/ui/field-group";
@@ -19,6 +19,7 @@ import {
   addPersonError,
   checkDraft,
   type Draft,
+  draftFromSeries,
   isRecurring,
   nameOf,
   newDraft,
@@ -29,8 +30,9 @@ import {
 } from "@/lib/bill-draft";
 import { todayIso } from "@/lib/dates";
 import { createId } from "@/lib/id";
-import { ME, type Person } from "@/lib/model";
+import { type AppData, ME } from "@/lib/model";
 import { DEFAULT_CURRENCY } from "@/lib/money";
+import { recurringStatuses } from "@/lib/recurring";
 import { updateData } from "@/lib/store";
 import { ItemsField } from "./items-field";
 import { ShareSummary } from "./share-summary";
@@ -42,16 +44,35 @@ const TITLE_HINTS: Record<Preset, string> = {
   recurring: "Like Electricity",
 };
 
-type BillFormProps = { preset: Preset; people: Person[]; onSaved: () => void };
+type BillFormProps = {
+  preset: Preset;
+  data: AppData;
+  /** Fill the form in from this recurring series, for its next bill ("Add Nov 1"). */
+  seriesId?: string;
+  onSaved: () => void;
+};
 
-export function BillForm({ preset, people, onSaved }: BillFormProps) {
+export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
   const router = useRouter();
-  const [draft, setDraft] = useState(() => newDraft(preset, todayIso(), createId));
+  const people = data.people;
+  // Ids unique to this form: Next keeps visited pages alive (hidden), so a fixed id
+  // like "total" could exist twice and point labels and errors at the hidden copy.
+  const uid = useId();
+  const ids = { addPerson: `${uid}add-person`, total: `${uid}total`, addItem: `${uid}add-item` };
+  const byId = (id: string) => `[id="${id}"]`;
+  const [draft, setDraft] = useState(() => {
+    const today = todayIso();
+    const next = seriesId ? recurringStatuses(data, today).find((s) => s.series.id === seriesId) : undefined;
+    return next ? draftFromSeries(next.series, next.nextDue, people, createId) : newDraft(preset, today, createId);
+  });
   const [submitted, setSubmitted] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState("");
   const [saveError, setSaveError] = useState<string | null>(null);
-  const [focusRequest, setFocusRequest] = useState<{ selector: string } | null>(null);
+  // A filled-in recurring bill only needs this time's amount, so start there.
+  const [focusRequest, setFocusRequest] = useState<{ selector: string } | null>(() =>
+    draft.seriesId ? { selector: byId(ids.total) } : null,
+  );
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
@@ -90,7 +111,7 @@ export function BillForm({ preset, people, onSaved }: BillFormProps) {
     const error = addPersonError(draft.pendingName, draft, people);
     if (error) {
       setAddError(error);
-      requestFocus("#add-person");
+      requestFocus(byId(ids.addPerson));
       return;
     }
     const person = { id: createId(), name: draft.pendingName.trim() };
@@ -100,7 +121,7 @@ export function BillForm({ preset, people, onSaved }: BillFormProps) {
     });
     setAddError(null);
     setAnnouncement(`${person.name} added to this bill.`);
-    requestFocus("#add-person"); // ready for the next name
+    requestFocus(byId(ids.addPerson)); // ready for the next name
   }
 
   function handleSubmit(event: FormEvent) {
@@ -159,7 +180,7 @@ export function BillForm({ preset, people, onSaved }: BillFormProps) {
         </div>
         <div className="mt-3">
           <AddField
-            id="add-person"
+            id={ids.addPerson}
             buttonLabel="Add person"
             placeholder="Name"
             value={draft.pendingName}
@@ -209,10 +230,18 @@ export function BillForm({ preset, people, onSaved }: BillFormProps) {
       )}
 
       {byItem && (
-        <ItemsField draft={draft} people={people} errors={errors} setDraft={setDraft} requestFocus={requestFocus} />
+        <ItemsField
+          draft={draft}
+          people={people}
+          errors={errors}
+          setDraft={setDraft}
+          requestFocus={requestFocus}
+          addItemId={ids.addItem}
+        />
       )}
 
       <MoneyField
+        id={ids.total}
         label={byItem ? "Total paid, including tax and tip" : "Amount"}
         hint={byItem ? "The amount on your card slip, after tip" : undefined}
         currency={DEFAULT_CURRENCY}

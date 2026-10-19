@@ -377,3 +377,41 @@ Home shows who owes me what across all bills. Commit.
   - screenshots of the bill page and Home.
 
 **Pushed back:** Nothing.
+
+## Step 10: Coming back (2026-10-19)
+
+**Asked:** Build the returning experience. Returning visitors get a Home designed for coming back, not the first-visit screen:
+- "Welcome back";
+- who still owes me, and for how long;
+- whether I owe anyone;
+- recurring bills that are due.
+
+Also reflect these changes in `flows.md`.
+
+**Made:**
+- **Two faces for Home** (`components/home/home-view.tsx`):
+  - With no bills, it's the first-visit screen.
+  - With any bill, it's "Welcome back".
+  - Until saved data is read, it shows the neutral shell, never the wrong one. (So the quick starts are no longer prerendered on the server.)
+- **Welcome back:**
+  - A one-line summary ("You're owed $133.56. You owe $60.00. 1 recurring bill is due.", or "Nobody owes anyone right now."), plus New one-time bill (the main action) and New recurring bill.
+  - **Who owes you:** each person's total across bills I paid, "Unpaid since today / for 3 days / for 2 weeks / for 2 months" measured from their oldest unpaid bill (a month or more in bold), and the bills as links with dates.
+  - **You owe:** the same for bills someone else paid where my share isn't paid back.
+  - **Recurring bills:** due ones first, with "Add Oct 15"; others show "Next Nov 1".
+  - **Your bills:** last.
+- **Add the next recurring bill:**
+  - `/new/recurring?series=<id>` fills in the name, people, payer and how often, dated when it was due, with the cursor in the blank Amount.
+  - Saving continues the same series instead of starting a new one.
+  - Due dates step by the frequency. Monthly bills keep the first bill's day, clamped in short months (`lib/recurring.ts`, `lib/dates.ts`).
+  - The search param is read inside Suspense, as Cache Components require.
+- **Not netted:** Who owes you and You owe are separate lists, as you asked, so `flows.md`'s "net per person on Home" moves to the person page along with Settle up.
+- **Bug found and fixed:** Next keeps visited pages alive (hidden), so a hidden One-time form and a visible Recurring form both had fixed ids like `add-person` and `total`. That could point labels and errors at the hidden copy. The form's ids now come from `useId`. Also, the form now resets when switching between "Add Oct 15" and a blank recurring bill.
+- **`flows.md`:** Decision 5, the routes, a rewritten Flow 3 (wireframe, rules and states), and the Flow 3 diagram in both `flows.md` and `README.md`.
+- **Checks:**
+  - lint and a clean build;
+  - 6 new logic tests: month-end dates, due-first ordering, durations, per-person balances, breakdowns, and keeping one series;
+  - a new end-to-end step: a recurring bill Jo paid starting in August, then "You owe Jo", "Due Sep 1" listed first, "Add Sep 1" opening the filled-in form with the cursor in Amount, saving to "Add Oct 1", still 2 series;
+  - all 17 end-to-end checks with no console errors;
+  - a screenshot of the returning Home with realistic data.
+
+**Pushed back:** Nothing.

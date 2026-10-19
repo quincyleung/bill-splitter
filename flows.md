@@ -12,7 +12,7 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 | 2 | Tax and tip input | One "Total paid, including tax and tip" field. Tax and tip are the difference from the items, shared in proportion to each person's items. |
 | 3 | Entering meal items | **Paste receipt text** (copied with the phone's built-in text recognition) **or type them in**. Both end up as the same editable item rows. |
 | 4 | Who paid | Me or anyone on the bill. Only debts between me and whoever paid are tracked. |
-| 5 | Balances | Net per person on Home. **Settle up** on the person page. |
+| 5 | Balances | Home lists **Who owes you** and **You owe** separately, each person with how long it's been unpaid. Netting the two and **Settle up** come with the person page. |
 | 6 | Recurring frequency | Weekly, Every 2 weeks, Monthly, or Custom (every N weeks or months). |
 | 7 | Currency | Each bill has a currency, defaulting to the last one used. The first default is $ (USD). No conversion: totals are shown per currency. |
 | 8 | Person page | Keep |
@@ -29,7 +29,7 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 |---|---|
 | `/` | Home: empty on the first visit, a dashboard after that |
 | `/new/one-time` | One-time bill: How to split starts on Evenly |
-| `/new/recurring` | Recurring: a recurring bill with Monthly preselected (`?from=<billId>` fills in the last one) |
+| `/new/recurring` | Recurring: a recurring bill with Monthly preselected (`?series=<id>` fills in last time's details for the next bill) |
 | `/bills/[id]` | One bill: each person's share and how it was worked out, Mark paid, Copy message, edit, delete |
 | `/bills/[id]/edit` | Edit a bill |
 | `/people/[id]` | One person: bills both ways, net balance, Settle up |
@@ -334,7 +334,7 @@ Others' shares, between them and Sam: Jo $42.00
 
 ## Flow 3: Coming back next week or next month
 
-**Screens and routes:** `/` (dashboard), `/bills/[id]`, `/people/[id]` and `/new/recurring?from=<id>`.
+**Screens and routes:** `/` (Welcome back), `/bills/[id]`, `/people/[id]` (later) and `/new/recurring?series=<id>`.
 
 ```mermaid
 flowchart TD
@@ -358,7 +358,7 @@ flowchart TD
   draftCard -->|Discard, after asking| dash
   dash --> recurring{"Recurring bill due?"}
   recurring -->|Not yet| nextDate["Row shows 'Next: Oct 29'"]
-  recurring -->|Due| addNext["Press 'Add Nov 1': /new/recurring?from=id<br/>with name, people, payer, currency<br/>and frequency filled in"]
+  recurring -->|Due| addNext["Press 'Add Nov 1': /new/recurring?series=id<br/>with name, people, payer, frequency<br/>and the due date filled in"]
   addNext --> form
   dash --> openBill["Open a bill or a saved link /bills/[id]"]
   openBill --> exists{"Is the bill on this phone?"}
@@ -375,37 +375,44 @@ flowchart TD
 ```
 
 ```
-[ One-time ] [ Recurring ]
+Welcome back
+You're owed $133.56. You owe $60.00. 1 recurring bill is due.
+[ New one-time bill ]  [ New recurring bill ]
 
-Unfinished meal from Tue   [Continue] [Discard]
+Who owes you
+  Jo     $63.00   Unpaid for 2 weeks · For Electricity (Oct 1, $63.00)
+  Josh   $58.16   Unpaid for 2 weeks · For Dinner at Aba (Oct 5, $58.16)
+  Sam    $12.40   Unpaid since today · For Uber home (Oct 19, $12.40)
 
-Owed to you  $68.35
-  Jo    $28.10 · 1 bill    >
-You owe  $1.75
-  Sam   $1.75 · 2 bills    >
+You owe
+  Jo     $60.00   Unpaid for 2 months · For Internet (Aug 15, $30.00),
+                  Internet (Sep 15, $30.00)
 
-Recurring
-  Electricity · monthly · Sam pays   [Add Nov 1]
-  Internet · every 2 weeks · you pay   Next: Oct 29
+Recurring bills
+  Internet · Monthly · Jo pays · Due Oct 15        [Add Oct 15]
+  Electricity · Monthly · you pay · Next Nov 1
 
-Bills
-  Dinner at Nopa · Oct 18 · 0 of 2 paid
-  Electricity · Oct 1 · Sam paid · not paid back
-  > Settled (6)
+Your bills
+  Uber home · Oct 19 · 0 of 1 paid                 $24.80
+  Dinner at Aba · Oct 5 · 1 of 2 paid              $78.40
+  …
 ```
 
-- **Net per person:** Sam owes me $40.25 for dinner and I owe Sam $42.00 for electricity, so Home shows "You owe Sam $1.75". Balances in different currencies are shown side by side, for example "$1.75 · ¥2,400", and never netted against each other.
-- **Settle up:** tapping a person opens `/people/[id]`. It lists every open bill between us in both directions, each with its own Mark paid, plus **Settle up**, which asks first: "Settle up with Sam? This marks 2 bills as paid. You pay Sam $1.75."
-- **Recurring:** "Add Nov 1" appears once the next one is due. It opens the recurring form with the name, people, payer, currency and frequency filled in, and focus on the empty amount field. Before then, the row shows "Next: Oct 29". Nothing is created automatically.
+- **First visit or coming back:** with no bills saved, Home is the first-visit screen (Flow 1). With any bill, it's this one. Until saved data is read, it shows the neutral shell, never the wrong one.
+- **Welcome back** sums things up in one line, and two buttons start a new bill straight away (One-time is the main action).
+- **Who owes you:** one row per person: what they owe across all bills I paid, **how long** it's been unpaid (from their oldest unpaid bill: "since today", "for 3 days", "for 2 weeks", "for 2 months"; a month or more is in bold), and the bills it's for, as links with dates. Paid shares drop off.
+- **You owe:** the same, for bills someone else paid where my share isn't paid back yet.
+- **Not netted:** someone can appear in both lists. Netting them ("You owe Sam $1.75 overall") and **Settle up** come with the person page, `/people/[id]`, which isn't built yet. Different currencies sit side by side ("$1.75 · ¥2,400") and are never added together.
+- **Recurring bills:** due ones first, each with **Add Oct 15**. That opens `/new/recurring?series=<id>` with the name, people, payer and how often filled in, dated when it was due, and the cursor in Amount, which is blank because it changes each time. Saving continues the same series. Others show "Next Nov 1". Monthly bills keep the first bill's day (a bill on the 31st is due Apr 30, then May 31). Nothing is created automatically.
 
 | State | What I see |
 |---|---|
 | Loading | The neutral shell. Never the empty welcome screen. |
-| Open bills | The dashboard above, with unpaid bills first. |
-| Partly settled | Each bill shows "1 of 3 paid". Each person shows their net balance. |
-| All settled | "Nobody owes anyone right now." The add buttons and Settled list stay. |
-| Draft waiting | The "Unfinished…" card. Discard asks first. |
-| Recurring due | "Add Nov 1" on that row. Before then, "Next: Nov 1". |
+| Open bills | "Welcome back" with the sections above. |
+| Partly settled | Each bill shows "1 of 3 paid", and paid shares drop out of Who owes you. |
+| All settled | "Nobody owes anyone right now." The new-bill buttons, Recurring bills and Your bills stay. |
+| Recurring due | "Add Oct 15" on that row and "1 recurring bill is due." in the summary. Before then, "Next Nov 1". |
+| Draft waiting | Later: an "Unfinished…" card. Discard asks first. |
 
 ### Errors
 

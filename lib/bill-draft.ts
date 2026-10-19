@@ -39,6 +39,8 @@ export type Draft = {
   unit: "week" | "month";
   /** What's typed next to "Add person" right now. */
   pendingName: string;
+  /** Set when this is the next bill of an existing recurring series ("Add Nov 1"). */
+  seriesId?: string;
 };
 
 export function newItem(makeId: () => string): DraftItem {
@@ -60,6 +62,27 @@ export function newDraft(preset: Preset, today: string, makeId: () => string): D
     every: "",
     unit: "month",
     pendingName: "",
+  };
+}
+
+/**
+ * The next bill of a recurring series: same name, people, payer and frequency, dated
+ * when it's due. The amount stays blank, because it changes every time.
+ */
+export function draftFromSeries(series: RecurringBill, dueDate: string, people: Person[], makeId: () => string): Draft {
+  const { unit, every } = series.frequency;
+  const repeats: Repeats =
+    unit === "week" && every === 1 ? "week" : unit === "week" && every === 2 ? "two-weeks" : unit === "month" && every === 1 ? "month" : "custom";
+  const known = (id: string) => id === ME || people.some((p) => p.id === id);
+  return {
+    ...newDraft("recurring", dueDate, makeId),
+    seriesId: series.id,
+    title: series.name,
+    ticked: series.personIds.filter(known),
+    payerId: known(series.payerId) ? series.payerId : ME,
+    repeats,
+    every: repeats === "custom" ? String(every) : "",
+    unit,
   };
 }
 
@@ -249,14 +272,16 @@ export function saveDraft(data: AppData, draft: Draft, now: Date, makeId: () => 
   let bill: Bill;
   let series: RecurringBill | null = null;
   if (isRecurring(draft)) {
+    // Adding the next bill of a series keeps the series, updated to how it's set now.
+    const existing = data.recurring.find((r) => r.id === draft.seriesId);
     series = {
-      id: makeId(),
+      id: existing?.id ?? makeId(),
       name: title,
-      currency: DEFAULT_CURRENCY,
+      currency: existing?.currency ?? DEFAULT_CURRENCY,
       payerId: draft.payerId,
       personIds: draft.ticked,
       frequency: frequencyOf(draft),
-      createdAt: stamp,
+      createdAt: existing?.createdAt ?? stamp,
     };
     bill = { ...base, kind: "recurring", recurringId: series.id };
   } else if (splitsByItem(draft)) {
@@ -283,7 +308,11 @@ export function saveDraft(data: AppData, draft: Draft, now: Date, makeId: () => 
       ...data,
       people,
       bills: [...data.bills, bill],
-      recurring: series ? [...data.recurring, series] : data.recurring,
+      recurring: !series
+        ? data.recurring
+        : data.recurring.some((r) => r.id === series.id)
+          ? data.recurring.map((r) => (r.id === series.id ? series : r))
+          : [...data.recurring, series],
     },
   };
 }
