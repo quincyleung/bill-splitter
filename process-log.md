@@ -70,3 +70,14 @@
 - Checked that both files still hold identical diagrams.
 
 **Pushed back:** You caught that the first version sent every mode through one shared path and then asked "Meal by item?" again, which made the item steps look like they applied to every mode.
+
+## Step 4: Research how other apps welcome someone new (2026-10-19)
+
+**Asked:** Send three subagents in parallel to research how Splitwise, Tricount and Settle Up welcome someone new: the first screen, what they ask for before you can do anything (sign-up, a group, names), and how many steps until a first bill is split. Use public sources. Write `research.md` with a comparison table, 3–5 patterns worth using and 2–3 to avoid. Don't change the app.
+
+**Made:**
+- Three research agents ran in parallel, one per app. Each labelled every claim as official, user-reported or inferred, and flagged conflicting sources.
+- `research.md`: a comparison table across 11 rows, our planned step count for comparison (about 5, against about 8–10 for the others), 5 patterns worth using and 3 to avoid (each with what it means for us), possible changes to `flows.md` that I didn't make, gaps and caveats, and sources.
+- The app and `flows.md` are unchanged.
+
+**Pushed back:** Nothing.
