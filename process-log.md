@@ -348,3 +348,32 @@ Then commit.
   - Lint, build, all 15 end-to-end checks, and screenshots of Home, the form, the bill page and the error state.
 
 **Pushed back:** Nothing.
+
+## Step 9: The bill page and who owes you (2026-10-19)
+
+**Asked:** Build the bill page with:
+- each person's share and how it was worked out (their items, their share of tax and tip);
+- a "Mark paid" control per person;
+- "Copy message", which copies a short text like "Dinner: you owe me $23.40".
+
+Home shows who owes me what across all bills. Commit.
+
+**Made:**
+- **Bill page:**
+  - The title, then "Oct 19 · $78.40 · You paid", then a headline naming who still owes ("Josh and Julie owe you $68.27") with "0 of 2 paid".
+  - One card per person:
+    - their share in large type;
+    - a status ("Owes you" or "Paid you back");
+    - how it was worked out. By item: each item they had (shared ones say "shared by 3" and show their part), the items subtotal, then "Tax and tip (26% of items) +$12.16". Evenly: "$90.00 split 3 ways". The lines always add up to the saved share (`lib/breakdown.ts`).
+  - My own share gets a card too, without the controls.
+- **Mark paid:** a Greek Summer checkbox on each card (a new shared Checkbox; it replaces Step 7's tick rows). Screen readers hear "Mark paid for Josh". A paid amount is struck through. On a bill someone else paid, Mark paid sits on my card and means I've paid them back.
+- **Copy message:** on each unpaid person's card. It copies "Dinner at Aba: you owe me $58.16" and confirms "Copied a message for Josh." It replaces the single group "Copy amounts" text from Step 6.
+- **Home's "Who owes you":** one row per person with their total across all bills I paid. Amounts are kept per currency, never converted (`lib/balances.ts`). The row also says which bills it's for, as links ("For Dinner at Aba ($58.16)"). Paid shares drop off.
+- **Docs:** `flows.md` updated (the bill page wireframe and rules, Copy message, Who owes you) and the main-task diagram in both files.
+- **Checks:**
+  - lint and a clean build;
+  - 16 end-to-end checks, now including the meal breakdown, the label "Mark paid for Josh", and reading the clipboard after Copy message (it held "Dinner with Josh and Julie: you owe me $30.00");
+  - Home's "Who owes you" after Julie paid;
+  - screenshots of the bill page and Home.
+
+**Pushed back:** Nothing.

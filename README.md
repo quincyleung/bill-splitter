@@ -83,7 +83,7 @@ flowchart TD
   errSave --> check
   stored -->|Yes| bill["Success: bill page /bills/[id] says 'Saved'"]
   bill --> payer{"Who paid?"}
-  payer -->|Me| owedToMe["Each person owes me their share<br/>Copy amounts to the group chat"]
+  payer -->|Me| owedToMe["Each person owes me their share<br/>Copy message to each of them"]
   owedToMe --> markPaid["Mark paid as each person pays me"]
   payer -->|Someone else| iOwe["I owe the payer my share"]
   iOwe --> paidBack["Press I paid them back"]

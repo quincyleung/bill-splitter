@@ -18,7 +18,7 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 | 8 | Person page | Keep |
 | 9 | Edit a saved bill | Keep, built after the core flows |
 | 10 | Autosaved draft | Keep. One draft at a time. |
-| 11 | Copy amounts | Keep, on bills I paid. The text stands on its own: "I paid for Dinner at Nopa (Oct 18). Sam $40.25, Jo $28.10." |
+| 11 | Copy message | One per person on bills I paid, short enough to paste anywhere: "Dinner at Aba: you owe me $40.25". |
 | 12 | iPhone data loss | Installable to the Home Screen (web app manifest), suggested once after the first bill is saved. Export/Import backup later. **On hold:** on iPhone, a site added to the Home Screen gets its own storage, separate from Safari's, so bills saved before adding it wouldn't show up there. Decide how to handle that before building the tip. |
 | 13 | Recurring split | Even only |
 | 14 | New people and hints (from research.md) | Someone I've just added is ticked for this bill. Fields show example hints. No sample bills. |
@@ -30,7 +30,7 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 | `/` | Home: empty on the first visit, a dashboard after that |
 | `/new/one-time` | One-time bill: How to split starts on Evenly |
 | `/new/recurring` | Recurring: a recurring bill with Monthly preselected (`?from=<billId>` fills in the last one) |
-| `/bills/[id]` | One bill: who owes whom, mark paid, copy amounts, edit, delete |
+| `/bills/[id]` | One bill: each person's share and how it was worked out, Mark paid, Copy message, edit, delete |
 | `/bills/[id]/edit` | Edit a bill |
 | `/people/[id]` | One person: bills both ways, net balance, Settle up |
 
@@ -146,7 +146,7 @@ flowchart TD
   errSave --> check
   stored -->|Yes| bill["Success: bill page /bills/[id] says 'Saved'"]
   bill --> payer{"Who paid?"}
-  payer -->|Me| owedToMe["Each person owes me their share<br/>Copy amounts to the group chat"]
+  payer -->|Me| owedToMe["Each person owes me their share<br/>Copy message to each of them"]
   owedToMe --> markPaid["Mark paid as each person pays me"]
   payer -->|Someone else| iOwe["I owe the payer my share"]
   iOwe --> paidBack["Press I paid them back"]
@@ -236,32 +236,51 @@ Fields: name ("Electricity"), date of this bill, amount and currency, roommates,
 When I paid:
 
 ```
-Dinner at Aba · Oct 18 · $102.20 · You paid
+Dinner at Aba
+Oct 18 · $102.20 · You paid
 Josh owes you $40.25
-1 of 2 paid. Tick each person when they pay you back.
+1 of 2 paid
 
-[ ] Josh    Owes you         $40.25
-[✓] Julie   Paid you back    $28.10   (struck through)
-Your share $33.85
-[Show breakdown]  (each person's items)
+┌ Josh                               $40.25 ┐
+│ Owes you                                  │
+│ Lamb shoulder                      $38.00 │
+│ Mezze, shared by 3                  $8.00 │   ← their items
+│ Items                              $46.00 │
+│ Tax and tip (26% of items)        +$12.16 │   ← their share of tax and tip
+│ [ ] Mark paid            [Copy message]   │
+└───────────────────────────────────────────┘
+┌ Julie                       ~~$28.10~~    ┐
+│ Paid you back  …breakdown…  [✓] Mark paid │
+└───────────────────────────────────────────┘
+┌ Your share                         $33.85 ┐
+│ …breakdown…                               │
+└───────────────────────────────────────────┘
 
-[Copy amounts]  [Edit]  [Delete]
+[Edit]  [Delete]
 ```
 
 When someone else paid:
 
 ```
-Electricity · Oct 1 · $126.00 · Sam paid
+Electricity
+Oct 1 · $126.00 · Sam paid · Repeats monthly
 You owe Sam $42.00
-[ ] I paid Sam back   Not paid back yet   $42.00
-Others' shares (between them and Sam): Jo $42.00
+
+┌ Your share                         $42.00 ┐
+│ You owe Sam                               │
+│ $126.00 split 3 ways                      │
+│ [ ] Mark paid                             │
+└───────────────────────────────────────────┘
+Others' shares, between them and Sam: Jo $42.00
 
 [Edit]  [Delete]
 ```
 
-- **Tick off each person** when they pay you back, one at a time; untick to undo. The heading then names only who still owes you, with "1 of 2 paid" under it, and becomes "All paid up" (with a "Everyone's paid you back." message) once the last one is ticked. On a bill someone else paid, the one tick box is **I paid Sam back**. Paid is just yes or no.
+- **Each person has a card** with their share and how it was worked out. By item: their items (shared ones say "shared by 3" and show their part), the items subtotal, then their share of tax and tip with the rate ("Tax and tip (26% of items) +$12.16"). The lines add up to their share. Evenly: "$90.00 split 3 ways". My own share gets a card too, without the controls.
+- **Mark paid** is a checkbox on each card. Tick it when that person pays you back, one at a time; untick to undo. Paid amounts are struck through. The heading names only who still owes you, with "1 of 2 paid" under it, and becomes "All paid up" (with "Everyone's paid you back.") once the last one is ticked. On a bill someone else paid, **Mark paid** on my card means I've paid them back. Paid is just yes or no.
 - **Home's list** shows each bill's status: "1 of 2 paid", "All paid up", "Not paid back yet" or "Paid back".
-- **Copy amounts** (only on bills I paid) puts text like "I paid for Dinner at Aba (Oct 18). Josh $40.25." on the clipboard, listing only people who haven't paid yet, to paste into the group chat. It stands on its own, so friends never need the app.
+- **Copy message** is on each unpaid person's card (only on bills I paid). It copies a short text to send them: "Dinner at Aba: you owe me $40.25". It stands on its own, so friends never need the app.
+- **Home's "Who owes you"** adds up what each person owes across all bills I paid (per currency, never converted), with the bills it's for as links: "Josh $70.25. For Dinner at Aba ($40.25), Uber home ($30.00)".
 - **Edit** opens `/bills/[id]/edit` with the same form, filled in. If a person already marked paid ends up with a different share, they go back to unpaid: "Sam's share changed from $40.25 to $43.10, so they're unpaid again."
 - **Delete** asks first: "Delete Dinner at Nopa? This can't be undone."
 
@@ -302,7 +321,7 @@ Others' shares (between them and Sam): Jo $42.00
 | Name | Blank | "Name this bill, like Dinner at Aba." On a recurring bill: "Name this bill, like Electricity." |
 | Repeats (custom) | Blank, or outside 1–52 weeks or 1–12 months | "Enter how often, like every 3 months." |
 | Save | Storage full or blocked | Shown near Save: "Couldn't save on this phone. Everything you typed is still here. Try again." |
-| Paid tick box | Couldn't save | The tick stays as it was, with "Couldn't save that. Try again." |
+| Mark paid | Couldn't save | The box stays as it was, with "Couldn't save that. Try again." |
 
 **Warnings that don't block Save:**
 - "Jo isn't on any item, so they owe $0. Tick them on an item or remove them."

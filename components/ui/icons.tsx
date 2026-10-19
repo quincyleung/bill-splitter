@@ -26,6 +26,33 @@ export function RadioIcon({ checked, className = "size-5 shrink-0" }: IconProps 
   );
 }
 
+/** A Greek Summer checkbox: 6px corners, navy with a white tick when checked. */
+export function CheckboxIcon({ checked, className = "size-5 shrink-0" }: IconProps & { checked: boolean }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 20 20" className={className}>
+      <rect
+        x="0.75"
+        y="0.75"
+        width="18.5"
+        height="18.5"
+        rx="6"
+        strokeWidth="1.5"
+        className={checked ? "fill-check stroke-check" : "fill-surface stroke-field"}
+      />
+      {checked && (
+        <path
+          d="M5.5 10.5l3 3 6-6.5"
+          fill="none"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          className="stroke-on-check"
+        />
+      )}
+    </svg>
+  );
+}
+
 export function AlertIcon({ className = "size-5" }: IconProps) {
   return (
     <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor" className={className}>

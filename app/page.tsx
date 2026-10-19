@@ -1,5 +1,6 @@
 import { ArchArt } from "@/components/home/arch-art";
 import { HomeStatus } from "@/components/home/home-status";
+import { OwedToMe } from "@/components/home/owed-to-me";
 import { QuickStarts } from "@/components/home/quick-starts";
 import { SavedBills } from "@/components/home/saved-bills";
 import { PageTitle } from "@/components/ui/page-title";
@@ -16,6 +17,7 @@ export default function HomePage() {
       <div className="mt-6">
         <QuickStarts />
       </div>
+      <OwedToMe />
       <SavedBills />
     </>
   );

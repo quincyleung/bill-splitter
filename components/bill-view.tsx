@@ -6,14 +6,15 @@ import { UnreadableNotice } from "@/components/unreadable-notice";
 import { Button } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button-link";
 import { Card } from "@/components/ui/card";
-import { CheckRow } from "@/components/ui/check-row";
+import { Checkbox } from "@/components/ui/checkbox";
 import { AlertIcon } from "@/components/ui/icons";
 import { PageTitle } from "@/components/ui/page-title";
 import { showToast } from "@/components/ui/toast";
 import { trackedShares, withPaid } from "@/lib/bills";
+import { breakdownFor } from "@/lib/breakdown";
 import { copyText } from "@/lib/clipboard";
 import { formatDate } from "@/lib/dates";
-import { type Bill, type Frequency, ME, type Person, type RecurringBill } from "@/lib/model";
+import { type Bill, type Frequency, ME, type Person, type RecurringBill, type Share } from "@/lib/model";
 import { formatMoney } from "@/lib/money";
 import { listNames, personName } from "@/lib/people";
 import { updateData, useAppData } from "@/lib/store";
@@ -58,7 +59,7 @@ function BillDetails({ bill, people, series }: { bill: Bill; people: Person[]; s
   const unpaid = owed.filter((s) => !s.paid);
   const othersWithPayer = youPaid ? [] : bill.shares.filter((s) => s.personId !== ME && s.personId !== bill.payerId);
 
-  /** Ticks a share off as paid back (or unticks it). If saving fails, the tick stays as it was. */
+  /** Marks a share paid back (or not). If saving fails, the box stays as it was. */
   function setPaid(personId: string, paid: boolean) {
     const result = updateData((data) => ({
       ...data,
@@ -72,10 +73,18 @@ function BillDetails({ bill, people, series }: { bill: Bill; people: Person[]; s
     if (paid && youPaid && unpaid.every((s) => s.personId === personId)) showToast("Everyone's paid you back.");
   }
 
-  async function copyAmounts() {
-    const amounts = unpaid.map((s) => `${name(s.personId)} ${money(s.amount)}`).join(", ");
-    const copied = await copyText(`I paid for ${bill.title} (${formatDate(bill.date)}). ${amounts}.`);
-    showToast(copied ? "Copied. Paste it into your group chat." : "Couldn't copy. Try again.");
+  async function copyMessage(share: Share) {
+    const copied = await copyText(`${bill.title}: you owe me ${money(share.amount)}`);
+    showToast(copied ? `Copied a message for ${name(share.personId)}.` : "Couldn't copy. Try again.");
+  }
+
+  let headline: string;
+  if (!youPaid) headline = myShare?.paid ? `You've paid ${name(bill.payerId)} back` : `You owe ${name(bill.payerId)} ${money(myShare?.amount ?? 0)}`;
+  else if (owed.length === 0) headline = "Nobody owes you on this bill";
+  else if (unpaid.length === 0) headline = "All paid up";
+  else {
+    const total = unpaid.reduce((sum, s) => sum + s.amount, 0);
+    headline = `${listNames(unpaid.map((s) => name(s.personId)))} ${unpaid.length === 1 ? "owes" : "owe"} you ${money(total)}`;
   }
 
   return (
@@ -86,79 +95,128 @@ function BillDetails({ bill, people, series }: { bill: Bill; people: Person[]; s
         {series && ` · Repeats ${frequencyLabel(series.frequency)}`}
       </p>
 
-      <div className="mt-6">
-        <Card as="section">
-          {youPaid ? (
-            <>
-              <h2 className="type-title text-ink">
-                {owed.length === 0
-                  ? "Nobody owes you on this bill"
-                  : unpaid.length === 0
-                    ? "All paid up"
-                    : `${listNames(unpaid.map((s) => name(s.personId)))} ${unpaid.length === 1 ? "owes" : "owe"} you ${money(unpaid.reduce((sum, s) => sum + s.amount, 0))}`}
-              </h2>
-              {owed.length > 0 && (
-                <p className="mt-1 type-small text-ink-muted">
-                  {owed.length - unpaid.length} of {owed.length} paid. Tick each person when they pay you back.
-                </p>
-              )}
-              <ul className="-mx-3 mt-2">
-                {owed.map((share) => (
-                  <li key={share.personId}>
-                    <CheckRow
-                      label={name(share.personId)}
-                      detail={share.paid ? "Paid you back" : "Owes you"}
-                      value={money(share.amount)}
-                      checked={share.paid}
-                      onChange={(paid) => setPaid(share.personId, paid)}
-                    />
-                  </li>
-                ))}
-              </ul>
-              {myShare && <p className="mt-2 text-ink-muted">Your share {money(myShare.amount)}</p>}
-            </>
+      <p className="type-title mt-6 text-ink">{headline}</p>
+      {owed.length > 0 && (
+        <p className="type-small mt-1 text-ink-muted">
+          {owed.length - unpaid.length} of {owed.length} paid
+        </p>
+      )}
+      {saveError && (
+        <p role="alert" className="type-small mt-3 flex items-start gap-2 font-semibold text-danger">
+          <AlertIcon className="mt-0.5 size-4 shrink-0" />
+          {saveError}
+        </p>
+      )}
+
+      <div className="mt-5 space-y-4">
+        {owed.map((share) => (
+          <ShareCard
+            key={share.personId}
+            bill={bill}
+            share={share}
+            title={name(share.personId)}
+            status={share.paid ? "Paid you back" : "Owes you"}
+            onPaid={(paid) => setPaid(share.personId, paid)}
+            onCopy={() => copyMessage(share)}
+          />
+        ))}
+        {myShare &&
+          (youPaid ? (
+            <ShareCard bill={bill} share={myShare} title="Your share" />
           ) : (
-            <>
-              <h2 className="type-title text-ink">
-                {myShare?.paid
-                  ? `You've paid ${name(bill.payerId)} back`
-                  : `You owe ${name(bill.payerId)} ${money(myShare?.amount ?? 0)}`}
-              </h2>
-              {myShare && (
-                <div className="-mx-3 mt-2">
-                  <CheckRow
-                    label={`I paid ${name(bill.payerId)} back`}
-                    detail={myShare.paid ? "Paid back" : "Not paid back yet"}
-                    value={money(myShare.amount)}
-                    checked={myShare.paid}
-                    onChange={(paid) => setPaid(ME, paid)}
-                  />
-                </div>
-              )}
-              {othersWithPayer.length > 0 && (
-                <p className="mt-2 text-ink-muted">
-                  Others&apos; shares, between them and {name(bill.payerId)}:{" "}
-                  {othersWithPayer.map((s) => `${name(s.personId)} ${money(s.amount)}`).join(", ")}
-                </p>
-              )}
-            </>
-          )}
-          {saveError && (
-            <p role="alert" className="mt-3 flex items-start gap-2 type-small font-semibold text-danger">
-              <AlertIcon className="mt-0.5 size-4 shrink-0" />
-              {saveError}
-            </p>
-          )}
-        </Card>
+            <ShareCard
+              bill={bill}
+              share={myShare}
+              title="Your share"
+              status={myShare.paid ? `Paid ${name(bill.payerId)} back` : `You owe ${name(bill.payerId)}`}
+              onPaid={(paid) => setPaid(ME, paid)}
+            />
+          ))}
       </div>
 
-      {unpaid.length > 0 && (
-        <div className="mt-4">
-          <Button variant="secondary" onClick={copyAmounts}>
-            Copy amounts
-          </Button>
-        </div>
+      {othersWithPayer.length > 0 && (
+        <p className="type-small mt-4 text-ink-muted">
+          Others&apos; shares, between them and {name(bill.payerId)}:{" "}
+          {othersWithPayer.map((s) => `${name(s.personId)} ${money(s.amount)}`).join(", ")}
+        </p>
       )}
     </>
+  );
+}
+
+type ShareCardProps = {
+  bill: Bill;
+  share: Share;
+  title: string;
+  status?: string;
+  /** Present when this share can be marked paid. */
+  onPaid?: (paid: boolean) => void;
+  onCopy?: () => void;
+};
+
+/** One person's share and how it was worked out, with Mark paid and Copy message. */
+function ShareCard({ bill, share, title, status, onPaid, onCopy }: ShareCardProps) {
+  const money = (amount: number) => formatMoney(Math.round(amount), bill.currency);
+  const breakdown = breakdownFor(bill, share.personId);
+  const settled = Boolean(onPaid) && share.paid;
+
+  return (
+    <Card as="section">
+      <div className="flex items-baseline justify-between gap-3">
+        <h2 className="type-title text-ink">{title}</h2>
+        <p className={`type-title ${settled ? "text-ink-muted line-through" : "text-ink"}`}>{money(share.amount)}</p>
+      </div>
+      {status && <p className="type-small text-ink-muted">{status}</p>}
+
+      <ul className="type-small mt-3 space-y-1 text-ink-muted" aria-label={`How ${title === "Your share" ? "your share" : `${title}'s share`} was worked out`}>
+        {breakdown.kind === "items" ? (
+          <>
+            {breakdown.items.map((item, index) => (
+              <li key={index} className="flex justify-between gap-3">
+                <span>
+                  {item.name}
+                  {item.sharedBy > 1 && `, shared by ${item.sharedBy}`}
+                </span>
+                <span>{money(item.amount)}</span>
+              </li>
+            ))}
+            {breakdown.items.length === 0 && <li>No items</li>}
+            <li className="flex justify-between gap-3 border-t border-line pt-1 text-ink">
+              <span>Items</span>
+              <span>{money(breakdown.itemsTotal)}</span>
+            </li>
+            <li className="flex justify-between gap-3 text-ink">
+              <span>Tax and tip ({Math.round(breakdown.rate * 100)}% of items)</span>
+              <span>+{money(breakdown.taxAndTip)}</span>
+            </li>
+          </>
+        ) : (
+          <li>
+            {breakdown.ways === 1
+              ? "The whole bill"
+              : `${money(breakdown.total)} split ${breakdown.ways} ways`}
+          </li>
+        )}
+      </ul>
+
+      {onPaid && (
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-2">
+          <Checkbox
+            label={
+              <>
+                Mark paid<span className="sr-only"> for {title === "Your share" ? "your share" : title}</span>
+              </>
+            }
+            checked={share.paid}
+            onChange={onPaid}
+          />
+          {onCopy && !share.paid && (
+            <Button variant="secondary" onClick={onCopy}>
+              Copy message<span className="sr-only"> for {title}</span>
+            </Button>
+          )}
+        </div>
+      )}
+    </Card>
   );
 }
