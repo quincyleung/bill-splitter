@@ -1,7 +1,7 @@
 "use client";
 
-// The one form behind all three quick starts. Meal opens with "By item", Even split
-// with "Evenly", and Recurring with a monthly, even split. One column; errors appear
+// The one form behind both quick starts. One-time opens on "Evenly" (the shortest
+// form) with "By item" one tap away; Recurring is a monthly, even split. One column; errors appear
 // next to their field after Save, and nothing typed is ever cleared.
 
 import { useRouter } from "next/navigation";
@@ -38,8 +38,7 @@ import { ShareSummary } from "./share-summary";
 const FIRST_INVALID = '[aria-invalid="true"], [data-invalid] input';
 
 const TITLE_HINTS: Record<Preset, string> = {
-  meal: "Like Dinner at Aba",
-  even: "Like Uber to the airport",
+  "one-time": "Like Dinner at Aba or Uber home",
   recurring: "Like Electricity",
 };
 
@@ -132,7 +131,7 @@ export function BillForm({ preset, people, onSaved }: BillFormProps) {
   return (
     <form ref={formRef} noValidate onSubmit={handleSubmit} className="space-y-6">
       <TextField
-        label={recurring ? "Name" : "Name (optional)"}
+        label="Name"
         hint={TITLE_HINTS[preset]}
         value={draft.title}
         onChange={(event) => update({ title: event.target.value })}

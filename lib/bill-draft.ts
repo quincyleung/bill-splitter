@@ -7,15 +7,14 @@ import { type AppData, type Bill, type Frequency, ME, type Person, type Recurrin
 import { DEFAULT_CURRENCY, formatMoney, parseMoney } from "./money";
 import { type ItemSplit, itemTotalsOf, splitByItems, splitEvenly } from "./split";
 
-export type Preset = "meal" | "even" | "recurring";
+export type Preset = "one-time" | "recurring";
 export type SplitMethod = "items" | "even";
 export type Repeats = "week" | "two-weeks" | "month" | "custom";
 
-/** What each quick start preselects, and the title used when the name is left blank. */
-export const PRESETS: Record<Preset, { split: SplitMethod; recurring: boolean; fallbackTitle: string }> = {
-  meal: { split: "items", recurring: false, fallbackTitle: "Meal" },
-  even: { split: "even", recurring: false, fallbackTitle: "Even split" },
-  recurring: { split: "even", recurring: true, fallbackTitle: "" },
+/** What each quick start preselects. One-time starts on Evenly, the shortest form; By item is one tap away. */
+export const PRESETS: Record<Preset, { split: SplitMethod; recurring: boolean }> = {
+  "one-time": { split: "even", recurring: false },
+  recurring: { split: "even", recurring: true },
 };
 
 export type DraftItem = { key: string; price: string; name: string; personIds: string[] };
@@ -23,7 +22,7 @@ export type DraftPerson = { id: string; name: string };
 
 export type Draft = {
   preset: Preset;
-  /** The bill's name: optional for one-time bills, required for recurring ones. */
+  /** The bill's name, e.g. "Dinner at Aba". Required. */
   title: string;
   date: string;
   /** People typed in on this form. Saved with the bill, and only if they're ticked. */
@@ -137,6 +136,7 @@ export type Errors = Record<string, string>;
 
 /** Field keys for errors, in the order the fields appear. */
 export const errorKey = {
+  name: (key: string) => `name:${key}`,
   price: (key: string) => `price:${key}`,
   who: (key: string) => `who:${key}`,
 };
@@ -147,7 +147,7 @@ export function checkDraft(draft: Draft, people: Person[]): { errors: Errors; wa
   const name = (id: string) => nameOf(id, draft, people);
   const recurring = isRecurring(draft);
 
-  if (recurring && !draft.title.trim()) errors.title = "Name this bill, like Electricity.";
+  if (!draft.title.trim()) errors.title = recurring ? "Name this bill, like Electricity." : "Name this bill, like Dinner at Aba.";
   if (!isIsoDate(draft.date)) errors.date = "Enter the date of the bill.";
 
   const pending = draft.pendingName.trim();
@@ -168,6 +168,7 @@ export function checkDraft(draft: Draft, people: Person[]): { errors: Errors; wa
     const items = parseItems(draft);
     if (items.length === 0) errors.items = "Add at least one item from the receipt.";
     for (const { item, price, personIds } of items) {
+      if (!item.name.trim()) errors[errorKey.name(item.key)] = "Name this item, like Burger.";
       if (price === null) errors[errorKey.price(item.key)] = "Enter a price, like 12.50.";
       else if (price === 0) errors[errorKey.price(item.key)] = "Enter a price above 0.";
       if (personIds.length === 0) errors[errorKey.who(item.key)] = "Choose who had this item.";
@@ -232,7 +233,7 @@ export function saveDraft(data: AppData, draft: Draft, now: Date, makeId: () => 
 
   const stamp = now.toISOString();
   const billId = makeId();
-  const title = draft.title.trim() || PRESETS[draft.preset].fallbackTitle;
+  const title = draft.title.trim();
   const base = {
     id: billId,
     title,

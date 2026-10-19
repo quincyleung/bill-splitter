@@ -8,7 +8,7 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 
 | # | Decision | Chosen |
 |---|---|---|
-| 1 | Modes | Three quick starts: **Meal** (by item), **Even split** (one time, like an Uber ride) and **Recurring** (evenly, repeats, Monthly preselected). Meal and Even split open the same form with a **How to split** choice (By item / Evenly) preselected, so a meal everyone shared can switch to Evenly. Recurring is always even. |
+| 1 | Modes | Two quick starts: **One-time** (a meal, a ride, anything once) and **Recurring** (repeats, Monthly preselected). One-time opens on **How to split: Evenly**, the shortest form, with **By item** one tap away. Recurring is always even. |
 | 2 | Tax and tip input | One "Total paid, including tax and tip" field. Tax and tip are the difference from the items, shared in proportion to each person's items. |
 | 3 | Entering meal items | **Paste receipt text** (copied with the phone's built-in text recognition) **or type them in**. Both end up as the same editable item rows. |
 | 4 | Who paid | Me or anyone on the bill. Only debts between me and whoever paid are tracked. |
@@ -28,15 +28,14 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 | Route | Screen |
 |---|---|
 | `/` | Home: empty on the first visit, a dashboard after that |
-| `/new/meal` | Meal: the bill form with By item preselected |
-| `/new/even` | Even split: the same form with Evenly preselected |
+| `/new/one-time` | One-time bill: How to split starts on Evenly |
 | `/new/recurring` | Recurring: a recurring bill with Monthly preselected (`?from=<billId>` fills in the last one) |
 | `/bills/[id]` | One bill: who owes whom, mark paid, copy amounts, edit, delete |
 | `/bills/[id]/edit` | Edit a bill |
 | `/people/[id]` | One person: bills both ways, net balance, Settle up |
 
 - **Navigation:** no tabs. Home's quick starts are how a bill starts, the app name in the header goes back to Home, and each page's title says where you are.
-- **Who paid:** every bill has one payer. It defaults to Me, and can be anyone ticked on the bill.
+- **Who paid:** every bill has one payer, picked with radio dots so it doesn't look like the tick-many people chips. It defaults to Me, and can be anyone ticked on the bill.
 - **Debts:** if I paid, everyone else on the bill owes me their share. If someone else paid, I owe them my share. What the others owe them is shown for reference but not tracked.
 - **Me:** I'm in every split by default, with my own items. I can untick myself only on a bill I paid.
 - **People are saved automatically** with the bill: anyone typed in with **Add person** who's still ticked when I press Save. Someone I've just added is ticked straight away, and Enter adds them and keeps the cursor there, so names can be typed one after another. People saved from earlier bills stay unticked until I tap them. The picker lists the people I used most recently first.
@@ -44,7 +43,7 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 - **Currency:** shown next to the amount field with a **Change** button. The picker lists my recent currencies first, then every other one from the browser's built-in list. Amounts in different currencies are never added together or converted.
 - **Loading state:** saved data can only be read in the browser, so each page shows a neutral shell until it has loaded. A returning user never sees a flash of the empty first-visit screen.
 - **Number fields** open the decimal keypad and accept `12`, `12.5` or `$12.50`.
-- **Labels:** no question marks ("Who paid", not "Who paid?"). Optional fields say "(optional)".
+- **Labels:** no question marks ("Who paid", not "Who paid?"), and no "(optional)": every field on a bill is needed, including each item's name.
 - **Hints:** fields show an example under their label, such as "Like Dinner at Nopa" or "Like 12.50". Placeholders never stand in for labels. There are no sample bills, because fake bills would mix into real balances.
 - **On Save:** errors appear next to their fields, focus moves to the first one, and nothing typed is cleared.
 
@@ -64,11 +63,9 @@ flowchart TD
   errStorage --> welcome
   canSave -->|Yes| welcome["Empty: Home with welcome text<br/>and three start buttons"]
   welcome --> mode{"Which quick start?"}
-  mode -->|Meal| meal["Bill form, By item<br/>/new/meal"]
-  mode -->|Even split| even["Bill form, Evenly<br/>/new/even"]
+  mode -->|One-time| once["One-time form, Evenly<br/>/new/one-time"]
   mode -->|Recurring| rec["Recurring form, Monthly<br/>/new/recurring"]
-  meal --> noPeople
-  even --> noPeople
+  once --> noPeople
   rec --> noPeople
   noPeople["Empty: Who was there shows only Me<br/>and a name field with Add person"] --> addName{"Type a name, press Add person"}
   addName -->|Blank| errName["Error: 'Type a name, then press Add person.'"]
@@ -92,9 +89,8 @@ Split a bill
 Pick one to start. Everything stays on this phone,
 and your friends don't need the app.
 
-[ Meal         Split by what each person had          ]
-[ Even split   Split evenly, like an Uber ride        ]
-[ Recurring    Split evenly and repeats, like utilities ]
+[ One-time    A meal, a ride, anything once ]
+[ Recurring   Repeats, like utilities       ]
 ```
 
 | State | What I see |
@@ -109,38 +105,34 @@ and your friends don't need the app.
 
 ```mermaid
 flowchart TD
-  start(["Home: tap a start button"]) --> mode{"Which mode?"}
+  start(["Home: tap a start button"]) --> mode{"Which quick start?"}
 
-  subgraph mealPath ["Meal: By item, split by who had what"]
-    meal["Empty: meal form, Me ticked and paying,<br/>Items offers Paste or Type"] --> mealPeople["Tick who was there, choose who paid"]
-    mealPeople --> how{"Paste or type the items?"}
-    how -->|Paste| paste["Paste receipt text, press Read receipt"]
+  subgraph oncePath ["One-time"]
+    once["Empty: one-time form, Me ticked and paying,<br/>How to split on Evenly"] --> oncePeople["Name, date, tick who was there,<br/>choose who paid"]
+    oncePeople --> how{"How to split?"}
+    how -->|Evenly| evenAmount["Enter amount and currency"]
+    evenAmount --> evenSplit["Split evenly between everyone ticked"]
+    how -->|By item| itemsHow{"Paste or type the items?"}
+    itemsHow -->|Paste| paste["Paste receipt text, press Read receipt"]
     paste --> prices{"Any prices found?"}
     prices -->|No| errPaste["Error: 'Couldn't find any prices in that text.<br/>Check you copied the receipt, or type the items instead.'"]
-    errPaste --> how
+    errPaste --> itemsHow
     prices -->|Yes| rows["Item rows added, pasted text kept"]
-    how -->|Type| rows
-    rows --> assign["Tick who had each item"]
+    itemsHow -->|Type| rows
+    rows --> assign["Name and price each item,<br/>tick who had it"]
     assign --> total["Enter total paid, including tax and tip"]
     total --> mealSplit["Each person pays for their items plus<br/>a proportional share of tax and tip"]
     mealSplit -.- mealWarn["Warnings that don't block Save:<br/>subtotal mismatch, ticked count vs quantity,<br/>high tax and tip"]
   end
 
-  subgraph evenPath ["Even split: one time"]
-    even["Empty: even split form, amount blank"] --> evenPeople["Tick who was there, choose who paid"]
-    evenPeople --> evenAmount["Enter amount and currency"]
-    evenAmount --> evenSplit["Split evenly between everyone ticked"]
-  end
-
-  subgraph recPath ["Recurring: split evenly"]
+  subgraph recPath ["Recurring, split evenly"]
     rec["Empty: recurring form, name,<br/>amount and Repeats blank"] --> recPeople["Tick roommates, choose who paid"]
     recPeople --> recDetails["Enter name, amount, currency<br/>and how often it repeats"]
     recDetails --> recSplit["Split evenly between roommates"]
     recSplit -.- recWarn["Warning that doesn't block Save:<br/>next one not due yet"]
   end
 
-  mode -->|Meal| meal
-  mode -->|Even split| even
+  mode -->|One-time| once
   mode -->|Recurring| rec
   mealSplit --> partly["Partly filled: summary updates live,<br/>draft saved as I go"]
   evenSplit --> partly
@@ -169,16 +161,16 @@ flowchart TD
   classDef empty stroke-dasharray:6 4
   classDef success stroke:#2e7d32,stroke-width:2px
   class errPaste,errFields,errSave,errMark error
-  class meal,even,rec empty
+  class once,rec empty
   class bill,settled success
 ```
 
-### Meal, by item: `/new/meal`
+### One-time, by item: `/new/one-time`
 
 The most important form. One page, one column, in receipt order. People come before items because items need people to assign.
 
 ```
-Name (optional)           [ Dinner at Aba  ]
+Name                      [ Dinner at Aba  ]
 Date                      [ Oct 18, 2026   ]
 
 Who was there
@@ -191,8 +183,8 @@ Who paid   (•) Me  ( ) Sam  ( ) Jo
 How to split   [✓ By item] [ Evenly ]
 
 Items   [ Paste receipt text ]  [ Type items ]
-  Name (optional) [ Burger ]
-  Price           [ 18.00  ]
+  Name   [ Burger ]
+  Price  [ 18.00  ]
   Who had it  [Me] [Sam ✓] [Jo] [Everyone]
   [Remove item]
   [+ Add item]
@@ -210,7 +202,7 @@ Who owes you
 [ Save bill ]
 ```
 
-- **Type items** adds a blank item: name (optional), then price, then who had it.
+- **Type items** adds a blank item: name, then price, then who had it.
 - **Paste receipt text** opens a box with help text: "On iPhone, open the receipt photo, long-press the text, tap Select All, then Copy." Then a **Read receipt** button. See "Reading a receipt" below.
 - A shared item (appetizer, a pitcher) gets ticked for several people, or for **Everyone**, and is split evenly between them.
 - Tax and tip (total paid minus the items) are spread in proportion to each person's item subtotal.
@@ -226,9 +218,9 @@ Who owes you
 - **Read items are added below any items already there**, as normal rows I can edit, remove or add to. The pasted text stays in the box.
 - **Tested on one real receipt** (5 lines, with quantities, bilingual, gratuity included): every item and the subtotal came out right. Test a receipt without quantities before building the parser.
 
-### Even split: `/new/even`
+### One-time, evenly: `/new/one-time`
 
-Fields: what was it (optional; a blank one is saved as "Even split", and a blank meal as "Meal"), date (today), amount and currency, who was there, who paid. Shares are amount ÷ people, with leftover cents going to whoever paid.
+Fields: name, date (today), who was there, who paid, How to split (Evenly), then the amount and currency. Shares are amount ÷ people, with leftover cents going to whoever paid.
 
 ### Recurring: `/new/recurring`
 
@@ -273,8 +265,8 @@ Others' shares (between them and Sam): Jo $42.00
 
 | State | What I see |
 |---|---|
-| Empty | Me is ticked and paying in every mode. Meal by item: Items offers Paste or Type, and the summary says "Add who was there and what they had." Even split and recurring: the amount is blank. |
-| Partly filled | Meal by item: items entered but no total yet, so the summary shows item subtotals with "+ tax and tip once you enter the total". Even split and recurring: even shares appear once there's an amount and at least one other person. In every mode, the draft is saved as I go. |
+| Empty | Me is ticked and paying in every mode. By item: Items offers Paste or Type, and the summary says "Add who was there and what they had." Evenly and recurring: the amount is blank. |
+| Partly filled | By item: items entered but no total yet, so the summary shows item subtotals with "+ tax and tip once you enter the total". Evenly and recurring: even shares appear once there's an amount and at least one other person. In every mode, the draft is saved as I go. |
 | Error | Pressing Save with problems shows each message next to its field and moves focus to the first. Nothing is cleared. |
 | Success | Opens `/bills/[id]` with a "Saved" message that screen readers announce. When every share is paid: "All paid up", and the bill moves to Settled. |
 
@@ -292,6 +284,7 @@ Others' shares (between them and Sam): Jo $42.00
 | Add person | A name typed but not added when Save is pressed | "Press Add person to put Jo on this bill, or clear the name." |
 | Paste box | Empty | "Paste the receipt text first, or type the items instead." |
 | Paste box | No prices found | "Couldn't find any prices in that text. Check you copied the receipt, or type the items instead." |
+| Item name | Blank | "Name this item, like Burger." |
 | Item price | Blank or not a number | "Enter a price, like 12.50." |
 | Item price | 0 or less | "Enter a price above 0." |
 | Item | Nobody ticked | "Choose who had this item." |
@@ -302,7 +295,7 @@ Others' shares (between them and Sam): Jo $42.00
 | Amount (even split, recurring) | Blank or invalid | "Enter the amount, like 24.80." |
 | Amount (even split, recurring) | 0 | "Enter an amount above 0." |
 | Date | Blank or not a real date | "Enter the date of the bill." |
-| Name (recurring) | Blank | "Name this bill, like Electricity." |
+| Name | Blank | "Name this bill, like Dinner at Aba." On a recurring bill: "Name this bill, like Electricity." |
 | Repeats (custom) | Blank, or outside 1–52 weeks or 1–12 months | "Enter how often, like every 3 months." |
 | Save | Storage full or blocked | Shown near Save: "Couldn't save on this phone. Everything you typed is still here. Try again." |
 | Mark paid | Couldn't save | The toggle switches back, with "Couldn't save that. Try again." |
@@ -359,7 +352,7 @@ flowchart TD
 ```
 
 ```
-[ Meal ] [ Even split ] [ Recurring ]
+[ One-time ] [ Recurring ]
 
 Unfinished meal from Tue   [Continue] [Discard]
 

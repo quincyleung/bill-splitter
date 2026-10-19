@@ -2,14 +2,14 @@ import type { Metadata } from "next";
 import { NewBill } from "@/components/bill-form/new-bill";
 import { PageTitle } from "@/components/ui/page-title";
 
-export const metadata: Metadata = { title: "Meal" };
+export const metadata: Metadata = { title: "One-time bill" };
 
-export default function NewMealPage() {
+export default function NewOneTimePage() {
   return (
     <>
-      <PageTitle>Meal</PageTitle>
+      <PageTitle>One-time bill</PageTitle>
       <div className="mt-6">
-        <NewBill preset="meal" />
+        <NewBill preset="one-time" />
       </div>
     </>
   );

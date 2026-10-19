@@ -18,11 +18,9 @@ flowchart TD
   errStorage --> welcome
   canSave -->|Yes| welcome["Empty: Home with welcome text<br/>and three start buttons"]
   welcome --> mode{"Which quick start?"}
-  mode -->|Meal| meal["Bill form, By item<br/>/new/meal"]
-  mode -->|Even split| even["Bill form, Evenly<br/>/new/even"]
+  mode -->|One-time| once["One-time form, Evenly<br/>/new/one-time"]
   mode -->|Recurring| rec["Recurring form, Monthly<br/>/new/recurring"]
-  meal --> noPeople
-  even --> noPeople
+  once --> noPeople
   rec --> noPeople
   noPeople["Empty: Who was there shows only Me<br/>and a name field with Add person"] --> addName{"Type a name, press Add person"}
   addName -->|Blank| errName["Error: 'Type a name, then press Add person.'"]
@@ -45,38 +43,34 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-  start(["Home: tap a start button"]) --> mode{"Which mode?"}
+  start(["Home: tap a start button"]) --> mode{"Which quick start?"}
 
-  subgraph mealPath ["Meal: By item, split by who had what"]
-    meal["Empty: meal form, Me ticked and paying,<br/>Items offers Paste or Type"] --> mealPeople["Tick who was there, choose who paid"]
-    mealPeople --> how{"Paste or type the items?"}
-    how -->|Paste| paste["Paste receipt text, press Read receipt"]
+  subgraph oncePath ["One-time"]
+    once["Empty: one-time form, Me ticked and paying,<br/>How to split on Evenly"] --> oncePeople["Name, date, tick who was there,<br/>choose who paid"]
+    oncePeople --> how{"How to split?"}
+    how -->|Evenly| evenAmount["Enter amount and currency"]
+    evenAmount --> evenSplit["Split evenly between everyone ticked"]
+    how -->|By item| itemsHow{"Paste or type the items?"}
+    itemsHow -->|Paste| paste["Paste receipt text, press Read receipt"]
     paste --> prices{"Any prices found?"}
     prices -->|No| errPaste["Error: 'Couldn't find any prices in that text.<br/>Check you copied the receipt, or type the items instead.'"]
-    errPaste --> how
+    errPaste --> itemsHow
     prices -->|Yes| rows["Item rows added, pasted text kept"]
-    how -->|Type| rows
-    rows --> assign["Tick who had each item"]
+    itemsHow -->|Type| rows
+    rows --> assign["Name and price each item,<br/>tick who had it"]
     assign --> total["Enter total paid, including tax and tip"]
     total --> mealSplit["Each person pays for their items plus<br/>a proportional share of tax and tip"]
     mealSplit -.- mealWarn["Warnings that don't block Save:<br/>subtotal mismatch, ticked count vs quantity,<br/>high tax and tip"]
   end
 
-  subgraph evenPath ["Even split: one time"]
-    even["Empty: even split form, amount blank"] --> evenPeople["Tick who was there, choose who paid"]
-    evenPeople --> evenAmount["Enter amount and currency"]
-    evenAmount --> evenSplit["Split evenly between everyone ticked"]
-  end
-
-  subgraph recPath ["Recurring: split evenly"]
+  subgraph recPath ["Recurring, split evenly"]
     rec["Empty: recurring form, name,<br/>amount and Repeats blank"] --> recPeople["Tick roommates, choose who paid"]
     recPeople --> recDetails["Enter name, amount, currency<br/>and how often it repeats"]
     recDetails --> recSplit["Split evenly between roommates"]
     recSplit -.- recWarn["Warning that doesn't block Save:<br/>next one not due yet"]
   end
 
-  mode -->|Meal| meal
-  mode -->|Even split| even
+  mode -->|One-time| once
   mode -->|Recurring| rec
   mealSplit --> partly["Partly filled: summary updates live,<br/>draft saved as I go"]
   evenSplit --> partly
@@ -105,7 +99,7 @@ flowchart TD
   classDef empty stroke-dasharray:6 4
   classDef success stroke:#2e7d32,stroke-width:2px
   class errPaste,errFields,errSave,errMark error
-  class meal,even,rec empty
+  class once,rec empty
   class bill,settled success
 ```
 

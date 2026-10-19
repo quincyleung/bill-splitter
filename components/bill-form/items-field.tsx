@@ -20,7 +20,7 @@ type ItemsFieldProps = {
   requestFocus: (selector: string) => void;
 };
 
-/** Typed-in items: an optional name, a price, and who had it. A shared item is split evenly. */
+/** Typed-in items: a name, a price, and who had it. A shared item is split evenly. */
 export function ItemsField({ draft, people, errors, setDraft, requestFocus }: ItemsFieldProps) {
   const updateItem = (key: string, change: Partial<DraftItem>) =>
     setDraft((current) => ({
@@ -51,10 +51,11 @@ export function ItemsField({ draft, people, errors, setDraft, requestFocus }: It
                   <div className="space-y-4">
                     <TextField
                       id={`name-${item.key}`}
-                      label="Name (optional)"
+                      label="Name"
                       hint="Like Burger"
                       value={item.name}
                       onChange={(event) => updateItem(item.key, { name: event.target.value })}
+                      error={errors[errorKey.name(item.key)]}
                       autoComplete="off"
                     />
                     <MoneyField

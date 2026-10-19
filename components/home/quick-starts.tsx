@@ -1,12 +1,11 @@
 import Link from "next/link";
 
 const QUICK_STARTS = [
-  { href: "/new/meal", title: "Meal", detail: "Split by what each person had" },
-  { href: "/new/even", title: "Even split", detail: "Split evenly, like an Uber ride" },
-  { href: "/new/recurring", title: "Recurring", detail: "Split evenly and repeats, like utilities" },
+  { href: "/new/one-time", title: "One-time", detail: "A meal, a ride, anything once" },
+  { href: "/new/recurring", title: "Recurring", detail: "Repeats, like utilities" },
 ];
 
-/** The three ways to start a bill. Static, so they show before saved data has loaded. */
+/** The two ways to start a bill. Static, so they show before saved data has loaded. */
 export function QuickStarts() {
   return (
     <ul className="space-y-3">

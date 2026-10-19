@@ -264,3 +264,35 @@ Then commit.
 - "Add a person" looked like a separate question.
 - Items should ask for a name before the price.
 - Labels shouldn't use question marks.
+
+## Step 6, continued: Required names, One-time / Recurring, a clearer Who paid (2026-10-19)
+
+**Asked:**
+- Make the name required, for the bill and for each item, because "(optional)" looks cluttered.
+- "Who paid" only lets me pick one person.
+- Would Home be better as just One-time and Recurring, since the form already lets you choose By item or Evenly?
+
+**Made:**
+- **Asked two questions before building:**
+  - Who paid: one payer is by design (`flows.md` cut "one bill paid by two people"), but the chips looked like the tick-many ones. You chose to keep one payer with a clearer control.
+  - Home: you chose One-time and Recurring, with One-time starting on Evenly.
+- **Names required:**
+  - "Name" is the first question on both forms, with no "(optional)" anywhere. Errors: "Name this bill, like Dinner at Aba." (or "like Electricity.").
+  - Each item asks for Name, then Price, then Who had it. Error: "Name this item, like Burger." Save moves focus to the first unnamed item.
+  - The blank-name fallbacks are gone.
+- **Home:**
+  - Two quick starts: **One-time** ("A meal, a ride, anything once") and **Recurring** ("Repeats, like utilities").
+  - `/new/one-time` ("One-time bill") replaces `/new/meal` and `/new/even`.
+  - The form opens on How to split: **Evenly**, with **By item** one tap away. Recurring is titled "Recurring bill".
+- **Who paid:** PersonChip has a radio style. It shows a ring with a dot and a light fill, so "Who paid" no longer looks like the solid tick chips under "Who was there".
+- **Docs:** updated `flows.md` (decisions, routes, rules, wireframes, headings, errors) and redrew the main-task diagram, where One-time now branches on How to split, in both `flows.md` and `README.md`.
+- **Checks:** lint, build, the rewritten logic tests, the storage tests, and 14 end-to-end checks in headless Chrome. The new ones cover:
+  - Name first and required;
+  - item names required, with focus moving to the unnamed item;
+  - the payer is a radio that looks different;
+  - the two quick starts.
+
+**Pushed back:**
+- Optional names looked cluttered.
+- The single-payer control looked like a multi-select.
+- Meal and Even split were really the same form, so Home is now One-time and Recurring.

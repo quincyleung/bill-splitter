@@ -18,6 +18,16 @@ export function CircleIcon({ className = "size-5" }: IconProps) {
   );
 }
 
+/** A radio button's ring, with a dot when chosen. */
+export function RadioIcon({ checked, className = "size-5" }: IconProps & { checked: boolean }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" className={className}>
+      <circle cx="10" cy="10" r="7" stroke="currentColor" strokeWidth="2" />
+      {checked && <circle cx="10" cy="10" r="3.5" fill="currentColor" />}
+    </svg>
+  );
+}
+
 export function AlertIcon({ className = "size-5" }: IconProps) {
   return (
     <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor" className={className}>
