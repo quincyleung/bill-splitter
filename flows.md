@@ -106,26 +106,41 @@ Friends don't need the app.
 ```mermaid
 flowchart TD
   start(["Home: tap a start button"]) --> mode{"Which mode?"}
-  mode -->|Meal by item| meal["Empty: meal form, Me ticked and paying,<br/>Items offers Paste or Type"]
-  mode -->|Even split| even["Empty: even split form, amount blank"]
-  mode -->|Recurring| rec["Empty: recurring form, name,<br/>amount and Repeats blank"]
-  meal --> people["Tick who was there, choose who paid"]
-  even --> people
-  rec --> people
-  people --> isMeal{"Meal by item?"}
-  isMeal -->|No| amount["Enter amount and currency<br/>Recurring: choose how often"]
-  isMeal -->|Yes| how{"Paste or type the items?"}
-  how -->|Paste| paste["Paste receipt text, press Read receipt"]
-  paste --> prices{"Any prices found?"}
-  prices -->|No| errPaste["Error: 'Couldn't find any prices in that text.<br/>Check you copied the receipt, or type the items instead.'"]
-  errPaste --> how
-  prices -->|Yes| rows["Item rows added, pasted text kept"]
-  how -->|Type| rows
-  rows --> assign["Tick who had each item"]
-  assign --> total["Enter total paid, including tax and tip"]
-  total --> partly["Partly filled: summary updates live,<br/>draft saved as I go"]
-  amount --> partly
-  partly -.- warn["Warnings that don't block Save:<br/>subtotal mismatch, ticked count vs quantity,<br/>high tax and tip, next one not due yet"]
+
+  subgraph mealPath ["Meal by item, split by who had what"]
+    meal["Empty: meal form, Me ticked and paying,<br/>Items offers Paste or Type"] --> mealPeople["Tick who was there, choose who paid"]
+    mealPeople --> how{"Paste or type the items?"}
+    how -->|Paste| paste["Paste receipt text, press Read receipt"]
+    paste --> prices{"Any prices found?"}
+    prices -->|No| errPaste["Error: 'Couldn't find any prices in that text.<br/>Check you copied the receipt, or type the items instead.'"]
+    errPaste --> how
+    prices -->|Yes| rows["Item rows added, pasted text kept"]
+    how -->|Type| rows
+    rows --> assign["Tick who had each item"]
+    assign --> total["Enter total paid, including tax and tip"]
+    total --> mealSplit["Each person pays for their items plus<br/>a proportional share of tax and tip"]
+    mealSplit -.- mealWarn["Warnings that don't block Save:<br/>subtotal mismatch, ticked count vs quantity,<br/>high tax and tip"]
+  end
+
+  subgraph evenPath ["Even split, one time"]
+    even["Empty: even split form, amount blank"] --> evenPeople["Tick who was there, choose who paid"]
+    evenPeople --> evenAmount["Enter amount and currency"]
+    evenAmount --> evenSplit["Split evenly between everyone ticked"]
+  end
+
+  subgraph recPath ["Recurring, split evenly"]
+    rec["Empty: recurring form, name,<br/>amount and Repeats blank"] --> recPeople["Tick roommates, choose who paid"]
+    recPeople --> recDetails["Enter name, amount, currency<br/>and how often it repeats"]
+    recDetails --> recSplit["Split evenly between roommates"]
+    recSplit -.- recWarn["Warning that doesn't block Save:<br/>next one not due yet"]
+  end
+
+  mode -->|Meal by item| meal
+  mode -->|Even split| even
+  mode -->|Recurring| rec
+  mealSplit --> partly["Partly filled: summary updates live,<br/>draft saved as I go"]
+  evenSplit --> partly
+  recSplit --> partly
   partly --> check{"Press Save: any problems?"}
   check -->|Yes| errFields["Error: message next to each field,<br/>focus on the first, nothing cleared"]
   errFields --> partly
@@ -250,8 +265,8 @@ Others' shares (between them and Sam): Jo $42.00
 
 | State | What I see |
 |---|---|
-| Empty | Me is ticked and paying. Items offers Paste or Type. Summary: "Add who was there and what they had." |
-| Partly filled | Items entered, no total yet → summary shows item subtotals with "+ tax and tip once you enter the total". The draft is saved as I go. |
+| Empty | Me is ticked and paying in every mode. Meal by item: Items offers Paste or Type, and the summary says "Add who was there and what they had." Even split and recurring: the amount is blank. |
+| Partly filled | Meal by item: items entered but no total yet, so the summary shows item subtotals with "+ tax and tip once you enter the total". Even split and recurring: even shares appear once there's an amount and at least one other person. In every mode, the draft is saved as I go. |
 | Error | Pressing Save with problems shows each message next to its field and moves focus to the first. Nothing is cleared. |
 | Success | Opens `/bills/[id]` with a "Saved" message that screen readers announce. When every share is paid: "All paid up", and the bill moves to Settled. |
 
