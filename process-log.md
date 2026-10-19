@@ -97,3 +97,45 @@
 - Marked the suggestions in `research.md` as made.
 
 **Pushed back:** You asked what change 1 meant before agreeing to it. Once it was explained, you kept all four.
+
+## Step 5: The foundation (2026-10-19)
+
+**Asked:** Build the foundation, with no features yet:
+- a localStorage module for people, groups, bills and recurring bills, with a versioned key, where empty or corrupted storage can't crash the app and data loads after mount to avoid hydration errors;
+- shared components: Button (primary and secondary), TextField and MoneyField (label, hint and error), a segmented control, PersonChip, Card and Toast;
+- shared navigation that shows which page you're on;
+- placeholder pages for each route.
+
+Then commit.
+
+**Made:**
+- **Data model** (`lib/model.ts`): types for people, groups, bills (meal, even and recurring kinds) and recurring series, following `flows.md`. Money is stored in the smallest unit, and "me" is a fixed id. Validators check everything read back from storage.
+- **Storage** (`lib/storage.ts`): versioned key `bill-splitter/v1`, and the functions never throw.
+  - Empty storage loads as empty data.
+  - Broken or wrongly shaped data comes back as "unreadable", with the raw text kept for a later Download and never overwritten silently.
+  - Blocked storage means the app runs in memory only.
+  - A full storage reports "full".
+- **Store** (`lib/store.ts`): `useAppData()` loads after mount using `useSyncExternalStore`. The server and the hydration render see "loading", and localStorage is only read in the browser afterwards. `updateData()` only changes what's on screen if the save worked. `resetData()` backs "Start fresh".
+- **Money** (`lib/money.ts`): parse `12` / `12.5` / `$12.50` / `1,234.50` into cents (yen has no decimals), and format with a fixed locale so server and browser output match.
+- **Components** (`components/ui/`):
+  - Button
+  - TextField and MoneyField: label, hint under the label, error under the input, all linked with `aria-describedby` and `aria-invalid`. MoneyField opens the decimal keypad and tells screen readers the currency name.
+  - SegmentedControl (real radio buttons)
+  - PersonChip (a real checkbox, with a check mark so the state isn't shown by colour alone)
+  - Card
+  - Toast: an always-present live region, a Dismiss button outside it, and a pause while hovered or focused.
+- **Theme** (`app/globals.css`): colour tokens for light and dark mode, all checked against AA (text 4.5:1, field borders and focus rings 3:1), and one visible focus ring for every control.
+- **Navigation:** a skip link, plus a header nav with Home, Meal, Even split and Recurring. The current page is filled and marked `aria-current="page"`. Bill and person pages mark Home as their section. Every page has its own `h1` and tab title.
+- **Placeholders** for all seven routes, each saying what the screen will hold.
+- **Checks:**
+  - lint and a production build;
+  - 21 scratch tests of storage, store and money in Node with a fake localStorage (corrupt data, blocked and full storage, round trip, start fresh, money parsing). These weren't committed, because there's no test runner and adding one means a package;
+  - the rendered HTML of every route and of every component (on a temporary page, since deleted).
+
+**Things I decided along the way:**
+- **Loading after mount:** Next's lint rejects the usual "`setState` in `useEffect`" pattern, so I used `useSyncExternalStore`. It has the same effect: nothing is read from storage until the page is running in the browser.
+- **The nav on bill and person pages:** with Cache Components on, `usePathname` can't run on the server for pages with an unknown id. The nav sits in a `Suspense` boundary, those pages first show it with nothing marked, and the browser fills in "Home" after loading.
+
+**Open question:** `flows.md` cut groups, but you listed them, so the storage has a `groups` collection that nothing uses yet.
+
+**Pushed back:** Nothing.
