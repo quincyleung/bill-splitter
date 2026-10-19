@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 /**
- * Home's section headings are quiet (small uppercase labels), so "Welcome back" and the
+ * Home's section headings are quiet (small uppercase labels), so the big "Bill Splitter" and the
  * new-bill cards lead, and the lists below read as supporting detail.
  */
 export function SectionLabel({ id, children }: { id: string; children: ReactNode }) {

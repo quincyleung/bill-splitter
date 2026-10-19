@@ -40,7 +40,7 @@ export function AllBills() {
             {monthName(month)}
           </h2>
           <div className="mt-3">
-            <BillList bills={bills} />
+            <BillList bills={bills} people={state.data.people} />
           </div>
         </section>
       ))}

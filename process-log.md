@@ -514,3 +514,45 @@ Also reflect these changes in `flows.md`.
 - **Checks:** lint, a clean build, all 17 end-to-end checks, and a screenshot of the returning Home. Then pushed.
 
 **Pushed back:** Latest bill and Who owes you were still too heavy next to the new-bill cards.
+
+## Step 15: One type scale, Recent bills, a bigger name, a lower first visit (2026-10-19)
+
+**Asked:**
+- Combine Latest bill and Recent bills, with the latest at the top.
+- Why do Who owes you and Recent bills look different? Make fonts and sizes uniform per role (heading, body, etc.).
+- Remove the illustration next to Bill Splitter.
+- Drop "Welcome back" and make Bill Splitter bigger instead.
+- On the first visit, move the content lower and leave more margin at the sides.
+
+**Made:**
+- **Why they differed:** in Step 14 the balance rows became 15px with lighter names and amounts, while bill rows kept 17px semibold names. Each list had its own markup.
+- **One type scale:** nine named roles in `app/globals.css`, listed there and in a table in `flows.md`:
+  - Display, 40px Marcellus: Home's title;
+  - Heading, 28px: page titles;
+  - Title, 22px: card titles and the app name;
+  - Lead, 20px Manrope semibold: key figures;
+  - Row, 17px medium: every list row's name and amount;
+  - Body, 17px;
+  - Control, 15px semibold;
+  - Small, 14px;
+  - Label, 12px uppercase.
+
+  `type-money` is gone: amounts take the role of where they sit, always in Manrope with even-width digits. AGENTS.md now says to use these roles, not raw font sizes.
+- **One row layout:** a shared `components/ui/rows.tsx` (RowList, RowText, RowValue) now draws Who owes you, You owe, Recurring bills, Recent bills and All bills, so they're identical. Bill rows' second line now says who still owes ("Oct 5 · Josh owes you $58.16") instead of "1 of 2 paid".
+- **Recent bills:** the 5 newest, latest at the top. "See all N bills" appears when there are more. The separate Latest bill component is deleted.
+- **Home title:** "Welcome back" is gone. Coming back, Home's h1 is "Bill Splitter" at 40px, and Home never shows the small header. Every other page keeps it as the way back. The header no longer needs saved data, only the path.
+- **Arch:** removed (component deleted).
+- **First visit:** "Split a bill" and the cards sit a little below the middle of the screen, easier to reach with a thumb, with 32px side margins instead of 16px.
+- **`flows.md`:** the navigation, look and new type rules, the Flow 1 wireframe, and Flow 3 (wireframe, hierarchy, Recent bills, states).
+- **Checks:**
+  - lint and a clean build;
+  - all 17 end-to-end checks, updated: Home has no header and a 40px "Bill Splitter" title; the header (with no arch) shows on bill pages; 5 recent bills with the latest at the top; the first-visit title sits below 200px with at least 32px margins; "Julie" is checked by row name in Who owes you;
+  - the end-to-end helpers now say which text is missing and can go Home from anywhere;
+  - screenshots of the returning Home and the first visit.
+
+**Pushed back:**
+- Latest bill should be part of Recent bills.
+- Lists looked inconsistent.
+- The arch was odd.
+- "Welcome back" wasn't needed.
+- The first visit sat too high and too close to the edges.

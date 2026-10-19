@@ -78,7 +78,29 @@
   }
 }
 
-/* Type roles, as in the recipe-book: carved Roman capitals for headings, a relaxed humanist sans for the rest. */
+/*
+ * Type roles, as in the recipe-book: carved Roman capitals for titles, a relaxed humanist
+ * sans for everything else. Every piece of text uses one of these, so the same kind of
+ * thing always looks the same:
+ *   type-display  Home's "Bill Splitter"            Marcellus 40px
+ *   type-heading  page titles (h1)                  Marcellus 28px
+ *   type-title    card titles, the app name         Marcellus 22px
+ *   type-lead     a key figure: "Josh owes you…"    Manrope 20px semibold
+ *   type-row      a list row's name and amount      Manrope 17px medium
+ *   (body)        sentences                          Manrope 17px regular
+ *   type-control  buttons, chips, checkboxes        Manrope 15px semibold
+ *   type-small    second lines, hints, breakdowns   Manrope 14px regular
+ *   type-label    section and field labels          Manrope 12px bold uppercase
+ * Money is never in Marcellus (its numerals look very different); it takes the role of
+ * where it sits, with the even-width digits set on body.
+ */
+@utility type-display {
+  font-family: var(--nf-marcellus);
+  font-size: 2.5rem;
+  font-weight: 400;
+  line-height: 1.1;
+}
+
 @utility type-heading {
   font-family: var(--nf-marcellus);
   font-size: 1.75rem;
@@ -112,17 +134,13 @@
   line-height: 1.2;
 }
 
-/*
- * Money is always Manrope semibold, never Marcellus (whose numerals look very different),
- * so every amount in the app matches. Marcellus is for names and titles only.
- */
-@utility type-money {
+@utility type-row {
   font-family: var(--nf-manrope);
-  font-weight: 600;
-  font-variant-numeric: tabular-nums lining-nums;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  line-height: 1.4;
 }
 
-/* A one-line statement with an amount in it, e.g. "Josh owes you $58.16". */
 @utility type-lead {
   font-family: var(--nf-manrope);
   font-size: 1.25rem;

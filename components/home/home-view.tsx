@@ -1,15 +1,14 @@
 "use client";
 
 // Home has two faces. A first visit gets just "Split a bill" and the two quick starts.
-// Coming back gets "Welcome back", then, in order of weight: the big new-bill cards,
-// who still owes me and for how long, whom I owe, the latest bill, recurring bills
-// that are due, and the next few recent bills. Saved data decides which, so until
+// Coming back gets a big "Bill Splitter", then, in order of weight: the new-bill cards,
+// who still owes me and for how long, whom I owe, recurring bills that are due, and
+// the five most recent bills (latest at the top). Saved data decides which, so until
 // it's read the page shows the neutral loading shell, never the wrong one.
 
 import { BalanceList } from "@/components/home/balance-list";
 import { QuickStarts } from "@/components/home/quick-starts";
 import { RecurringList } from "@/components/home/recurring-list";
-import { LatestBill } from "@/components/home/latest-bill";
 import { RecentBills } from "@/components/home/recent-bills";
 import { LoadingShell } from "@/components/loading-shell";
 import { UnreadableNotice } from "@/components/unreadable-notice";
@@ -28,7 +27,7 @@ export function HomeView() {
   if (state.status === "unreadable") {
     return (
       <>
-        <PageTitle>Split a bill</PageTitle>
+        <HomeTitle />
         <div className="mt-4">
           <UnreadableNotice raw={state.raw} />
         </div>
@@ -38,17 +37,23 @@ export function HomeView() {
   return state.data.bills.length === 0 ? <FirstVisit /> : <Returning data={state.data} />;
 }
 
-/** Just "Split a bill" and the two cards: no app name, no illustration, no explanation. */
+/** Home's title once there's anything saved: the app's name, big. */
+function HomeTitle() {
+  return <h1 className="type-display pt-6 text-ink">Bill Splitter</h1>;
+}
+
+/**
+ * Just "Split a bill" and the two cards: no app name, no illustration, no explanation.
+ * Sits a little below the middle of the screen, within thumb reach, with wider margins.
+ */
 function FirstVisit() {
   return (
-    <>
-      <div className="pt-6">
-        <PageTitle>Split a bill</PageTitle>
-      </div>
+    <div className="flex min-h-[calc(100dvh-4rem)] flex-col justify-center px-4 pt-16">
+      <PageTitle>Split a bill</PageTitle>
       <div className="mt-6">
         <QuickStarts />
       </div>
-    </>
+    </div>
   );
 }
 
@@ -58,8 +63,7 @@ function Returning({ data }: { data: AppData }) {
   const owe = iOwe(data);
   const recurring = recurringStatuses(data, today);
   const due = recurring.filter((r) => r.due).length;
-  const [latest, ...older] = newestFirst(data.bills);
-  const recent = older.slice(0, 4);
+  const recent = newestFirst(data.bills).slice(0, 5);
   const money = (balances: typeof owed) =>
     totalOf(balances)
       .map((t) => formatMoney(t.amount, t.currency))
@@ -76,7 +80,7 @@ function Returning({ data }: { data: AppData }) {
 
   return (
     <>
-      <PageTitle>Welcome back</PageTitle>
+      <HomeTitle />
       <p className="mt-1 text-ink-muted">{summary}</p>
       <div className="mt-6">
         <QuickStarts />
@@ -85,9 +89,8 @@ function Returning({ data }: { data: AppData }) {
         <BalanceList id="owed-to-me" title="Who owes you" balances={owed} people={data.people} today={today} />
       )}
       {owe.length > 0 && <BalanceList id="i-owe" title="You owe" balances={owe} people={data.people} today={today} />}
-      {latest && <LatestBill bill={latest} people={data.people} />}
       {recurring.length > 0 && <RecurringList statuses={recurring} people={data.people} />}
-      {recent.length > 0 && <RecentBills bills={recent} total={data.bills.length} />}
+      <RecentBills bills={recent} people={data.people} total={data.bills.length} />
     </>
   );
 }

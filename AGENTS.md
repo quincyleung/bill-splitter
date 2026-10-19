@@ -29,7 +29,7 @@ Me. I'm usually the one who paid, and I split on my phone right after paying. De
 - Errors sit next to their field and say what to do next ("Enter an amount above $0"), not only what went wrong. Link them with `aria-describedby` and set `aria-invalid`.
 - Never clear what was typed, including after an error.
 - Everything is keyboard-accessible, with visible focus and nothing that needs a mouse.
-- Visual style is Greek Summer, from `../recipe-book` (`app/_ds/themes.ts`). Its tokens and type roles live in `app/globals.css`; use them, not raw colours. The accent is only for the main action; selection uses `selected`, checkboxes `check`.
+- Visual style is Greek Summer, from `../recipe-book` (`app/_ds/themes.ts`). Its tokens and type roles live in `app/globals.css` (the roles are listed there and in `flows.md`); use them, not raw colours or font sizes. The accent is only for the main action; selection uses `selected`, checkboxes `check`.
 - Every input has a real `<label>`. Placeholders don't count as labels.
 - Text and controls meet WCAG AA contrast.
 

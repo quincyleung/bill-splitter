@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { SectionLabel } from "@/components/home/section-label";
+import { RowList, RowText, RowValue, rowClass } from "@/components/ui/rows";
 import type { Balance } from "@/lib/balances";
 import { daysBetween, durationLabel, formatDate } from "@/lib/dates";
 import type { Person } from "@/lib/model";
@@ -8,45 +9,46 @@ import { personName } from "@/lib/people";
 
 type BalanceListProps = { id: string; title: string; balances: Balance[]; people: Person[]; today: string };
 
-/**
- * One row per person: how much, how long it's been unpaid, and the bills it's for.
- * Smaller and lighter than the new-bill cards above, so the hierarchy is clear.
- */
+/** One row per person: how much, how long it's been unpaid, and the bills it's for. */
 export function BalanceList({ id, title, balances, people, today }: BalanceListProps) {
   return (
     <section aria-labelledby={id} className="mt-8">
       <SectionLabel id={id}>{title}</SectionLabel>
-      <ul className="mt-3 divide-y divide-line overflow-hidden rounded-card border border-line bg-surface">
-        {balances.map((balance) => {
-          const days = daysBetween(balance.since, today);
-          return (
-            <li key={balance.personId} className="px-5 py-2.5">
-              <div className="flex items-baseline justify-between gap-3 text-[0.9375rem]">
-                <span className="text-ink">{personName(balance.personId, people)}</span>
-                <span className="font-medium text-ink">
-                  {balance.totals.map((t) => formatMoney(t.amount, t.currency)).join(" · ")}
-                </span>
-              </div>
-              <p className="type-small text-ink-muted">
-                <span className={days >= 30 ? "font-medium text-ink" : undefined}>Unpaid {durationLabel(days)}</span>
-                {" · For "}
-                {balance.bills.map(({ bill, amount }, index) => (
-                  <span key={bill.id}>
-                    {index > 0 && ", "}
-                    <Link
-                      href={`/bills/${bill.id}`}
-                      className="text-ink underline decoration-ink/40 underline-offset-4 hover:decoration-ink"
-                    >
-                      {bill.title}
-                    </Link>{" "}
-                    ({formatDate(bill.date)}, {formatMoney(amount, bill.currency)})
-                  </span>
-                ))}
-              </p>
-            </li>
-          );
-        })}
-      </ul>
+      <div className="mt-3">
+        <RowList>
+          {balances.map((balance) => {
+            const days = daysBetween(balance.since, today);
+            return (
+              <li key={balance.personId} className={rowClass}>
+                <RowText
+                  title={personName(balance.personId, people)}
+                  meta={
+                    <>
+                      <span className={days >= 30 ? "font-semibold text-ink" : undefined}>
+                        Unpaid {durationLabel(days)}
+                      </span>
+                      {" · For "}
+                      {balance.bills.map(({ bill, amount }, index) => (
+                        <span key={bill.id}>
+                          {index > 0 && ", "}
+                          <Link
+                            href={`/bills/${bill.id}`}
+                            className="text-ink underline decoration-ink/40 underline-offset-4 hover:decoration-ink"
+                          >
+                            {bill.title}
+                          </Link>{" "}
+                          ({formatDate(bill.date)}, {formatMoney(amount, bill.currency)})
+                        </span>
+                      ))}
+                    </>
+                  }
+                />
+                <RowValue>{balance.totals.map((t) => formatMoney(t.amount, t.currency)).join(" · ")}</RowValue>
+              </li>
+            );
+          })}
+        </RowList>
+      </div>
     </section>
   );
 }

@@ -154,7 +154,7 @@ function ShareCard({ bill, share, title, status, onPaid, onCopy }: ShareCardProp
     <Card as="section">
       <div className="flex items-baseline justify-between gap-3">
         <h2 className="type-title text-ink">{title}</h2>
-        <p className={`type-money text-[1.25rem] ${settled ? "text-ink-muted line-through" : "text-ink"}`}>{money(share.amount)}</p>
+        <p className={`type-lead ${settled ? "text-ink-muted line-through" : "text-ink"}`}>{money(share.amount)}</p>
       </div>
       {status && <p className="type-small text-ink-muted">{status}</p>}
 

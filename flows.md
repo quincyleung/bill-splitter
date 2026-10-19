@@ -35,7 +35,7 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 | `/bills/[id]/edit` | Edit a bill |
 | `/people/[id]` | One person: bills both ways, net balance, Settle up |
 
-- **Navigation:** no tabs and no header bar. The app name, with a small arch, sits at the top of every page on the same background and goes back to Home, except on the first-visit Home, which has nothing above "Split a bill". Home's quick starts are how a bill starts, and each page's title says where you are.
+- **Navigation:** no tabs and no header bar. On every page except Home, the app name sits at the top on the same background and goes back to Home. Home has none: a first visit is just "Split a bill", and coming back, "Bill Splitter" is Home's own big title. Home's quick starts are how a bill starts, and each page's title says where you are.
 - **Who paid:** every bill has one payer, picked with radio dots so it doesn't look like the tick-many people chips. It defaults to Me, and can be anyone ticked on the bill.
 - **Debts:** if I paid, everyone else on the bill owes me their share. If someone else paid, I owe them my share. What the others owe them is shown for reference but not tracked.
 - **Me:** I'm in every split by default, with my own items. I can untick myself only on a bill I paid.
@@ -44,7 +44,22 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 - **Currency:** shown next to the amount field with a **Change** button. The picker lists my recent currencies first, then every other one from the browser's built-in list. Amounts in different currencies are never added together or converted.
 - **Loading state:** saved data can only be read in the browser, so each page shows a neutral shell until it has loaded. A returning user never sees a flash of the empty first-visit screen.
 - **Number fields** open the decimal keypad and accept `12`, `12.5` or `$12.50`.
-- **Look:** the Greek Summer design system from the recipe-book project: Marcellus headings, Manrope text, small uppercase field labels, navy on warm white, Aegean blue only for the main action, light-blue fill for anything selected, every amount of money in Manrope semibold with even-width digits (never Marcellus, whose numerals look different), pill buttons and chips, 12px fields, 20px cards with a thin limestone line and no shadows. Light only. A small arch sits beside the app name.
+- **Look:** the Greek Summer design system from the recipe-book project: navy on warm white, Aegean blue only for the main action, light-blue fill for anything selected, pill buttons and chips, 12px fields, 20px cards with a thin limestone line and no shadows. Light only, no illustrations.
+- **Type:** one set of roles, so the same kind of thing always looks the same (defined in `app/globals.css`):
+
+  | Role | Used for | Style |
+  |---|---|---|
+  | Display | Home's "Bill Splitter" | Marcellus 40px |
+  | Heading | page titles | Marcellus 28px |
+  | Title | card titles, the app name | Marcellus 22px |
+  | Lead | a key figure: "Josh owes you $58.16", a share | Manrope 20px semibold |
+  | Row | every list row's name and amount | Manrope 17px medium |
+  | Body | sentences, inputs | Manrope 17px regular |
+  | Control | buttons, chips, checkboxes | Manrope 15px semibold |
+  | Small | second lines, hints, breakdowns | Manrope 14px regular |
+  | Label | section and field labels | Manrope 12px bold uppercase |
+
+  Money is never in Marcellus (its numerals look very different). It takes the role of where it sits, always with even-width digits.
 - **Labels:** no question marks ("Who paid", not "Who paid?"), and no "(optional)": every field on a bill is needed, including each item's name.
 - **Hints:** fields show an example under their label, such as "Like Dinner at Nopa" or "Like 12.50". Placeholders never stand in for labels. There are no sample bills, because fake bills would mix into real balances.
 - **On Save:** errors appear next to their fields, focus moves to the first one, and nothing typed is cleared.
@@ -87,7 +102,12 @@ flowchart TD
 ```
 
 ```
-Split a bill                (nothing above it)
+
+
+
+
+Split a bill                (a little below the middle of the screen,
+                             nothing above it, wider side margins)
 
 [ One-time    A meal, ride, or anything once               ]
 [ Recurring   Rent, subscription, or anything that repeats ]
@@ -343,7 +363,7 @@ Others' shares, between them and Sam: Jo $42.00
 
 ## Flow 3: Coming back next week or next month
 
-**Screens and routes:** `/` (Welcome back), `/bills/[id]`, `/people/[id]` (later) and `/new/recurring?series=<id>`.
+**Screens and routes:** `/` (Home, coming back), `/bills/[id]`, `/people/[id]` (later) and `/new/recurring?series=<id>`.
 
 ```mermaid
 flowchart TD
@@ -384,7 +404,7 @@ flowchart TD
 ```
 
 ```
-Welcome back
+Bill Splitter                      (big: Home's title, no header above)
 You're owed $133.56. You owe $60.00. 1 recurring bill is due.
 
 [ One-time    A meal, ride, or anything once               ]  ← the big cards lead
@@ -399,24 +419,20 @@ YOU OWE
   Jo     $60.00   Unpaid for 2 months · For Internet (Aug 15, $30.00),
                   Internet (Sep 15, $30.00)
 
-LATEST BILL                        (a compact row)
-  Uber home · Oct 19 · Sam owes you $12.40        $24.80
-
 RECURRING BILLS
   Internet · Monthly · Jo pays · Due Oct 15        [Add Oct 15]
   Electricity · Monthly · you pay · Next Nov 1
 
-RECENT BILLS                       (the next 4, newest first)
-  Dinner at Aba · Oct 5 · 1 of 2 paid              $78.40
-  Electricity · Oct 1 · 0 of 1 paid               $126.00
+RECENT BILLS                       (the 5 newest, latest at the top)
+  Uber home · Oct 19 · Sam owes you $12.40         $24.80
+  Dinner at Aba · Oct 5 · Josh owes you $58.16     $78.40
   …
 See all 6 bills                    (→ /bills, by month)
 ```
 
 - **First visit or coming back:** with no bills saved, Home is the first-visit screen (Flow 1). With any bill, it's this one. Until saved data is read, it shows the neutral shell, never the wrong one.
-- **Hierarchy:** "Welcome back" sums things up in one line. Next come the two big new-bill cards (the same as on a first visit; One-time is the Aegean-blue main action), so starting a bill always comes first. The sections below have quiet small-uppercase labels and lighter, smaller rows (Who owes you and You owe use regular-weight names and medium-weight amounts), in this order: Who owes you and You owe (kept together), Latest bill, Recurring bills, Recent bills.
-- **Latest bill:** the most recent bill gets its own compact row (like the recent bills, so it doesn't compete with the cards), after the two balance lists, with who still owes on it ("Sam owes you $12.40"). The whole card opens the bill.
-- **Recent bills:** the next 4, newest first, near the bottom. If there are more than 5 bills in all, **See all N bills** opens `/bills`, every bill grouped by month.
+- **Hierarchy:** a big "Bill Splitter" (Home's title) and one summary line. Next come the two big new-bill cards (the same as on a first visit; One-time is the Aegean-blue main action), so starting a bill always comes first. The sections below have quiet small-uppercase labels, and every list uses the same rows (Row type for names and amounts, Small for the second line), in this order: Who owes you and You owe (kept together), Recurring bills, Recent bills.
+- **Recent bills:** the 5 newest, latest at the top, each with who still owes on it ("Sam owes you $12.40"). If there are more, **See all N bills** opens `/bills`, every bill grouped by month, in the same rows.
 - **Who owes you:** one row per person: what they owe across all bills I paid, **how long** it's been unpaid (from their oldest unpaid bill: "since today", "for 3 days", "for 2 weeks", "for 2 months"; a month or more is in bold), and the bills it's for, as links with dates. Paid shares drop off.
 - **You owe:** the same, for bills someone else paid where my share isn't paid back yet.
 - **Not netted:** someone can appear in both lists. Netting them ("You owe Sam $1.75 overall") and **Settle up** come with the person page, `/people/[id]`, which isn't built yet. Different currencies sit side by side ("$1.75 · ¥2,400") and are never added together.
@@ -425,9 +441,9 @@ See all 6 bills                    (→ /bills, by month)
 | State | What I see |
 |---|---|
 | Loading | The neutral shell. Never the empty welcome screen. |
-| Open bills | "Welcome back" with the sections above. |
+| Open bills | "Bill Splitter" with the sections above. |
 | Partly settled | Each bill shows "1 of 3 paid", and paid shares drop out of Who owes you. |
-| All settled | "Nobody owes anyone right now." The new-bill cards, Latest bill, Recurring bills and Recent bills stay. |
+| All settled | "Nobody owes anyone right now." The new-bill cards, Recurring bills and Recent bills stay. |
 | Recurring due | "Add Oct 15" on that row and "1 recurring bill is due." in the summary. Before then, "Next Nov 1". |
 | Draft waiting | Later: an "Unfinished…" card. Discard asks first. |
 

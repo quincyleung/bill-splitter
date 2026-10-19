@@ -1,33 +1,28 @@
 import Link from "next/link";
-import { paidStatus } from "@/lib/bills";
+import { RowList, RowText, RowValue, rowClass } from "@/components/ui/rows";
+import { billHeadline } from "@/lib/bills";
 import { formatDate } from "@/lib/dates";
-import type { Bill } from "@/lib/model";
+import type { Bill, Person } from "@/lib/model";
 import { formatMoney } from "@/lib/money";
 
-/** A bill in a list: name, date and status, and the total. Links to the bill. */
-export function BillRow({ bill }: { bill: Bill }) {
+/** A bill in a list: its name, the date and who still owes, and the total. Links to the bill. */
+export function BillRow({ bill, people }: { bill: Bill; people: Person[] }) {
   return (
-    <Link href={`/bills/${bill.id}`} className="flex min-h-11 items-center justify-between gap-3 px-5 py-3 hover:bg-accent-soft">
-      <span>
-        <span className="block font-semibold text-ink">{bill.title}</span>
-        <span className="type-small block text-ink-muted">
-          {formatDate(bill.date)} · {paidStatus(bill)}
-        </span>
-      </span>
-      <span className="type-money text-ink">{formatMoney(bill.total, bill.currency)}</span>
+    <Link href={`/bills/${bill.id}`} className={`${rowClass} hover:bg-accent-soft`}>
+      <RowText title={bill.title} meta={`${formatDate(bill.date)} · ${billHeadline(bill, people)}`} />
+      <RowValue>{formatMoney(bill.total, bill.currency)}</RowValue>
     </Link>
   );
 }
 
-/** A Greek Summer list card of bills. */
-export function BillList({ bills }: { bills: Bill[] }) {
+export function BillList({ bills, people }: { bills: Bill[]; people: Person[] }) {
   return (
-    <ul className="divide-y divide-line overflow-hidden rounded-card border border-line bg-surface">
+    <RowList>
       {bills.map((bill) => (
         <li key={bill.id}>
-          <BillRow bill={bill} />
+          <BillRow bill={bill} people={people} />
         </li>
       ))}
-    </ul>
+    </RowList>
   );
 }
