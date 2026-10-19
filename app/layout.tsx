@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
-import { Suspense } from "react";
-import { NavLinks, SiteNav } from "@/components/site-nav";
+import Link from "next/link";
 import { StorageBanner } from "@/components/storage-banner";
 import { Toaster } from "@/components/ui/toast";
 import "./globals.css";
@@ -27,11 +26,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           Skip to main content
         </a>
         <header className="border-b border-line bg-surface">
-          <div className="mx-auto max-w-xl px-4 pt-3 pb-2">
-            <p className="mb-2 text-lg font-bold">Bill Splitter</p>
-            <Suspense fallback={<NavLinks pathname={null} />}>
-              <SiteNav />
-            </Suspense>
+          <div className="mx-auto max-w-xl px-4 py-1">
+            {/* No tabs: Home's quick starts cover them. The app name is the way back to Home. */}
+            <Link href="/" className="inline-flex min-h-11 items-center text-lg font-bold text-ink">
+              Bill Splitter<span className="sr-only">, home</span>
+            </Link>
           </div>
         </header>
         <StorageBanner />

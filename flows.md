@@ -8,7 +8,7 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 
 | # | Decision | Chosen |
 |---|---|---|
-| 1 | Modes | Three quick starts: **Dinner** (by item), **Uber** (evenly, one time) and **Monthly bill** (evenly, repeats). Dinner and Uber open the same form with a **How to split** choice (By item / Evenly) preselected, so a dinner everyone shared can switch to Evenly. Monthly bill is always even. |
+| 1 | Modes | Three quick starts: **Meal** (by item), **Even split** (one time, like an Uber ride) and **Recurring** (evenly, repeats, Monthly preselected). Meal and Even split open the same form with a **How to split** choice (By item / Evenly) preselected, so a meal everyone shared can switch to Evenly. Recurring is always even. |
 | 2 | Tax and tip input | One "Total paid, including tax and tip" field. Tax and tip are the difference from the items, shared in proportion to each person's items. |
 | 3 | Entering meal items | **Paste receipt text** (copied with the phone's built-in text recognition) **or type them in**. Both end up as the same editable item rows. |
 | 4 | Who paid | Me or anyone on the bill. Only debts between me and whoever paid are tracked. |
@@ -28,13 +28,14 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 | Route | Screen |
 |---|---|
 | `/` | Home: empty on the first visit, a dashboard after that |
-| `/new/meal` | Dinner: the bill form with By item preselected |
-| `/new/even` | Uber: the same form with Evenly preselected |
-| `/new/recurring` | Monthly bill: a recurring bill with Monthly preselected (`?from=<billId>` fills in the last one) |
+| `/new/meal` | Meal: the bill form with By item preselected |
+| `/new/even` | Even split: the same form with Evenly preselected |
+| `/new/recurring` | Recurring: a recurring bill with Monthly preselected (`?from=<billId>` fills in the last one) |
 | `/bills/[id]` | One bill: who owes whom, mark paid, copy amounts, edit, delete |
 | `/bills/[id]/edit` | Edit a bill |
 | `/people/[id]` | One person: bills both ways, net balance, Settle up |
 
+- **Navigation:** no tabs. Home's quick starts are how a bill starts, the app name in the header goes back to Home, and each page's title says where you are.
 - **Who paid:** every bill has one payer. It defaults to Me, and can be anyone ticked on the bill.
 - **Debts:** if I paid, everyone else on the bill owes me their share. If someone else paid, I owe them my share. What the others owe them is shown for reference but not tracked.
 - **Me:** I'm in every split by default, with my own items. I can untick myself only on a bill I paid.
@@ -62,9 +63,9 @@ flowchart TD
   errStorage --> welcome
   canSave -->|Yes| welcome["Empty: Home with welcome text<br/>and three start buttons"]
   welcome --> mode{"Which quick start?"}
-  mode -->|Dinner| meal["Bill form, By item<br/>/new/meal"]
-  mode -->|Uber| even["Bill form, Evenly<br/>/new/even"]
-  mode -->|Monthly bill| rec["Recurring form, Monthly<br/>/new/recurring"]
+  mode -->|Meal| meal["Bill form, By item<br/>/new/meal"]
+  mode -->|Even split| even["Bill form, Evenly<br/>/new/even"]
+  mode -->|Recurring| rec["Recurring form, Monthly<br/>/new/recurring"]
   meal --> noPeople
   even --> noPeople
   rec --> noPeople
@@ -90,9 +91,9 @@ Split a bill
 Pick one to start. Everything stays on this phone,
 and your friends don't need the app.
 
-[ Dinner        Split by what each person had ]
-[ Uber          Split evenly                  ]
-[ Monthly bill  Split evenly, every month     ]
+[ Meal         Split by what each person had          ]
+[ Even split   Split evenly, like an Uber ride        ]
+[ Recurring    Split evenly and repeats, like utilities ]
 ```
 
 | State | What I see |
@@ -109,7 +110,7 @@ and your friends don't need the app.
 flowchart TD
   start(["Home: tap a start button"]) --> mode{"Which mode?"}
 
-  subgraph mealPath ["Dinner: By item, split by who had what"]
+  subgraph mealPath ["Meal: By item, split by who had what"]
     meal["Empty: meal form, Me ticked and paying,<br/>Items offers Paste or Type"] --> mealPeople["Tick who was there, choose who paid"]
     mealPeople --> how{"Paste or type the items?"}
     how -->|Paste| paste["Paste receipt text, press Read receipt"]
@@ -124,22 +125,22 @@ flowchart TD
     mealSplit -.- mealWarn["Warnings that don't block Save:<br/>subtotal mismatch, ticked count vs quantity,<br/>high tax and tip"]
   end
 
-  subgraph evenPath ["Uber: Evenly, one time"]
+  subgraph evenPath ["Even split: one time"]
     even["Empty: even split form, amount blank"] --> evenPeople["Tick who was there, choose who paid"]
     evenPeople --> evenAmount["Enter amount and currency"]
     evenAmount --> evenSplit["Split evenly between everyone ticked"]
   end
 
-  subgraph recPath ["Monthly bill: recurring, split evenly"]
+  subgraph recPath ["Recurring: split evenly"]
     rec["Empty: recurring form, name,<br/>amount and Repeats blank"] --> recPeople["Tick roommates, choose who paid"]
     recPeople --> recDetails["Enter name, amount, currency<br/>and how often it repeats"]
     recDetails --> recSplit["Split evenly between roommates"]
     recSplit -.- recWarn["Warning that doesn't block Save:<br/>next one not due yet"]
   end
 
-  mode -->|Dinner| meal
-  mode -->|Uber| even
-  mode -->|Monthly bill| rec
+  mode -->|Meal| meal
+  mode -->|Even split| even
+  mode -->|Recurring| rec
   mealSplit --> partly["Partly filled: summary updates live,<br/>draft saved as I go"]
   evenSplit --> partly
   recSplit --> partly
@@ -171,7 +172,7 @@ flowchart TD
   class bill,settled success
 ```
 
-### Dinner, by item: `/new/meal`
+### Meal, by item: `/new/meal`
 
 The most important form. One page, one column, in receipt order. People come before items because items need people to assign.
 
@@ -222,11 +223,11 @@ Who owes you
 - **Read items are added below any items already there**, as normal rows I can edit, remove or add to. The pasted text stays in the box.
 - **Tested on one real receipt** (5 lines, with quantities, bilingual, gratuity included): every item and the subtotal came out right. Test a receipt without quantities before building the parser.
 
-### Uber, evenly: `/new/even`
+### Even split: `/new/even`
 
-Fields: what was it (defaults to "Uber ride"), date (today), amount and currency, who was there, who paid. Shares are amount ÷ people, with leftover cents going to whoever paid.
+Fields: what was it (optional; a blank one is saved as "Even split", and a blank meal as "Meal"), date (today), amount and currency, who was there, who paid. Shares are amount ÷ people, with leftover cents going to whoever paid.
 
-### Monthly bill, recurring: `/new/recurring`
+### Recurring: `/new/recurring`
 
 Fields: name ("Electricity"), date of this bill, amount and currency, roommates, who paid, and **Repeats**: Weekly, Every 2 weeks, Monthly, or Custom ("Every [N] [weeks / months]"). Split evenly.
 
@@ -355,7 +356,7 @@ flowchart TD
 ```
 
 ```
-[ Dinner ] [ Uber ] [ Monthly bill ]
+[ Meal ] [ Even split ] [ Recurring ]
 
 Unfinished meal from Tue   [Continue] [Discard]
 

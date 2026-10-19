@@ -2,14 +2,14 @@ import type { Metadata } from "next";
 import { NewBill } from "@/components/bill-form/new-bill";
 import { PageTitle } from "@/components/ui/page-title";
 
-export const metadata: Metadata = { title: "Monthly bill" };
+export const metadata: Metadata = { title: "Recurring" };
 
-export default function NewMonthlyBillPage() {
+export default function NewRecurringPage() {
   return (
     <>
-      <PageTitle>Monthly bill</PageTitle>
+      <PageTitle>Recurring</PageTitle>
       <div className="mt-6">
-        <NewBill preset="monthly" />
+        <NewBill preset="recurring" />
       </div>
     </>
   );

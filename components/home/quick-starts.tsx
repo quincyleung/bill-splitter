@@ -1,9 +1,9 @@
 import Link from "next/link";
 
 const QUICK_STARTS = [
-  { href: "/new/meal", title: "Dinner", detail: "Split by what each person had" },
-  { href: "/new/even", title: "Uber", detail: "Split evenly" },
-  { href: "/new/recurring", title: "Monthly bill", detail: "Split evenly, every month" },
+  { href: "/new/meal", title: "Meal", detail: "Split by what each person had" },
+  { href: "/new/even", title: "Even split", detail: "Split evenly, like an Uber ride" },
+  { href: "/new/recurring", title: "Recurring", detail: "Split evenly and repeats, like utilities" },
 ];
 
 /** The three ways to start a bill. Static, so they show before saved data has loaded. */

@@ -7,14 +7,15 @@ import { type AppData, type Bill, type Frequency, ME, type Person, type Recurrin
 import { DEFAULT_CURRENCY, formatMoney, parseMoney } from "./money";
 import { type ItemSplit, itemTotalsOf, splitByItems, splitEvenly } from "./split";
 
-export type Preset = "dinner" | "uber" | "monthly";
+export type Preset = "meal" | "even" | "recurring";
 export type SplitMethod = "items" | "even";
 export type Repeats = "week" | "two-weeks" | "month" | "custom";
 
-export const PRESETS: Record<Preset, { heading: string; split: SplitMethod; recurring: boolean; fallbackTitle: string }> = {
-  dinner: { heading: "Dinner", split: "items", recurring: false, fallbackTitle: "Dinner" },
-  uber: { heading: "Uber", split: "even", recurring: false, fallbackTitle: "Uber ride" },
-  monthly: { heading: "Monthly bill", split: "even", recurring: true, fallbackTitle: "" },
+/** What each quick start preselects, and the title used when "What was it?" is left blank. */
+export const PRESETS: Record<Preset, { split: SplitMethod; recurring: boolean; fallbackTitle: string }> = {
+  meal: { split: "items", recurring: false, fallbackTitle: "Meal" },
+  even: { split: "even", recurring: false, fallbackTitle: "Even split" },
+  recurring: { split: "even", recurring: true, fallbackTitle: "" },
 };
 
 export type DraftItem = { key: string; price: string; name: string; personIds: string[] };

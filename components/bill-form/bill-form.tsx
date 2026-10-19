@@ -1,7 +1,7 @@
 "use client";
 
-// The one form behind all three quick starts. Dinner opens with "By item", Uber with
-// "Evenly", and Monthly bill with a recurring, even split. One column; errors appear
+// The one form behind all three quick starts. Meal opens with "By item", Even split
+// with "Evenly", and Recurring with a monthly, even split. One column; errors appear
 // next to their field after Save, and nothing typed is ever cleared.
 
 import { useRouter } from "next/navigation";
@@ -37,9 +37,9 @@ import { ShareSummary } from "./share-summary";
 const FIRST_INVALID = '[aria-invalid="true"], [data-invalid] input';
 
 const TITLE_HINTS: Record<Preset, string> = {
-  dinner: "Like Dinner at Nopa",
-  uber: "Like Uber to the airport",
-  monthly: "Like Electricity",
+  meal: "Like Dinner at Nopa",
+  even: "Like Uber to the airport",
+  recurring: "Like Electricity",
 };
 
 type BillFormProps = { preset: Preset; people: Person[]; onSaved: () => void };

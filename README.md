@@ -18,9 +18,9 @@ flowchart TD
   errStorage --> welcome
   canSave -->|Yes| welcome["Empty: Home with welcome text<br/>and three start buttons"]
   welcome --> mode{"Which quick start?"}
-  mode -->|Dinner| meal["Bill form, By item<br/>/new/meal"]
-  mode -->|Uber| even["Bill form, Evenly<br/>/new/even"]
-  mode -->|Monthly bill| rec["Recurring form, Monthly<br/>/new/recurring"]
+  mode -->|Meal| meal["Bill form, By item<br/>/new/meal"]
+  mode -->|Even split| even["Bill form, Evenly<br/>/new/even"]
+  mode -->|Recurring| rec["Recurring form, Monthly<br/>/new/recurring"]
   meal --> noPeople
   even --> noPeople
   rec --> noPeople
@@ -47,7 +47,7 @@ flowchart TD
 flowchart TD
   start(["Home: tap a start button"]) --> mode{"Which mode?"}
 
-  subgraph mealPath ["Dinner: By item, split by who had what"]
+  subgraph mealPath ["Meal: By item, split by who had what"]
     meal["Empty: meal form, Me ticked and paying,<br/>Items offers Paste or Type"] --> mealPeople["Tick who was there, choose who paid"]
     mealPeople --> how{"Paste or type the items?"}
     how -->|Paste| paste["Paste receipt text, press Read receipt"]
@@ -62,22 +62,22 @@ flowchart TD
     mealSplit -.- mealWarn["Warnings that don't block Save:<br/>subtotal mismatch, ticked count vs quantity,<br/>high tax and tip"]
   end
 
-  subgraph evenPath ["Uber: Evenly, one time"]
+  subgraph evenPath ["Even split: one time"]
     even["Empty: even split form, amount blank"] --> evenPeople["Tick who was there, choose who paid"]
     evenPeople --> evenAmount["Enter amount and currency"]
     evenAmount --> evenSplit["Split evenly between everyone ticked"]
   end
 
-  subgraph recPath ["Monthly bill: recurring, split evenly"]
+  subgraph recPath ["Recurring: split evenly"]
     rec["Empty: recurring form, name,<br/>amount and Repeats blank"] --> recPeople["Tick roommates, choose who paid"]
     recPeople --> recDetails["Enter name, amount, currency<br/>and how often it repeats"]
     recDetails --> recSplit["Split evenly between roommates"]
     recSplit -.- recWarn["Warning that doesn't block Save:<br/>next one not due yet"]
   end
 
-  mode -->|Dinner| meal
-  mode -->|Uber| even
-  mode -->|Monthly bill| rec
+  mode -->|Meal| meal
+  mode -->|Even split| even
+  mode -->|Recurring| rec
   mealSplit --> partly["Partly filled: summary updates live,<br/>draft saved as I go"]
   evenSplit --> partly
   recSplit --> partly

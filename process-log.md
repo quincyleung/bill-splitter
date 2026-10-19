@@ -210,3 +210,22 @@ Then commit.
 **On hold:** the "Add to Home Screen" tip. On iPhone a Home Screen web app gets its own storage, separate from Safari's, so bills saved before adding it wouldn't show up in the Home Screen app. That needs a decision first.
 
 **Pushed back:** Nothing.
+
+## Step 6, continued: No tabs, clearer names (2026-10-19)
+
+**Asked:** Remove the Home / Dinner / Uber / Monthly bill tabs at the top, because they're redundant. Use better names for the options, like Meal, Even Split and Recurring.
+
+**Made:**
+- **Tabs removed** (the nav component is deleted). The header now holds only the app name, which links back to Home; screen readers hear "Bill Splitter, home". Each page's title still says where you are, and Home's quick starts are how a bill starts. This replaces the "shared navigation that shows which page you're on" from Step 5.
+- **Renamed the options everywhere:** quick starts, page titles, tab titles, and the presets in code (now `meal`, `even`, `recurring`, matching the routes).
+  - Meal: "Split by what each person had"
+  - Even split: "Split evenly, like an Uber ride"
+  - Recurring: "Split evenly and repeats, like utilities"
+
+  I used sentence case ("Even split") to match the rest of the app. A blank "What was it?" is now saved as "Meal" or "Even split" instead of "Dinner" or "Uber ride".
+- **Docs:** updated `flows.md` (decisions, routes, a new navigation rule, wireframes, headings) and the diagrams in both `flows.md` and `README.md`, which still match.
+- **Checks:** lint, build, the logic and storage tests, the 13 headless Chrome end-to-end checks (now also checking the header has no tabs and links Home), and new screenshots.
+
+**Pushed back:**
+- The tabs I added in Step 5 duplicated the quick starts.
+- The quick start names Dinner / Uber / Monthly bill were too narrow, so they're now Meal / Even split / Recurring.
