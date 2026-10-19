@@ -11,12 +11,6 @@ export type Person = {
   lastUsedAt: string;
 };
 
-export type Group = {
-  id: string;
-  name: string;
-  personIds: string[];
-};
-
 export type Share = {
   personId: string;
   amount: number;
@@ -72,13 +66,12 @@ export const SCHEMA_VERSION = 1;
 export type AppData = {
   version: typeof SCHEMA_VERSION;
   people: Person[];
-  groups: Group[];
   bills: Bill[];
   recurring: RecurringBill[];
 };
 
 export function emptyData(): AppData {
-  return { version: SCHEMA_VERSION, people: [], groups: [], bills: [], recurring: [] };
+  return { version: SCHEMA_VERSION, people: [], bills: [], recurring: [] };
 }
 
 // Validation for data read back from storage. Anything that fails is treated as
@@ -98,10 +91,6 @@ const isArrayOf = <T>(value: unknown, check: (item: unknown) => item is T): valu
 
 function isPerson(value: unknown): value is Person {
   return isObject(value) && isString(value.id) && isString(value.name) && isString(value.lastUsedAt);
-}
-
-function isGroup(value: unknown): value is Group {
-  return isObject(value) && isString(value.id) && isString(value.name) && isStringArray(value.personIds);
 }
 
 function isShare(value: unknown): value is Share {
@@ -170,7 +159,6 @@ export function isAppData(value: unknown): value is AppData {
     isObject(value) &&
     value.version === SCHEMA_VERSION &&
     isArrayOf(value.people, isPerson) &&
-    isArrayOf(value.groups, isGroup) &&
     isArrayOf(value.bills, isBill) &&
     isArrayOf(value.recurring, isRecurringBill)
   );

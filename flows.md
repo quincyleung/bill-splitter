@@ -396,7 +396,7 @@ Bills
 - **Currency conversion:** it would need exchange rates from an outside service.
 - **Discounts and coupons on meals:** a total below the items counts as an error.
 - **Reading the photo inside the app** (an OCR package or an AI API): the phone's own text recognition plus paste covers it.
-- **Groups** ("Roommates")
+- **Groups** ("Roommates"): add them later only if people using the app ask for them.
 - **A page to manage people** (rename or delete)
 - **Automatic recurring bills and reminders**
 - **Search and filters** on the bills list

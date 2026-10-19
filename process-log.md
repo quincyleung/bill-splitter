@@ -139,3 +139,16 @@ Then commit.
 **Open question:** `flows.md` cut groups, but you listed them, so the storage has a `groups` collection that nothing uses yet.
 
 **Pushed back:** Nothing.
+
+## Step 5, continued: Groups removed (2026-10-19)
+
+**Asked:** What groups are, then remove them for now.
+
+**Made:**
+- Explained that groups in our storage were a named set of people, a shortcut for ticking everyone on a bill. That's narrower than Splitwise, Tricount and Settle Up, where a group holds the bills and balances and has to come first.
+- Asked whether "remove but provide the option" meant optional groups now or removal now. You chose removal.
+- Took groups out of `lib/model.ts`: the type, the stored list and its validation. Saved data that still has a `groups` list loads fine, because extra fields are ignored. Adding groups back later can treat a missing list as empty, so existing data won't need converting.
+- In `flows.md`, the "Cut" entry now says to add groups only if people using the app ask for them.
+- Reran the 21 storage, store and money tests, lint and the build. All pass.
+
+**Pushed back:** I had added groups to storage because you listed them, although `flows.md` had cut them. You decided to remove them for now.
