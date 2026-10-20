@@ -9,7 +9,10 @@ import { personName } from "@/lib/people";
 
 type BalanceListProps = { id: string; title: string; balances: Balance[]; people: Person[]; today: string };
 
-/** One row per person: how much, how long it's been unpaid, and the bills it's for. */
+/**
+ * One row per person: how much (on the right), then how long it's been unpaid and the
+ * bills it's for, with their dates. Amounts aren't repeated under the name.
+ */
 export function BalanceList({ id, title, balances, people, today }: BalanceListProps) {
   return (
     <section aria-labelledby={id} className="mt-8">
@@ -28,7 +31,7 @@ export function BalanceList({ id, title, balances, people, today }: BalanceListP
                         Unpaid {durationLabel(days)}
                       </span>
                       {" · For "}
-                      {balance.bills.map(({ bill, amount }, index) => (
+                      {balance.bills.map(({ bill }, index) => (
                         <span key={bill.id}>
                           {index > 0 && ", "}
                           <Link
@@ -37,7 +40,7 @@ export function BalanceList({ id, title, balances, people, today }: BalanceListP
                           >
                             {bill.title}
                           </Link>{" "}
-                          ({formatDate(bill.date)}, {formatMoney(amount, bill.currency)})
+                          ({formatDate(bill.date)})
                         </span>
                       ))}
                     </>

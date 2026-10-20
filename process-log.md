@@ -879,3 +879,23 @@ Also reflect these changes in `flows.md`.
 **Pushed back:**
 - Six chips should be "two rows".
 - A group you can't take back.
+
+## Step 23: No amounts in the Who owes you line; "Show all" (2026-10-20)
+
+**Asked:**
+- Under Who owes you, keep "Unpaid for…" and what it's for, but remove the dollar amount, since it's already on the right.
+- Make "Show all 20 people" just "Show all".
+
+**Made:**
+- **Home's rows** now read "Josh · Unpaid for 2 weeks · For Dinner at Aba (Oct 5), Uber home (Oct 17)", with $70.56 only on the right. You owe uses the same row, so it changed too.
+- **The button** under Who was there now says **Show all**. It now fits beside "Same 5 people as Ski trip".
+- **`flows.md`** has the new wording and the Home sketch.
+- **Checks:**
+  - lint and a production build;
+  - all end-to-end checks. The Home check now says the line has the bill and its date, and no "$";
+  - the accessibility audit: 0 issues, and 26 keyboard checks pass;
+  - screenshots of Home and Who was there.
+
+**Pushed back:**
+- The amount was shown twice.
+- The count on Show all wasn't needed.

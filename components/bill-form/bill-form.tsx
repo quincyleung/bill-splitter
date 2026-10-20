@@ -22,7 +22,6 @@ import {
   checkDraft,
   type Draft,
   draftFromSeries,
-  everyoneIds,
   findPeople,
   isRecurring,
   NEW_PERSON,
@@ -135,7 +134,6 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
   const peopleLegend = recurring ? "Who's splitting it" : "Who was there";
   const byItem = splitsByItem(draft);
   const chips = pickerIds(draft, people);
-  const everyone = everyoneIds(draft, people);
   const matches = findPeople(draft.pendingName, draft, people);
   const groups = recentGroups(data);
   const payerOptions = [
@@ -298,7 +296,7 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
             ))}
             {people.length > draft.recentChips && (
               <Button ref={showAllRef} variant="secondary" aria-haspopup="dialog" onClick={() => setShowAll(true)}>
-                Show all {everyone.length - 1} people
+                Show all
               </Button>
             )}
           </div>
