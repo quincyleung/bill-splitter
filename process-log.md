@@ -1153,3 +1153,28 @@ Also reflect these changes in `flows.md`.
   - the accessibility audit: 0 issues, 33 keyboard checks pass.
 
 **Pushed back:** the hover highlight.
+
+## Step 37: Shares round to the nearest cent (2026-10-20)
+
+**Asked:**
+- Double-check the math: a test bill (Burger $100 for four, Salmon $80 for three, $200 total) seemed to add up to $199.97.
+- Then: instead of rounding down, round normally (half a cent and up rounds up).
+
+**Made:**
+- **The check:** the math was right. The shares were $27.77 + $57.40 + $57.40 + $57.43 = $200.00. The old rule rounded each friend down (so nobody was overcharged) and gave the payer the leftover 3¢. Assuming my share was also $57.40 gives $199.97.
+- **The new rule (`allocate` in `lib/split.ts`):**
+  - Each share rounds to the nearest cent, half up, e.g. $27.7778 → $27.78, $57.4074 → $57.41.
+  - If that leaves the total a cent or two over or under, whoever paid takes the difference, so shares still add up exactly.
+  - The same example is now $27.78, $57.41, $57.41 and $57.40 for me.
+  - If the payer isn't in the split, or would drop below zero, the difference goes one cent at a time to whoever rounding moved furthest the other way.
+  - A tiny nudge keeps a true half cent from becoming .4999… after division.
+- **What it changes:** friends can now be charged a cent above their exact share, e.g. $8.27 for $8.2667. Bills that are already saved keep their stored amounts.
+- **`flows.md`:** the money rule, with the example, and the even-split line.
+- **Checks:**
+  - logic tests: the example above; $20 three ways → 6.67, 6.67, and 6.66 for me; a true half rounds up; the payer never goes below zero; someone else paying; and the hot pot receipt (friends $48.74, me $48.71). The two old tests that expected rounding down were updated;
+  - lint and a production build;
+  - all end-to-end checks;
+  - the accessibility audit: 0 issues, 33 keyboard checks pass;
+  - the example entered in the form, whose summary reads $27.78 / $57.41 / $57.41 / your share $57.40.
+
+**Pushed back:** rounding down looked like missing cents; you want normal rounding.

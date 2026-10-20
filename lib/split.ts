@@ -1,27 +1,35 @@
 // Splitting money in whole units (cents). Every split adds up to the exact total.
 
 /**
- * Rounds each exact share down, then gives the leftover units to the payer if
- * they're in the split, so a friend is never overcharged. If the payer isn't in
- * the split, the leftover goes one unit at a time to the largest remainders.
+ * Rounds each exact share to the nearest unit (cent), half a cent and up rounding up.
+ * Rounding can leave the total a unit or two over or under, so whoever paid takes the
+ * difference and the shares add up exactly. If the payer isn't in the split (or would
+ * go below zero), the difference is spread one unit at a time over the people whose
+ * rounding moved them furthest the other way.
  */
 function allocate(exact: Map<string, number>, total: number, payerId: string): Map<string, number> {
   const shares = new Map<string, number>();
   let leftover = total;
   for (const [id, value] of exact) {
-    const whole = Math.max(0, Math.floor(value + 1e-6));
-    shares.set(id, whole);
-    leftover -= whole;
+    // The tiny nudge keeps a true half (2777.5) from landing at 2777.4999… after division.
+    const rounded = Math.max(0, Math.round(value + 1e-6));
+    shares.set(id, rounded);
+    leftover -= rounded;
   }
   if (leftover === 0 || shares.size === 0) return shares;
 
-  if (shares.has(payerId) && leftover > 0) {
-    shares.set(payerId, shares.get(payerId)! + leftover);
+  const payerShare = shares.get(payerId);
+  if (payerShare !== undefined && payerShare + leftover >= 0) {
+    shares.set(payerId, payerShare + leftover);
     return shares;
   }
 
-  const order = [...exact.entries()].sort(([, a], [, b]) => (b % 1) - (a % 1)).map(([id]) => id);
+  // Short: add to whoever was rounded down most. Over: take from whoever was rounded up most.
   const step = leftover > 0 ? 1 : -1;
+  const moved = (id: string) => exact.get(id)! - shares.get(id)!;
+  const order = [...exact.keys()]
+    .filter((id) => step > 0 || shares.get(id)! > 0)
+    .sort((a, b) => (step > 0 ? moved(b) - moved(a) : moved(a) - moved(b)));
   for (let i = 0; leftover !== 0; i = (i + 1) % order.length) {
     shares.set(order[i], shares.get(order[i])! + step);
     leftover -= step;
