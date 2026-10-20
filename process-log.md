@@ -950,3 +950,22 @@ Also reflect these changes in `flows.md`.
 **Pushed back:**
 - A menu was one tap too many for deleting an item.
 - The item name example wasn't needed.
+
+## Step 26: The date box no longer sticks out on iPhone (2026-10-20)
+
+**Asked:** On my phone, the date field goes past the right side of the screen.
+
+**Made:**
+- **The cause:** iPhone Safari draws date boxes natively, and for those it doesn't count the padding and border inside the width. A full-width date box was wider than the screen by its padding and border (about 26px).
+- **The fix (in `app/globals.css`):**
+  - On iPhone and iPad only (`@supports (-webkit-touch-callout: none)`, an iOS-only property), date boxes are drawn like the other boxes (`appearance: none`), so they fit.
+  - The date is left-aligned like the text in every other box (iOS centres it).
+  - Desktop and Android keep their own date picker look.
+- **Not tested on an iPhone here:** there's no iOS Simulator on this Mac. This is the standard fix for this Safari behaviour, and I've asked you to check it on your phone.
+- **Checks:**
+  - lint and a production build;
+  - all end-to-end checks;
+  - the accessibility audit: 0 issues, no sideways scroll at 320px, 27 keyboard checks pass;
+  - a desktop screenshot of the form, which looks unchanged.
+
+**Pushed back:** the date field overflowing on a real phone.

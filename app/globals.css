@@ -83,6 +83,23 @@
     outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
+
+  /* iPhone Safari draws date boxes natively and doesn't count their padding and border
+     inside the width, so a full-width date box pokes out past the right edge. Drawn
+     like the other boxes, it fits. (Only on iPhone and iPad: -webkit-touch-callout is
+     an iOS-only property, so desktop and Android keep their own date picker look.) */
+  @supports (-webkit-touch-callout: none) {
+    input[type="date"] {
+      -webkit-appearance: none;
+      appearance: none;
+      max-width: 100%;
+    }
+  }
+
+  /* The date sits on the left, like the text in every other box (iOS centres it). */
+  input[type="date"]::-webkit-date-and-time-value {
+    text-align: left;
+  }
 }
 
 /*
