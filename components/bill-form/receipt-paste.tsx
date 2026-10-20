@@ -30,12 +30,14 @@ export function ReceiptPaste({ draft, setDraft, requestFocus }: ReceiptPasteProp
   function read() {
     if (!draft.receiptText.trim()) {
       setError("Paste the receipt text first, or type the items instead.");
+      setStatus("Paste the receipt text first, or type the items instead.");
       requestFocus(`[id="${boxId}"]`);
       return;
     }
     const receipt = parseReceipt(draft.receiptText, DEFAULT_CURRENCY);
     if (receipt.items.length === 0) {
       setError("Couldn't find any prices in that text. Check you copied the receipt, or type the items instead.");
+      setStatus("Couldn't find any prices in that text. Check you copied the receipt, or type the items instead.");
       requestFocus(`[id="${boxId}"]`);
       return;
     }

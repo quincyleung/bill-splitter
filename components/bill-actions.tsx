@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { AlertIcon, MoreIcon } from "@/components/ui/icons";
 import { showToast } from "@/components/ui/toast";
 import { withoutBill } from "@/lib/bills";
-import { shareText } from "@/lib/clipboard";
+import { copyText } from "@/lib/clipboard";
 import { groupSummary } from "@/lib/messages";
 import type { Bill, Person } from "@/lib/model";
 import { updateData } from "@/lib/store";
@@ -169,20 +169,19 @@ export function DeleteDialog({ bill, onCancel }: { bill: Bill; onCancel: () => v
 
 /**
  * One message for the whole group: the bill, who paid, and what each person owes
- * (with their items). Opens the phone's share sheet, or copies it where there isn't one.
+ * (with their items). It copies the text and says "Summary copied." to paste into the
+ * group chat. (It used to open the system share sheet, which on a Mac showed a
+ * "Plain Text" pop-up with the title and text run together, so it copies instead.)
  */
 export function ShareSummaryButton({ bill, people }: { bill: Bill; people: Person[] }) {
   const buttonRef = useRef<HTMLButtonElement>(null);
-  async function share() {
-    const result = await shareText(bill.title, groupSummary(bill, people));
-    // The share sheet or copy step can leave focus at the top of the page, which would
-    // reveal the "Skip to main content" link. Put it back on this button.
+  async function copySummary() {
+    const copied = await copyText(groupSummary(bill, people));
     buttonRef.current?.focus({ preventScroll: true });
-    if (result === "copied") showToast("Summary copied.");
-    if (result === "failed") showToast("Couldn't share or copy. Try again.");
+    showToast(copied ? "Summary copied." : "Couldn't copy. Try again.");
   }
   return (
-    <Button ref={buttonRef} variant="secondary" fullWidth onClick={share}>
+    <Button ref={buttonRef} variant="secondary" fullWidth onClick={copySummary}>
       Share summary
     </Button>
   );

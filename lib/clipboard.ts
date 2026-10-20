@@ -32,20 +32,3 @@ export async function copyText(text: string): Promise<boolean> {
   return copied;
 }
 
-/**
- * Opens the phone's share sheet (so the summary can go straight to a group chat) when
- * the browser has one, and copies the text otherwise. Closing the share sheet counts
- * as "cancelled", not a failure.
- */
-export async function shareText(title: string, text: string): Promise<"shared" | "copied" | "cancelled" | "failed"> {
-  if (window.isSecureContext && typeof navigator.share === "function") {
-    try {
-      await navigator.share({ title, text });
-      return "shared";
-    } catch (error) {
-      if (error instanceof DOMException && error.name === "AbortError") return "cancelled";
-      // Any other failure: fall back to copying.
-    }
-  }
-  return (await copyText(text)) ? "copied" : "failed";
-}

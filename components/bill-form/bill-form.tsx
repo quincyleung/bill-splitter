@@ -39,12 +39,6 @@ import { ShareSummary } from "./share-summary";
 
 const FIRST_INVALID = '[aria-invalid="true"], [data-invalid] input';
 
-/** Examples shown inside the Name box until you type (the label above stays the real label). */
-const TITLE_EXAMPLES: Record<Preset, string> = {
-  "one-time": "Dinner at Aba",
-  recurring: "Electricity",
-};
-
 type BillFormProps = {
   preset: Preset;
   data: AppData;
@@ -78,6 +72,8 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
   }, [onSaved]);
   const [addError, setAddError] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState("");
+  // Read out when Save finds problems: how many, and that focus is on the first.
+  const [saveProblems, setSaveProblems] = useState("");
   const [saveError, setSaveError] = useState<string | null>(null);
   // A filled-in recurring bill only needs this time's amount, so start there.
   const [focusRequest, setFocusRequest] = useState<{ selector: string } | null>(() =>
@@ -121,6 +117,7 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
     const error = addPersonError(draft.pendingName, draft, people);
     if (error) {
       setAddError(error);
+      setAnnouncement(error);
       requestFocus(byId(ids.addPerson));
       return;
     }
@@ -138,8 +135,12 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
     event.preventDefault();
     setSubmitted(true);
     setAddError(null);
-    if (Object.keys(check.errors).length > 0) {
+    const problems = Object.keys(check.errors).length;
+    if (problems > 0) {
       setSaveError(null);
+      const message = `Couldn't save yet: ${problems} ${problems === 1 ? "thing needs" : "things need"} fixing. Moved to the first one.`;
+      // A trailing space alternates so pressing Save again re-announces the same message.
+      setSaveProblems((previous) => (previous === message ? message + " " : message));
       requestFocus(FIRST_INVALID);
       return;
     }
@@ -167,7 +168,7 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
     <form ref={formRef} noValidate onSubmit={handleSubmit} className="space-y-6">
       <TextField
         label="Name"
-        placeholder={TITLE_EXAMPLES[preset]}
+        placeholder={recurring ? "e.g. Netflix" : "e.g. Dinner at Aba"}
         value={draft.title}
         onChange={(event) => update({ title: event.target.value })}
         error={errors.title}
@@ -181,7 +182,7 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
         error={errors.date}
       />
 
-      <FieldGroup legend={recurring ? "Who's splitting it" : "Who was there"} hint="New names are saved for next time.">
+      <FieldGroup legend={recurring ? "Who's splitting it" : "Who was there"}>
         <div className="flex flex-wrap gap-2">
           {chips.map((id) => (
             <PersonChip
@@ -195,6 +196,7 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
         <div className="mt-3">
           <AddField
             id={ids.addPerson}
+            label="Name of someone to add"
             buttonLabel="Add person"
             placeholder="Name"
             value={draft.pendingName}
@@ -281,42 +283,49 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
       )}
 
       {recurring && (
-        <>
-          <SegmentedControl
-            legend="Repeats"
-            name="repeats"
-            value={draft.repeats}
-            onChange={(repeats) => update({ repeats })}
-            options={[
-              { value: "week", label: "Weekly" },
-              { value: "two-weeks", label: "Every 2 weeks" },
-              { value: "month", label: "Monthly" },
-              { value: "custom", label: "Custom" },
-            ]}
-          />
+        <SegmentedControl
+          legend="Repeats"
+          name="repeats"
+          value={draft.repeats}
+          onChange={(repeats) => update({ repeats })}
+          options={[
+            { value: "week", label: "Weekly" },
+            { value: "two-weeks", label: "Every 2 weeks" },
+            { value: "month", label: "Monthly" },
+            { value: "custom", label: "Custom" },
+          ]}
+        >
+          {/* Custom's interval sits in its own light-blue panel inside Repeats, so it reads as part of Custom. */}
           {draft.repeats === "custom" && (
-            <>
-              <TextField
-                label="Repeat every"
-                hint={draft.unit === "week" ? "1 to 52 weeks" : "1 to 12 months"}
-                inputMode="numeric"
-                value={draft.every}
-                onChange={(event) => update({ every: event.target.value })}
-                error={errors.every}
-              />
-              <SegmentedControl
-                legend="Weeks or months"
-                name="unit"
-                value={draft.unit}
-                onChange={(unit) => update({ unit })}
-                options={[
-                  { value: "week", label: "Weeks" },
-                  { value: "month", label: "Months" },
-                ]}
-              />
-            </>
+            <div className="mt-3 rounded-field border border-selected-border bg-accent-soft p-4">
+              <p className="type-small font-semibold text-ink">
+                Custom: how often it repeats ({draft.unit === "week" ? "1 to 52 weeks" : "1 to 12 months"})
+              </p>
+              {/* Every [N] [Weeks | Months], level with each other so it reads (and tabs) left to right. */}
+              <div className="mt-3 flex flex-wrap items-start gap-3">
+                <div className="w-28">
+                  <TextField
+                    label="Every"
+                    inputMode="numeric"
+                    value={draft.every}
+                    onChange={(event) => update({ every: event.target.value })}
+                    error={errors.every}
+                  />
+                </div>
+                <SegmentedControl
+                  legend="Weeks or months"
+                  name="unit"
+                  value={draft.unit}
+                  onChange={(unit) => update({ unit })}
+                  options={[
+                    { value: "week", label: "Weeks" },
+                    { value: "month", label: "Months" },
+                  ]}
+                />
+              </div>
+            </div>
           )}
-        </>
+        </SegmentedControl>
       )}
 
       <ShareSummary draft={draft} people={people} warnings={check.warnings} />
@@ -328,6 +337,9 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
             {saveError}
           </p>
         )}
+        <p role="alert" className="sr-only">
+          {saveProblems}
+        </p>
         <Button type="submit" fullWidth>
           Save bill
         </Button>

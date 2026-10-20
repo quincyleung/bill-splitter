@@ -736,3 +736,66 @@ Also reflect these changes in `flows.md`.
 - Examples in the box.
 - No visible form reset after Save.
 - A stray pop-up on Share summary.
+
+## Step 20: Accessibility pass, Share summary copies only, clearer Custom repeats (2026-10-20)
+
+**Asked:**
+- Push Step 19.
+- An accessibility pass on every page:
+  - logical tab order and visible focus;
+  - a real `<label>` on every field;
+  - errors linked to their fields (`aria-describedby`) and announced;
+  - person chips, toggles and the segmented control working by keyboard;
+  - every colour pair checked for AA contrast.
+  
+  List what changed, then commit.
+- A screenshot of the "main text" pop-up: the Mac share sheet showing "Plain Text".
+- Remove the example text from the one-time Name and from the recurring Name ("Electricity").
+- When Custom is chosen under Repeats, make it clear that the interval belongs to Custom; it looked like separate fields.
+- Remove "New names are saved for next time." under Who was there.
+- Then put the Name examples back, fainter: "e.g. Dinner at Aba" on a one-time bill and "e.g. Netflix" on a recurring one.
+
+**Made:**
+- **The audit:** a headless Chrome script that visits every page and state (first visit, Home with bills, both forms empty, partly filled and after a failed Save, the receipt paste, a bill, the delete pop-up, a person, a missing bill, Custom repeats). It checks:
+  - every field has a real label;
+  - errors are linked to their fields;
+  - every control has a name;
+  - there are no duplicate ids;
+  - headings are in order;
+  - targets are at least 24px;
+  - nothing scrolls sideways at 320px;
+  - text and placeholder contrast is at least 4.5:1, and outline and checkbox contrast at least 3:1;
+  - the tab order doesn't jump backwards up the page;
+  - every stop shows a focus ring.
+  
+  It also tests 17 keyboard paths: chips, radios, segmented controls, Mark paid, the ⋯ menu, the pop-up (focus on Cancel, Tab trapped, Escape) and the skip link.
+- **What it found, and the fixes:**
+  - **Add person had no real label** (it pointed at the button's text). It now has a visually hidden `<label>`, "Name of someone to add".
+  - **The date field showed no focus ring** (Safari and Chrome draw it inside the native control). A focus outline now covers dates too.
+  - **Add person errors weren't announced.** They now go to the form's live region.
+  - **Save errors weren't announced as a whole.** A hidden alert now says "Couldn't save yet: 2 things need fixing. Moved to the first one." Focus still moves to the first problem.
+  - **Receipt paste errors weren't announced.** They now go to its status region too.
+  - **The Custom panel tabbed backwards** (Every, then up to Weeks/Months). The row is now level, so it reads and tabs left to right.
+- **Passed as they were:** every other label, error link, contrast pair, name, target size and keyboard path.
+- **Share summary copies only:**
+  - On a Mac, Safari's share sheet shows the text as "Plain Text", with the title and text run together. That was the "main text" pop-up.
+  - Share summary now just copies the summary and says "Summary copied."
+  - My earlier skip-link theory was wrong. That change (the skip link shown only for keyboard focus) stays, because it's harmless.
+- **Custom repeats:** choosing Custom opens a light-blue panel inside Repeats, headed "Custom: how often it repeats (1 to 12 months)", with **Every** and **Weeks or months** side by side. The range in the heading follows Weeks or Months.
+- **Hint removed:** "New names are saved for next time."
+- **Name examples:**
+  - First removed, then put back fainter: "e.g. Dinner at Aba" on a one-time bill and "e.g. Netflix" on a recurring one.
+  - All example text inside a box (including "Burger" and "Name") now uses a new `ink-faint` grey (#67758e). That's 4.65:1 on white, the faintest that still meets AA; the old grey was 6.87:1.
+  - The recurring blank-name error now says "like Netflix" to match.
+- **Checks:**
+  - the audit: 0 issues, and all 17 keyboard paths pass;
+  - console clean;
+  - lint and a production build;
+  - all end-to-end checks. The Share summary check now asserts "Summary copied." and that no share sheet opens;
+  - screenshots of both forms and the Custom panel.
+
+**Pushed back:**
+- The share sheet's "main text" pop-up.
+- Examples: first removed, then back but fainter, with "e.g."
+- Custom repeats looking like separate fields.
+- The "new names are saved" hint.

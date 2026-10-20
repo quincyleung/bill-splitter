@@ -12,6 +12,7 @@
   --surface: #ffffff;
   --ink: #14305c;
   --ink-muted: #4a5b78;
+  --ink-faint: #67758e; /* example text inside a box only: the faintest that still meets 4.5:1 on white */
   --line: #e7dcc6; /* limestone: card outlines and dividers, decorative only */
   --field: #7d8da8; /* outlines of inputs and secondary controls (3:1) */
   --accent: #1d4e9e;
@@ -38,6 +39,7 @@
   --color-surface: var(--surface);
   --color-ink: var(--ink);
   --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
   --color-line: var(--line);
   --color-field: var(--field);
   --color-accent: var(--accent);
@@ -74,7 +76,10 @@
     font-variant-numeric: tabular-nums;
   }
 
-  :focus-visible {
+  :focus-visible,
+  /* Chrome focuses the day/month/year parts inside a date box, which doesn't count as
+     :focus-visible on the box itself, so give it the ring whenever it has focus. */
+  input[type="date"]:focus {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
   }

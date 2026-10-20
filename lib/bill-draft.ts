@@ -182,7 +182,7 @@ export function checkDraft(draft: Draft, people: Person[]): { errors: Errors; wa
   const name = (id: string) => nameOf(id, draft, people);
   const recurring = isRecurring(draft);
 
-  if (!draft.title.trim()) errors.title = recurring ? "Name this bill, like Electricity." : "Name this bill, like Dinner at Aba.";
+  if (!draft.title.trim()) errors.title = recurring ? "Name this bill, like Netflix." : "Name this bill, like Dinner at Aba.";
   if (!isIsoDate(draft.date)) errors.date = "Enter the date of the bill.";
 
   const pending = draft.pendingName.trim();

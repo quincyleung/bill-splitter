@@ -43,5 +43,5 @@ export function inputBorder(error?: string) {
 
 /** The look of a plain text input, shared by TextField and AddField. */
 export function inputClass(error?: string) {
-  return `block min-h-11 w-full min-w-0 flex-1 rounded-field border bg-surface px-3 text-[1.0625rem] text-ink transition-colors placeholder:text-ink-muted hover:border-ink focus:border-ink ${inputBorder(error)}`;
+  return `block min-h-11 w-full min-w-0 flex-1 rounded-field border bg-surface px-3 text-[1.0625rem] text-ink transition-colors placeholder:text-ink-faint hover:border-ink focus:border-ink ${inputBorder(error)}`;
 }

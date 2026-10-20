@@ -4,6 +4,7 @@
 // Monthly / Custom. Built on real radio buttons, so arrow keys and screen readers work.
 // Greek Summer chips: the chosen one gets the light blue "selected" fill, a navy edge and a tick.
 
+import type { ReactNode } from "react";
 import { describedBy, FieldError, FieldHint, labelClass, useFieldIds } from "./field";
 import { CheckIcon } from "./icons";
 
@@ -17,6 +18,8 @@ type SegmentedControlProps<T extends string> = {
   onChange: (value: T) => void;
   hint?: string;
   error?: string;
+  /** Follow-up fields for the chosen option, shown inside this same group (e.g. Custom's interval). */
+  children?: ReactNode;
 };
 
 export function SegmentedControl<T extends string>({
@@ -27,6 +30,7 @@ export function SegmentedControl<T extends string>({
   onChange,
   hint,
   error,
+  children,
 }: SegmentedControlProps<T>) {
   const { hintId, errorId } = useFieldIds();
   return (
@@ -53,6 +57,7 @@ export function SegmentedControl<T extends string>({
         ))}
       </div>
       {error && <FieldError id={errorId}>{error}</FieldError>}
+      {children}
     </fieldset>
   );
 }

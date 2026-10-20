@@ -1,9 +1,9 @@
 "use client";
 
 // A text input with its button on the right, e.g. a name and "Add person", used inside
-// a FieldGroup so it reads as part of that question. The button's text is the input's
-// visible label (aria-labelledby), the usual pattern for search-style fields. Enter
-// presses the button instead of submitting the form.
+// a FieldGroup so it reads as part of that question. It has a real <label> (visually
+// hidden, since the box's placeholder and the button beside it say what it's for).
+// Enter presses the button instead of submitting the form.
 
 import type { ComponentProps } from "react";
 import { Button } from "./button";
@@ -14,21 +14,25 @@ type AddFieldProps = Omit<
   "className" | "id" | "aria-labelledby" | "aria-describedby" | "aria-invalid"
 > & {
   id: string;
+  /** The field's real label, read by screen readers, e.g. "Name of someone to add". */
+  label: string;
   buttonLabel: string;
   onAdd: () => void;
   error?: string;
 };
 
-export function AddField({ id, buttonLabel, onAdd, error, onKeyDown, ...inputProps }: AddFieldProps) {
+export function AddField({ id, label, buttonLabel, onAdd, error, onKeyDown, ...inputProps }: AddFieldProps) {
   const buttonId = `${id}-button`;
   const errorId = `${id}-error`;
   return (
     <div>
+      <label htmlFor={id} className="sr-only">
+        {label}
+      </label>
       <div className="flex gap-2">
         <input
           type="text"
           id={id}
-          aria-labelledby={buttonId}
           aria-describedby={describedBy(error && errorId)}
           aria-invalid={error ? true : undefined}
           className={inputClass(error)}

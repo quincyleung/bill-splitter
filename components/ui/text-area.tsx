@@ -23,7 +23,7 @@ export function TextArea({ label, hint, error, id, rows = 6, ...props }: TextAre
         rows={rows}
         aria-describedby={describedBy(hint && hintId, error && errorId)}
         aria-invalid={error ? true : undefined}
-        className={`type-small mt-2 block w-full rounded-field border bg-surface px-3 py-2 text-ink transition-colors placeholder:text-ink-muted hover:border-ink focus:border-ink ${inputBorder(error)}`}
+        className={`type-small mt-2 block w-full rounded-field border bg-surface px-3 py-2 text-ink transition-colors placeholder:text-ink-faint hover:border-ink focus:border-ink ${inputBorder(error)}`}
         {...props}
       />
       {error && <FieldError id={errorId}>{error}</FieldError>}

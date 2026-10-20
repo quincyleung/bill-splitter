@@ -61,7 +61,7 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 
   Money is never in Marcellus (its numerals look very different). It takes the role of where it sits, always with even-width digits.
 - **Labels:** no question marks ("Who paid", not "Who paid?"), and no "(optional)": every field on a bill is needed, including each item's name.
-- **Examples:** a name field shows an example as faint text inside the box until I type ("Dinner at Aba", "Electricity", "Burger"). The label above is always a real label; the example is extra. Instructions that aren't examples ("The amount on your card slip, after tip", "New names are saved for next time.") stay as a line under the label. There are no sample bills, because fake bills would mix into real balances.
+- **Examples:** a bill's Name and an item's Name show an example as faint text inside the box until I type: "e.g. Dinner at Aba" on a one-time bill, "e.g. Netflix" on a recurring one, and "Burger" for an item. The faint grey is the lightest that still meets AA (4.6:1 on white). Labels are always real labels; instructions that aren't examples ("The amount on your card slip, after tip") stay as a line under the label. There are no sample bills, because fake bills would mix into real balances.
 - **On Save:** errors appear next to their fields, focus moves to the first one, and nothing typed is cleared. When it saves, the loading screen shows for half a second and then the new bill opens. The form is reset only after it's out of sight, so it's never seen clearing. There's no "Saved" message: the bill is the confirmation.
 
 ## Reading the diagrams
@@ -194,7 +194,6 @@ Name                      [ Dinner at Aba  ]
 Date                      [ Oct 18, 2026   ]
 
 Who was there
-New names are saved for next time.
 [✓ Me] [✓ Sam] [ Alex ] [✓ Jo]
 [ Name                    ] [Add person]
 
@@ -248,7 +247,7 @@ Fields: name, date (today), who was there, who paid, How to split (Evenly), then
 
 ### Recurring: `/new/recurring`
 
-Fields: name ("Electricity"), date of this bill, amount and currency, roommates, who paid, and **Repeats**: Weekly, Every 2 weeks, Monthly, or Custom ("Every [N] [weeks / months]"). Split evenly.
+Fields: name (faint example "e.g. Netflix"), date of this bill, amount and currency, roommates, who paid, and **Repeats**: Weekly, Every 2 weeks, Monthly, or Custom. Choosing Custom opens a light-blue panel inside Repeats, "Custom: how often it repeats (1 to 12 months)", with **Every** [N] and **Weeks or months** side by side, so the interval clearly belongs to Custom. Split evenly.
 
 - Saving creates a recurring series that remembers the name, people, payer, currency and frequency. If my roommate always pays electricity, that's already set next time.
 - **Next due** = this bill's date + the interval. A monthly bill on the 29th–31st falls on the last day of shorter months.
@@ -315,7 +314,7 @@ Others' shares, between them and Sam: Jo $42.00
   An even split reads "Uber home (Oct 19) / $24.80 split 2 ways / Your total: $12.40".
 - **Home's "Who owes you"** adds up what each person owes across all bills I paid (per currency, never converted), with the bills it's for as links: "Josh $70.25. For Dinner at Aba ($40.25), Uber home ($30.00)".
 - **Edit** opens `/bills/[id]/edit` with the same form, filled in. If a person already marked paid ends up with a different share, they go back to unpaid: "Sam's share changed from $40.25 to $43.10, so they're unpaid again."
-- **At the bottom:** **Share summary** on the left and **Back to Home** (the blue main action) on the right, side by side. Share summary sends the whole bill to a group in one message: the bill, its total and who paid, then each person's share with their items (by item) and who has paid back. The payer isn't marked again, since "paid by" already says who. On a phone it opens the share sheet, so it can go straight to the group chat. Where there's no share sheet, it copies the text ("Summary copied."). For example:
+- **At the bottom:** **Share summary** on the left and **Back to Home** (the blue main action) on the right, side by side. Share summary sends the whole bill to a group in one message: the bill, its total and who paid, then each person's share with their items (by item) and who has paid back. The payer isn't marked again, since "paid by" already says who. It copies the text and says "Summary copied.", ready to paste into the group chat. (It doesn't open the system share sheet: on a Mac that showed a "Plain Text" pop-up with the title and text run together.) For example:
 
   ```
   Dinner at Aba (Oct 5)
@@ -364,7 +363,7 @@ Others' shares, between them and Sam: Jo $42.00
 | Amount (even split, recurring) | Blank or invalid | "Enter the amount, like 24.80." |
 | Amount (even split, recurring) | 0 | "Enter an amount above 0." |
 | Date | Blank or not a real date | "Enter the date of the bill." |
-| Name | Blank | "Name this bill, like Dinner at Aba." On a recurring bill: "Name this bill, like Electricity." |
+| Name | Blank | "Name this bill, like Dinner at Aba." On a recurring bill: "Name this bill, like Netflix." |
 | Repeats (custom) | Blank, or outside 1–52 weeks or 1–12 months | "Enter how often, like every 3 months." |
 | Save | Storage full or blocked | Shown near Save: "Couldn't save on this phone. Everything you typed is still here. Try again." |
 | Mark paid | Couldn't save | The box stays as it was, with "Couldn't save that. Try again." |
