@@ -206,7 +206,7 @@ Who was there
 
 Who paid   (•) Me  ( ) Sam  ( ) Jo
 
-How to split   [✓ By item] [ Evenly ]
+How to split   [ Evenly ] [✓ By item]
 
 Items
   [Paste receipt text]  → pop-up: Receipt text [ … ]  [Close] [Read receipt]

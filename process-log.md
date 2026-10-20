@@ -1101,3 +1101,18 @@ Also reflect these changes in `flows.md`.
   - screenshots.
 
 **Pushed back:** this step came from the user test rather than from you, so there was no pushback.
+
+## Step 34: How to split: Evenly on the left, By item on the right (2026-10-20)
+
+**Asked:** Under How to split, move Evenly to the left and By item to its right.
+
+**Made:**
+- **The order:** How to split now reads **Evenly**, then **By item**. Evenly is still selected when a one-time bill opens. With the arrow keys, Right now moves from Evenly to By item.
+- **`flows.md`:** the sketch matches.
+- **Checks:**
+  - lint and a production build;
+  - all end-to-end checks;
+  - the accessibility audit: 0 issues. Its arrow-key check now goes Right from Evenly to By item, and 31 keyboard checks pass;
+  - a screenshot.
+
+**Pushed back:** the order of the two options.

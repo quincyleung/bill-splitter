@@ -364,8 +364,8 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
           value={draft.split}
           onChange={(split) => update({ split })}
           options={[
-            { value: "items", label: "By item" },
             { value: "even", label: "Evenly" },
+            { value: "items", label: "By item" },
           ]}
         />
       )}
