@@ -3,7 +3,7 @@
 // "More options" (⋯): a small menu on the right of a bill's name, holding the action
 // that removes it (Delete bill), in red. A disclosure:
 // Enter or a tap opens it with focus on the action; Escape closes it (focus back on ⋯),
-// as do tapping outside and focus leaving it.
+// as do tapping outside and focus moving to another control.
 
 import { type RefObject, useEffect, useId, useRef, useState } from "react";
 import { IconButton } from "./icon-button";
@@ -50,8 +50,13 @@ export function MoreMenu({ title, deleteLabel, onDelete, triggerRef }: MoreMenuP
     <div
       ref={wrapRef}
       className="relative shrink-0"
+      // Close when focus moves to something else (e.g. Tab away). Not when it moves to
+      // nothing: Safari (iPhone and Mac) doesn't focus a tapped button, it drops focus as
+      // the tap starts, and closing then would hide Delete before the tap lands. Taps
+      // outside are handled above.
       onBlur={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false);
+        const next = event.relatedTarget as Node | null;
+        if (next && !event.currentTarget.contains(next)) setOpen(false);
       }}
     >
       <IconButton

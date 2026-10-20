@@ -1052,3 +1052,23 @@ Also reflect these changes in `flows.md`.
   - all end-to-end checks. The deleted-every-bill check now also asserts the second sentence is gone.
 
 **Pushed back:** the second sentence wasn't needed.
+
+## Step 32: Deleting a bill works on iPhone (2026-10-20)
+
+**Asked:** I can't delete a bill on my phone. Please fix.
+
+**Made:**
+- **The cause:**
+  - Safari (on iPhone and Mac) doesn't give a tapped button focus. As the tap starts, it drops focus from whatever had it.
+  - The ⋯ menu put focus on Delete bill when it opened, and closed itself whenever focus left it. So the moment a finger landed on Delete bill, focus dropped, the menu closed, and Delete bill disappeared before the tap finished. Nothing happened.
+  - Chrome focuses buttons on click, so my tests (in Chrome) never saw it. The bug was there since the ⋯ menu was added (Step 18).
+- **The fix (`components/ui/more-menu.tsx`):**
+  - The menu closes on blur only when focus moves to another control outside it (e.g. Tab away), not when focus drops to nothing.
+  - Taps outside still close it (a separate pointerdown handler), as do Escape and ⋯.
+- **Checks:**
+  - lint and a production build;
+  - all end-to-end checks. The delete check now does what Safari does before tapping Delete bill (drops focus), checks the menu stays open, then deletes through the pop-up. It fails on the old code;
+  - the accessibility audit: 0 issues. A new keyboard check confirms Tab away still closes the menu (31 pass).
+- **Not tested on an iPhone here** (no iOS Simulator). Your dev server on :3000 already has the fix.
+
+**Pushed back:** a bug I missed, because tests only ran in Chrome.
