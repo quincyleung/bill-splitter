@@ -1072,3 +1072,32 @@ Also reflect these changes in `flows.md`.
 - **Not tested on an iPhone here** (no iOS Simulator). Your dev server on :3000 already has the fix.
 
 **Pushed back:** a bug I missed, because tests only ran in Chrome.
+
+## Step 33: First-run check, then fixes for issues 1 and 7 (2026-10-20)
+
+**Asked:**
+- Open the live site in a fresh window with nothing saved, as a brand-new user.
+- Goal: "Split last night's dinner with three friends who each ordered different things, then split the Uber home evenly."
+- Make at least one mistake on purpose, reload Home, and check what's remembered.
+- Rank usability feedback by severity, without fixing anything.
+- Then: add a "First-run check" section to README.md with the feedback and a "Changes I made" list, and fix issues 1 and 7.
+
+**Made:**
+- **The check:** a headless Chrome walkthrough at phone size on bill-splitter-iota-opal.vercel.app, with storage cleared first, using real taps and typing.
+  - Dinner by item: Maya, Leo, Priya, five dishes, with the Salmon left unticked and $84 typed as the total. Then the Uber evenly, then a reload.
+  - Counts: dinner 25 taps and 96 keystrokes, Uber 10 taps and 14. Everything was remembered.
+  - Seven issues, ranked, are in the README's "First-run check".
+- **Issue 1 (high): the summary showed wrong numbers before Save.**
+  - The by-item summary dropped items with no one ticked, so their price was counted as tax and tip ("Priya $3.12, tax and tip 39%").
+  - `previewDraft` now shows shares only when every priced item has someone ticked and the total covers all the items. Otherwise it shows each person's items so far with one note, as a warning for an unticked item (named, with its price) or a total below the items, and as info when there's no total yet.
+  - Tax and tip are always worked out against every item.
+- **Issue 7 (low): item titles.** An item card is titled by its name once it has one ("Salmon"), and "Item 4" until then (`itemTitle`). Its trash can is "Delete Salmon", and deleting says "Salmon deleted." Title legends leave room on the right for the trash can and wrap long names.
+- **README:** the "First-run check" section and a "Changes I made" list. **`flows.md`:** the summary rule and the item titles.
+- **Checks:**
+  - logic tests: an unticked item named with its price (one and two, one unnamed), a total below the items, no total, the ready state with tax and tip on every item, item titles;
+  - lint and a production build;
+  - all end-to-end checks. A new one replays the mistake: an unticked Salmon shows the warning and no shares or tax and tip; ticking it shows Sam $30.00, my $20.00 and 25%; a $30 total shows the total-below warning. The items check now expects "Fries" as a title and "Delete Fries";
+  - the accessibility audit: 0 issues, 31 keyboard checks pass;
+  - screenshots.
+
+**Pushed back:** this step came from the user test rather than from you, so there was no pushback.

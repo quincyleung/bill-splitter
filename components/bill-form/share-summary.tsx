@@ -1,7 +1,9 @@
 "use client";
 
 // The live "Who owes you" box at the bottom of the form. It updates as you type, so
-// you can check it against the receipt before saving.
+// you can check it against the receipt before saving. By item, it only shows shares
+// once every priced item has someone ticked and the total covers the items; until
+// then it shows each person's items so far and says what's missing.
 
 import { Card } from "@/components/ui/card";
 import { AlertIcon } from "@/components/ui/icons";
@@ -33,7 +35,14 @@ export function ShareSummary({ draft, people, warnings }: ShareSummaryProps) {
             </li>
           ))}
         </ul>
-        <p className="mt-2 type-small text-ink-muted">Plus tax and tip once you enter the total.</p>
+        {preview.note.tone === "warning" ? (
+          <p className="mt-3 flex items-start gap-2 type-small font-semibold text-ink">
+            <AlertIcon className="mt-0.5 size-4 shrink-0 text-danger" />
+            {preview.note.text}
+          </p>
+        ) : (
+          <p className="mt-2 type-small text-ink-muted">{preview.note.text}</p>
+        )}
       </>
     );
   } else {

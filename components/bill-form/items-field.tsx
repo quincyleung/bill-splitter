@@ -10,7 +10,7 @@ import { TrashIcon } from "@/components/ui/icons";
 import { MoneyField } from "@/components/ui/money-field";
 import { PersonChip } from "@/components/ui/person-chip";
 import { TextField } from "@/components/ui/text-field";
-import { type Draft, type DraftItem, type Errors, errorKey, nameOf, newItem } from "@/lib/bill-draft";
+import { type Draft, type DraftItem, type Errors, errorKey, itemTitle, nameOf, newItem } from "@/lib/bill-draft";
 import { createId } from "@/lib/id";
 import { ME, type Person } from "@/lib/model";
 import { DEFAULT_CURRENCY, formatMoney, parseMoney } from "@/lib/money";
@@ -63,9 +63,9 @@ export function ItemsField({ draft, people, errors, setDraft, requestFocus, addI
     requestFocus(`#name-${item.key}`);
   }
 
-  function removeItem(key: string, index: number) {
+  function removeItem(key: string, title: string) {
     setDraft((current) => ({ ...current, items: current.items.filter((item) => item.key !== key) }));
-    setAnnouncement(`Item ${index + 1} deleted.`);
+    setAnnouncement(`${title} deleted.`);
     requestFocus(`[id="${addItemId}"]`);
   }
 
@@ -85,13 +85,14 @@ export function ItemsField({ draft, people, errors, setDraft, requestFocus, addI
                 {draft.items.length > 1 && (
                   <div className="absolute top-3 right-2.5">
                     <IconButton
-                      label={`Delete item ${index + 1}`}
+                      label={item.name.trim() ? `Delete ${item.name.trim()}` : `Delete item ${index + 1}`}
                       icon={<TrashIcon />}
-                      onClick={() => removeItem(item.key, index)}
+                      onClick={() => removeItem(item.key, itemTitle(item, index))}
                     />
                   </div>
                 )}
-                <FieldGroup legend={`Item ${index + 1}`} size="title">
+                {/* Titled by the item's name once it has one ("Salmon"), so the cards can be scanned. */}
+                <FieldGroup legend={itemTitle(item, index)} size="title">
                   <div className="space-y-4">
                     {perPerson !== null && (
                       <p className="type-small text-ink-muted">

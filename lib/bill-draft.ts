@@ -5,7 +5,7 @@
 import { isIsoDate } from "./dates";
 import { type AppData, type Bill, type Frequency, ME, type Person, type RecurringBill } from "./model";
 import { DEFAULT_CURRENCY, formatMoney, parseMoney } from "./money";
-import { nameMatches } from "./people";
+import { listNames, nameMatches } from "./people";
 import { type ItemSplit, itemTotalsOf, splitByItems, splitEvenly } from "./split";
 
 export type Preset = "one-time" | "recurring";
@@ -251,13 +251,23 @@ function parseItems(draft: Draft) {
   }));
 }
 
+/** A line under a by-item summary that can't show shares yet, saying why. */
+export type PreviewNote = { text: string; tone: "info" | "warning" };
+
 export type Preview =
   | { state: "incomplete"; message: string }
-  /** By item, before the total is entered: each person's items so far. */
-  | { state: "items-only"; itemTotals: Map<string, number> }
+  /**
+   * By item, before shares can be worked out: each person's items so far, and why not
+   * yet (an item with no one ticked, no total yet, or a total below the items).
+   */
+  | { state: "items-only"; itemTotals: Map<string, number>; note: PreviewNote }
   | { state: "ready"; total: number; shares: Map<string, number>; items: ItemSplit | null };
 
-/** What the live summary shows. Uses whatever is valid so far. */
+/**
+ * What the live summary shows. Uses whatever is valid so far, but never guesses: an
+ * item with a price and no one ticked, or a total below the items, means no shares yet
+ * (otherwise the unticked item's price would quietly count as tax and tip).
+ */
 export function previewDraft(draft: Draft): Preview {
   if (draft.ticked.length === 0) return { state: "incomplete", message: "Tick who was there to see each share." };
   const total = parseMoney(draft.total, DEFAULT_CURRENCY);
@@ -267,14 +277,37 @@ export function previewDraft(draft: Draft): Preview {
     return { state: "ready", total, shares: splitEvenly(total, draft.ticked, draft.payerId), items: null };
   }
 
-  const lines = parseItems(draft)
-    .filter(({ price, personIds }) => price && personIds.length > 0)
+  const priced = parseItems(draft)
+    .map((parsed, index) => ({ ...parsed, index }))
+    .filter(({ price }) => price);
+  if (priced.length === 0) return { state: "incomplete", message: "Add who was there and what they had." };
+  const lines = priced
+    .filter(({ personIds }) => personIds.length > 0)
     .map(({ price, personIds }) => ({ price: price!, personIds }));
-  if (lines.length === 0) return { state: "incomplete", message: "Add who was there and what they had." };
+  const itemTotals = itemTotalsOf(lines, draft.ticked).itemTotals;
+  const money = (amount: number) => formatMoney(amount, DEFAULT_CURRENCY);
 
-  const split = total === null ? null : splitByItems(lines, total, draft.ticked, draft.payerId);
-  if (!split) return { state: "items-only", itemTotals: itemTotalsOf(lines, draft.ticked).itemTotals };
-  return { state: "ready", total: total!, shares: split.shares, items: split };
+  const unticked = priced.filter(({ personIds }) => personIds.length === 0);
+  if (unticked.length > 0) {
+    const names = listNames(unticked.map(({ item, price, index }) => `${itemTitle(item, index)} (${money(price!)})`));
+    const one = unticked.length === 1;
+    const text = `${names} ${one ? "has" : "have"} no one ticked yet. Tick who had ${one ? "it" : "them"} to include ${one ? "it" : "them"}.`;
+    return { state: "items-only", itemTotals, note: { text, tone: "warning" } };
+  }
+  if (total === null) return { state: "items-only", itemTotals, note: { text: "Plus tax and tip once you enter the total.", tone: "info" } };
+
+  const subtotal = priced.reduce((sum, { price }) => sum + price!, 0);
+  const split = splitByItems(lines, total, draft.ticked, draft.payerId);
+  if (total < subtotal || !split) {
+    const text = `The total (${money(total)}) is less than the items (${money(subtotal)}), so tax and tip can't be worked out. Check the total.`;
+    return { state: "items-only", itemTotals, note: { text, tone: "warning" } };
+  }
+  return { state: "ready", total, shares: split.shares, items: split };
+}
+
+/** An item's title: its name once it has one ("Salmon"), otherwise "Item 4". */
+export function itemTitle(item: DraftItem, index: number): string {
+  return item.name.trim() || `Item ${index + 1}`;
 }
 
 export type Errors = Record<string, string>;

@@ -231,12 +231,13 @@ Who owes you
 ```
 
 - **Type items** adds a blank item: name, then price, then who had it.
-- **Each item is a card** titled **Item 1**, **Item 2**… in the Lead style (Manrope 20px semibold), clearly above its small uppercase field labels (Name, Price, Who had it). Marcellus isn't used here, because its 1 looks like a Roman I.
+- **Each item is a card** titled by the item's name once it has one ("Salmon"), and **Item 1**, **Item 2**… until then, in the Lead style (Manrope 20px semibold), clearly above its small uppercase field labels (Name, Price, Who had it). So the cards can be scanned for a dish. Marcellus isn't used here, because its 1 looks like a Roman I.
 - **Deleting an item:** a **trash can** on the right of the item's title (when there's more than one item), named "Delete item 2" for screen readers. One tap deletes it; there's no confirmation, since nothing is saved yet. There's no button at the bottom of each item, so a long bill isn't a stack of buttons. Focus moves to Add item, and screen readers hear "Item 2 deleted."
 - **Paste receipt text** opens a pop-up with the box, help on copying the text, and **Read receipt**, which fills in the items and closes it. See "Reading a receipt" below.
 - A shared item (appetizer, a pitcher) gets ticked for several people, or for **Everyone**, and is split evenly between them.
 - Tax and tip (total paid minus the items) are spread in proportion to each person's item subtotal.
 - The summary at the bottom updates as I type. When someone else paid, it reads "You owe Sam $33.85", and the others' shares are shown for reference.
+- **The summary never guesses** (from the first-run check in the README). By item, it shows shares only once every priced item has someone ticked and the total covers the items. Until then it shows each person's items so far and one line saying what's missing: a warning "Salmon ($24.00) has no one ticked yet. Tick who had it to include it.", a warning "The total ($84.00) is less than the items ($84.50), so tax and tip can't be worked out. Check the total.", or (no total yet) "Plus tax and tip once you enter the total." Tax and tip are always worked out against every item, so an unticked dish never counts as tip.
 
 ### Reading a receipt
 
@@ -346,7 +347,7 @@ Others' shares, between them and Sam: Jo $42.00
 | State | What I see |
 |---|---|
 | Empty | Me is ticked and paying in every mode. By item: Items offers Paste or Type, and the summary says "Add who was there and what they had." Evenly and recurring: the amount is blank. |
-| Partly filled | By item: items entered but no total yet, so the summary shows item subtotals with "+ tax and tip once you enter the total". Evenly and recurring: even shares appear once there's an amount and at least one other person. In every mode, the draft is saved as I go. |
+| Partly filled | By item: items entered but no total yet, so the summary shows item subtotals with "Plus tax and tip once you enter the total." (or a warning naming an item with no one ticked, or a total below the items). Evenly and recurring: even shares appear once there's an amount and at least one other person. In every mode, the draft is saved as I go. |
 | Error | Pressing Save with problems shows each message next to its field and moves focus to the first. Nothing is cleared. |
 | Success | The loading screen, then the bill at `/bills/[id]`. No "Saved" message: the bill is the confirmation, and screen readers hear its title as the page changes. When every share is paid: "All paid up", and the bill moves to Settled. |
 
