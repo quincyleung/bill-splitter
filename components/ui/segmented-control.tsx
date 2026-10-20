@@ -18,6 +18,8 @@ type SegmentedControlProps<T extends string> = {
   onChange: (value: T) => void;
   hint?: string;
   error?: string;
+  /** Keep the legend for screen readers only, when the line already reads clearly ("Every 3 [Weeks] [Months]"). */
+  hideLegend?: boolean;
   /** Follow-up fields for the chosen option, shown inside this same group (e.g. Custom's interval). */
   children?: ReactNode;
 };
@@ -30,14 +32,15 @@ export function SegmentedControl<T extends string>({
   onChange,
   hint,
   error,
+  hideLegend = false,
   children,
 }: SegmentedControlProps<T>) {
   const { hintId, errorId } = useFieldIds();
   return (
     <fieldset aria-describedby={describedBy(hint && hintId, error && errorId)} data-invalid={error ? "" : undefined}>
-      <legend className={labelClass}>{legend}</legend>
+      <legend className={hideLegend ? "sr-only" : labelClass}>{legend}</legend>
       {hint && <FieldHint id={hintId}>{hint}</FieldHint>}
-      <div className="mt-2 flex flex-wrap gap-2">
+      <div className={`flex flex-wrap gap-2 ${hideLegend ? "" : "mt-2"}`}>
         {options.map((option) => (
           <label
             key={option.value}

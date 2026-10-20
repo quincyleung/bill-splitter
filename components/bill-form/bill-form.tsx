@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { type FormEvent, useEffect, useId, useRef, useState } from "react";
 import { AddField } from "@/components/ui/add-field";
 import { Button } from "@/components/ui/button";
+import { ChecklistDialog } from "@/components/ui/checklist-dialog";
 import { FieldGroup } from "@/components/ui/field-group";
 import { AlertIcon } from "@/components/ui/icons";
 import { MoneyField } from "@/components/ui/money-field";
@@ -19,25 +20,35 @@ import {
   checkDraft,
   type Draft,
   draftFromSeries,
+  everyoneIds,
+  findPeople,
   isRecurring,
+  NEW_PERSON,
   nameOf,
   newDraft,
   pickerIds,
   type Preset,
+  RECENT_CHIPS,
+  recentGroups,
   saveDraft,
+  savedPersonNamed,
   splitsByItem,
+  tickPeople,
+  untickPerson,
 } from "@/lib/bill-draft";
 import { todayIso } from "@/lib/dates";
 import { createId } from "@/lib/id";
 import { type AppData, ME } from "@/lib/model";
 import { DEFAULT_CURRENCY, formatMoney, toInputAmount } from "@/lib/money";
+import { byName } from "@/lib/people";
 import { recurringStatuses } from "@/lib/recurring";
 import { updateData } from "@/lib/store";
 import { LoadingShell } from "@/components/loading-shell";
 import { ItemsField } from "./items-field";
 import { ShareSummary } from "./share-summary";
 
-const FIRST_INVALID = '[aria-invalid="true"], [data-invalid] input';
+// The first field with a problem; in a group, its first box, tick or "choose people" button.
+const FIRST_INVALID = '[aria-invalid="true"], [data-invalid] input, [data-invalid] button[aria-haspopup]';
 
 type BillFormProps = {
   preset: Preset;
@@ -75,6 +86,8 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
   // Read out when Save finds problems: how many, and that focus is on the first.
   const [saveProblems, setSaveProblems] = useState("");
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [showAll, setShowAll] = useState(false);
+  const showAllRef = useRef<HTMLButtonElement>(null);
   // A filled-in recurring bill only needs this time's amount, so start there.
   const [focusRequest, setFocusRequest] = useState<{ selector: string } | null>(() =>
     draft.seriesId ? { selector: byId(ids.total) } : null,
@@ -93,27 +106,41 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
   const check = checkDraft(draft, people);
   const errors = submitted ? check.errors : {};
   const recurring = isRecurring(draft);
+  const peopleLegend = recurring ? "Who's splitting it" : "Who was there";
   const byItem = splitsByItem(draft);
   const chips = pickerIds(draft, people);
+  const everyone = everyoneIds(draft, people);
+  const matches = findPeople(draft.pendingName, draft, people);
+  const groups = recentGroups(data);
   const payerOptions = [
     ME,
     ...draft.ticked.filter((id) => id !== ME),
     ...(draft.payerId !== ME && !draft.ticked.includes(draft.payerId) ? [draft.payerId] : []),
   ];
 
+  // Unticking someone takes them off every item too.
   function setTicked(id: string, on: boolean) {
-    setDraft((current) => {
-      const ticked = on ? [...current.ticked, id] : current.ticked.filter((t) => t !== id);
-      return {
-        ...current,
-        ticked: pickerIds(current, people).filter((t) => ticked.includes(t)),
-        // Unticking someone takes them off every item.
-        items: on ? current.items : current.items.map((item) => ({ ...item, personIds: item.personIds.filter((p) => p !== id) })),
-      };
-    });
+    setDraft((current) => (on ? tickPeople(current, people, [id]) : untickPerson(current, people, id)));
   }
 
-  function addPerson() {
+  /** A suggestion picked in "Find or add a person": someone saved, or the typed name as someone new. */
+  function pickPerson(id: string): void {
+    if (id === NEW_PERSON) return addPerson();
+    setDraft((current) => ({ ...tickPeople(current, people, [id]), pendingName: "" }));
+    setAddError(null);
+    setAnnouncement(`${name(id)} added to this bill.`);
+    requestFocus(byId(ids.addPerson)); // ready for the next name
+  }
+
+  function tickGroup(group: { title: string; ids: string[] }) {
+    setDraft((current) => tickPeople(current, people, group.ids));
+    setAnnouncement(`Added the ${group.ids.length} people from ${group.title}.`);
+  }
+
+  function addPerson(): void {
+    // A name that's already saved puts that person on the bill, rather than a second one.
+    const existing = savedPersonNamed(draft.pendingName, draft, people);
+    if (existing) return pickPerson(existing);
     const error = addPersonError(draft.pendingName, draft, people);
     if (error) {
       setAddError(error);
@@ -122,10 +149,7 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
       return;
     }
     const person = { id: createId(), name: draft.pendingName.trim() };
-    setDraft((current) => {
-      const next = { ...current, added: [...current.added, person], pendingName: "" };
-      return { ...next, ticked: pickerIds(next, people).filter((t) => t === person.id || current.ticked.includes(t)) };
-    });
+    setDraft((current) => tickPeople({ ...current, added: [...current.added, person], pendingName: "" }, people, [person.id]));
     setAddError(null);
     setAnnouncement(`${person.name} added to this bill.`);
     requestFocus(byId(ids.addPerson)); // ready for the next name
@@ -182,7 +206,9 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
         error={errors.date}
       />
 
-      <FieldGroup legend={recurring ? "Who's splitting it" : "Who was there"}>
+      {/* Me and the 6 most recent people as chips, then anyone found, added or picked.
+          With lots of saved people, the rest are a search, a recent group, or Show all away. */}
+      <FieldGroup legend={peopleLegend}>
         <div className="flex flex-wrap gap-2">
           {chips.map((id) => (
             <PersonChip
@@ -196,9 +222,11 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
         <div className="mt-3">
           <AddField
             id={ids.addPerson}
-            label="Name of someone to add"
+            label="Find or add a person"
             buttonLabel="Add person"
-            placeholder="Name"
+            placeholder="Find or add a name"
+            suggestions={matches}
+            onPick={pickPerson}
             value={draft.pendingName}
             onChange={(event) => {
               update({ pendingName: event.target.value });
@@ -212,10 +240,39 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
             maxLength={40}
           />
         </div>
+        {(groups.length > 0 || everyone.length - 1 > RECENT_CHIPS) && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {groups.map((group) => (
+              <Button key={group.ids.join()} variant="secondary" onClick={() => tickGroup(group)}>
+                Same {group.ids.length} people as {group.title}
+              </Button>
+            ))}
+            {everyone.length - 1 > RECENT_CHIPS && (
+              <Button ref={showAllRef} variant="secondary" aria-haspopup="dialog" onClick={() => setShowAll(true)}>
+                Show all {everyone.length - 1} people
+              </Button>
+            )}
+          </div>
+        )}
         <p role="status" className="sr-only">
           {announcement}
         </p>
       </FieldGroup>
+      {showAll && (
+        <ChecklistDialog
+          title={peopleLegend}
+          options={[
+            { id: ME, label: "Me" },
+            ...[...draft.added, ...people].sort(byName).map((person) => ({ id: person.id, label: person.name })),
+          ]}
+          selected={draft.ticked}
+          onToggle={setTicked}
+          onClose={() => {
+            setShowAll(false);
+            showAllRef.current?.focus();
+          }}
+        />
+      )}
 
       <FieldGroup legend="Who paid" error={errors.payer}>
         <div className="flex flex-wrap gap-2">
@@ -295,34 +352,32 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
             { value: "custom", label: "Custom" },
           ]}
         >
-          {/* Custom's interval sits in its own light-blue panel inside Repeats, so it reads as part of Custom. */}
+          {/* Custom's interval is one line in a light-blue panel inside Repeats, so it reads as
+              part of Custom: Every [ 3 ] [Weeks] [Months]. */}
           {draft.repeats === "custom" && (
-            <div className="mt-3 rounded-field border border-selected-border bg-accent-soft p-4">
-              <p className="type-small font-semibold text-ink">
-                Custom: how often it repeats ({draft.unit === "week" ? "1 to 52 weeks" : "1 to 12 months"})
-              </p>
-              {/* Every [N] [Weeks | Months], level with each other so it reads (and tabs) left to right. */}
-              <div className="mt-3 flex flex-wrap items-start gap-3">
-                <div className="w-28">
-                  <TextField
-                    label="Every"
-                    inputMode="numeric"
-                    value={draft.every}
-                    onChange={(event) => update({ every: event.target.value })}
-                    error={errors.every}
+            <div className="mt-3 rounded-field border border-selected-border bg-accent-soft p-2">
+              <TextField
+                inline
+                label="Every"
+                inputMode="numeric"
+                maxLength={2}
+                value={draft.every}
+                onChange={(event) => update({ every: event.target.value })}
+                error={errors.every}
+                after={
+                  <SegmentedControl
+                    legend="Weeks or months"
+                    hideLegend
+                    name="unit"
+                    value={draft.unit}
+                    onChange={(unit) => update({ unit })}
+                    options={[
+                      { value: "week", label: "Weeks" },
+                      { value: "month", label: "Months" },
+                    ]}
                   />
-                </div>
-                <SegmentedControl
-                  legend="Weeks or months"
-                  name="unit"
-                  value={draft.unit}
-                  onChange={(unit) => update({ unit })}
-                  options={[
-                    { value: "week", label: "Weeks" },
-                    { value: "month", label: "Months" },
-                  ]}
-                />
-              </div>
+                }
+              />
             </div>
           )}
         </SegmentedControl>

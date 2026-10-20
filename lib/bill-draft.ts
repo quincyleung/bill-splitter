@@ -5,6 +5,7 @@
 import { isIsoDate } from "./dates";
 import { type AppData, type Bill, type Frequency, ME, type Person, type RecurringBill } from "./model";
 import { DEFAULT_CURRENCY, formatMoney, parseMoney } from "./money";
+import { nameMatches } from "./people";
 import { type ItemSplit, itemTotalsOf, splitByItems, splitEvenly } from "./split";
 
 export type Preset = "one-time" | "recurring";
@@ -36,6 +37,11 @@ export type Draft = {
   added: DraftPerson[];
   /** Everyone on the bill, including ME. */
   ticked: string[];
+  /**
+   * People given a chip on this form beyond Me and the recent ones: found, added, or
+   * ticked from Show all or Same people as. Only ever grows, so chips never jump around.
+   */
+  shown: string[];
   payerId: string;
   split: SplitMethod;
   items: DraftItem[];
@@ -65,6 +71,7 @@ export function newDraft(preset: Preset, today: string, makeId: () => string): D
     date: today,
     added: [],
     ticked: [ME],
+    shown: [],
     payerId: ME,
     split: PRESETS[preset].split,
     items: [newItem(makeId)],
@@ -91,6 +98,7 @@ export function draftFromSeries(series: RecurringBill, dueDate: string, people: 
     seriesId: series.id,
     title: series.name,
     ticked: series.personIds.filter(known),
+    shown: series.personIds.filter((id) => id !== ME && known(id)),
     payerId: known(series.payerId) ? series.payerId : ME,
     repeats,
     every: repeats === "custom" ? String(every) : "",
@@ -113,23 +121,112 @@ export function nameOf(id: string, draft: Draft, people: Person[]): string {
   return draft.added.find((p) => p.id === id)?.name ?? people.find((p) => p.id === id)?.name ?? "Someone";
 }
 
-/** Chips in "Who was there": Me, then people added on this form, then saved people, most recent first. */
-export function pickerIds(draft: Draft, people: Person[]): string[] {
-  const saved = [...people].sort((a, b) => b.lastUsedAt.localeCompare(a.lastUsedAt)).map((p) => p.id);
-  return [ME, ...draft.added.map((p) => p.id), ...saved];
+/** How many saved people get a chip before anyone is picked: the most recent ones. */
+export const RECENT_CHIPS = 6;
+
+/** Saved people, the ones used most recently first. */
+function byRecent(people: Person[]): Person[] {
+  return [...people].sort((a, b) => b.lastUsedAt.localeCompare(a.lastUsedAt));
 }
 
-/** Why a name can't be added, or null if it can. */
+/**
+ * Chips in "Who was there": Me, the 6 people used most recently, then anyone else put on
+ * this form (found, added, or from Show all or Same people as) in the order they came.
+ */
+export function pickerIds(draft: Draft, people: Person[]): string[] {
+  const recent = byRecent(people)
+    .slice(0, RECENT_CHIPS)
+    .map((p) => p.id);
+  return [...new Set([ME, ...recent, ...draft.shown])];
+}
+
+/** Everyone who can be picked: Me, people added on this form, and every saved person. */
+export function everyoneIds(draft: Draft, people: Person[]): string[] {
+  return [ME, ...draft.added.map((p) => p.id), ...people.map((p) => p.id)];
+}
+
+/** Ticked ids in chip order (anyone without a chip, which shouldn't happen, goes last). */
+function inChipOrder(draft: Draft, people: Person[], ticked: Set<string>): string[] {
+  const chips = pickerIds(draft, people);
+  return [...chips.filter((id) => ticked.has(id)), ...[...ticked].filter((id) => !chips.includes(id))];
+}
+
+/** Puts people on the bill, giving anyone without a chip one after the chips already there. */
+export function tickPeople(draft: Draft, people: Person[], ids: string[]): Draft {
+  const chips = pickerIds(draft, people);
+  const next = { ...draft, shown: [...draft.shown, ...ids.filter((id) => !chips.includes(id))] };
+  return { ...next, ticked: inChipOrder(next, people, new Set([...draft.ticked, ...ids])) };
+}
+
+/** Takes someone off the bill, and off every item. Their chip stays, unticked. */
+export function untickPerson(draft: Draft, people: Person[], id: string): Draft {
+  return {
+    ...draft,
+    ticked: inChipOrder(draft, people, new Set(draft.ticked.filter((t) => t !== id))),
+    items: draft.items.map((item) => ({ ...item, personIds: item.personIds.filter((p) => p !== id) })),
+  };
+}
+
+/** The suggestion that adds what's typed as someone new. */
+export const NEW_PERSON = "new";
+
+/** How many people "Find or add a person" suggests at once. */
+export const MAX_MATCHES = 5;
+
+/**
+ * Suggestions while typing in "Find or add a person": people not on the bill whose name
+ * matches (an exact match first, then the most recent), ending with "Add “Jo” as someone
+ * new" unless that exact name is already saved. Empty when nobody matches: Enter then
+ * adds the name as someone new.
+ */
+export function findPeople(query: string, draft: Draft, people: Person[]): { id: string; label: string }[] {
+  const typed = query.trim();
+  if (!typed) return [];
+  const lower = typed.toLowerCase();
+  const candidates = [...[...draft.added].reverse(), ...byRecent(people)];
+  const matches = candidates
+    .filter((p) => !draft.ticked.includes(p.id) && nameMatches(p.name, typed))
+    .sort((a, b) => Number(b.name.toLowerCase() === lower) - Number(a.name.toLowerCase() === lower))
+    .slice(0, MAX_MATCHES)
+    .map((p) => ({ id: p.id, label: p.name }));
+  if (matches.length === 0) return [];
+  const taken = ["me", "you"].includes(lower) || candidates.some((p) => p.name.toLowerCase() === lower);
+  return taken ? matches : [...matches, { id: NEW_PERSON, label: `Add “${typed}” as someone new` }];
+}
+
+/**
+ * "Same people as Dinner at Aba": the people on the newest bills, up to two different
+ * groups, each with at least two people besides me who are still saved.
+ */
+export function recentGroups(data: AppData, limit = 2): { title: string; ids: string[] }[] {
+  const saved = new Set(data.people.map((p) => p.id));
+  const seen = new Set<string>();
+  const groups: { title: string; ids: string[] }[] = [];
+  for (const bill of [...data.bills].sort((a, b) => b.createdAt.localeCompare(a.createdAt))) {
+    const ids = bill.shares.map((s) => s.personId).filter((id) => id !== ME && saved.has(id));
+    const key = [...ids].sort().join(",");
+    if (ids.length < 2 || seen.has(key)) continue;
+    seen.add(key);
+    groups.push({ title: bill.title, ids });
+    if (groups.length === limit) break;
+  }
+  return groups;
+}
+
+/** Someone already saved (or added on this form) with exactly this name, who isn't on the bill yet. */
+export function savedPersonNamed(name: string, draft: Draft, people: Person[]): string | null {
+  const lower = name.trim().toLowerCase();
+  const match = [...draft.added, ...people].find((p) => p.name.toLowerCase() === lower);
+  return match && !draft.ticked.includes(match.id) ? match.id : null;
+}
+
+/** Why a name can't be added, or null if it can. (Check savedPersonNamed first: that person is put on the bill instead.) */
 export function addPersonError(name: string, draft: Draft, people: Person[]): string | null {
   const trimmed = name.trim();
   if (!trimmed) return "Type a name, then press Add person.";
   if (["me", "you"].includes(trimmed.toLowerCase())) return "You're already on the list as Me.";
   const match = [...draft.added, ...people].find((p) => p.name.toLowerCase() === trimmed.toLowerCase());
-  if (match) {
-    return draft.ticked.includes(match.id)
-      ? `${match.name} is already on this bill.`
-      : `${match.name} is already in the list. Tap their name to include them.`;
-  }
+  if (match && draft.ticked.includes(match.id)) return `${match.name} is already on this bill.`;
   return null;
 }
 
@@ -247,7 +344,7 @@ export function checkDraft(draft: Draft, people: Person[]): { errors: Errors; wa
     const every = Number(draft.every);
     const max = draft.unit === "week" ? 52 : 12;
     if (!/^\d+$/.test(draft.every.trim()) || every < 1 || every > max) {
-      errors.every = "Enter how often, like every 3 months.";
+      errors.every = draft.unit === "week" ? "Enter how often, from 1 to 52 weeks." : "Enter how often, from 1 to 12 months.";
     }
   }
 

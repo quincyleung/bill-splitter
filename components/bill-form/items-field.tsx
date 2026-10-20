@@ -1,15 +1,16 @@
 "use client";
 
-import type { Dispatch, SetStateAction } from "react";
+import { type Dispatch, type SetStateAction, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { ChecklistDialog } from "@/components/ui/checklist-dialog";
 import { FieldGroup } from "@/components/ui/field-group";
 import { MoneyField } from "@/components/ui/money-field";
 import { PersonChip } from "@/components/ui/person-chip";
 import { TextField } from "@/components/ui/text-field";
 import { type Draft, type DraftItem, type Errors, errorKey, nameOf, newItem } from "@/lib/bill-draft";
 import { createId } from "@/lib/id";
-import type { Person } from "@/lib/model";
+import { ME, type Person } from "@/lib/model";
 import { DEFAULT_CURRENCY, formatMoney, parseMoney } from "@/lib/money";
 import { ReceiptPaste } from "./receipt-paste";
 
@@ -23,8 +24,30 @@ type ItemsFieldProps = {
   addItemId: string;
 };
 
+/** Past this many people on the bill, each item's "Who had it" is one button that opens a pop-up list. */
+const COMPACT_OVER = 8;
+
 /** Typed-in items: a name, a price, and who had it. A shared item is split evenly. */
 export function ItemsField({ draft, people, errors, setDraft, requestFocus, addItemId }: ItemsFieldProps) {
+  // The item whose "Who had it" pop-up is open.
+  const [picking, setPicking] = useState<string | null>(null);
+  const compact = draft.ticked.length > COMPACT_OVER;
+  const name = (id: string) => nameOf(id, draft, people);
+  // In the pop-up: Me first, then A to Z.
+  const pickOptions = [
+    ...draft.ticked.filter((id) => id === ME),
+    ...draft.ticked.filter((id) => id !== ME).sort((a, b) => name(a).localeCompare(name(b), undefined, { sensitivity: "base" })),
+  ].map((id) => ({ id, label: name(id) }));
+
+  /** "Sam, Jo + 3", "Everyone", or "Choose who had it". */
+  function whoSummary(item: DraftItem) {
+    const had = draft.ticked.filter((id) => item.personIds.includes(id));
+    if (had.length === 0) return "Choose who had it";
+    if (had.length === draft.ticked.length) return "Everyone";
+    const names = had.slice(0, 2).map(name).join(", ");
+    return had.length > 2 ? `${names} + ${had.length - 2}` : names;
+  }
+
   const updateItem = (key: string, change: Partial<DraftItem>) =>
     setDraft((current) => ({
       ...current,
@@ -81,12 +104,59 @@ export function ItemsField({ draft, people, errors, setDraft, requestFocus, addI
                     <FieldGroup legend="Who had it" error={errors[errorKey.who(item.key)]}>
                       {draft.ticked.length === 0 ? (
                         <p className="text-ink-muted">Tick people under Who was there first.</p>
+                      ) : compact ? (
+                        <div className="flex flex-wrap gap-2">
+                          <Button
+                            id={`who-${item.key}`}
+                            variant="secondary"
+                            aria-haspopup="dialog"
+                            onClick={() => setPicking(item.key)}
+                          >
+                            {whoSummary(item)}
+                            {item.personIds.length > 0 && (
+                              <>
+                                <span aria-hidden="true" className="text-ink-muted">
+                                  ·
+                                </span>
+                                Change
+                              </>
+                            )}
+                          </Button>
+                          <PersonChip
+                            label="Everyone"
+                            checked={everyone}
+                            onChange={(on) => updateItem(item.key, { personIds: on ? [...draft.ticked] : [] })}
+                          />
+                          {picking === item.key && (
+                            <ChecklistDialog
+                              title={`Who had ${item.name.trim() || "this item"}`}
+                              options={pickOptions}
+                              selected={item.personIds}
+                              onToggle={(id, on) =>
+                                setDraft((current) => ({
+                                  ...current,
+                                  items: current.items.map((i) =>
+                                    i.key === item.key
+                                      ? { ...i, personIds: on ? [...i.personIds, id] : i.personIds.filter((p) => p !== id) }
+                                      : i,
+                                  ),
+                                }))
+                              }
+                              allLabel="Everyone"
+                              onAll={(on) => updateItem(item.key, { personIds: on ? [...draft.ticked] : [] })}
+                              onClose={() => {
+                                setPicking(null);
+                                document.getElementById(`who-${item.key}`)?.focus();
+                              }}
+                            />
+                          )}
+                        </div>
                       ) : (
                         <div className="flex flex-wrap gap-2">
                           {draft.ticked.map((id) => (
                             <PersonChip
                               key={id}
-                              label={nameOf(id, draft, people)}
+                              label={name(id)}
                               checked={item.personIds.includes(id)}
                               onChange={(on) =>
                                 updateItem(item.key, {

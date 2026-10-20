@@ -39,7 +39,13 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 - **Who paid:** every bill has one payer, picked with radio dots so it doesn't look like the tick-many people chips. It defaults to Me, and can be anyone ticked on the bill.
 - **Debts:** if I paid, everyone else on the bill owes me their share. If someone else paid, I owe them my share. What the others owe them is shown for reference but not tracked.
 - **Me:** I'm in every split by default, with my own items. I can untick myself only on a bill I paid.
-- **People are saved automatically** with the bill: anyone typed in with **Add person** who's still ticked when I press Save. Someone I've just added is ticked straight away, and Enter adds them and keeps the cursor there, so names can be typed one after another. People saved from earlier bills stay unticked until I tap them. The picker lists the people I used most recently first.
+- **People are saved automatically** with the bill: anyone typed in with **Add person** who's still ticked when I press Save. Someone I've just added is ticked straight away, and Enter adds them and keeps the cursor there, so names can be typed one after another. People saved from earlier bills stay unticked until I tap them.
+- **Picking people when there are lots of them** (built in Step 21, for groups of 20 or more):
+  - **Chips:** Who was there shows **Me** and the **6 people I used most recently**. Anyone else I find, add or tick gets a chip after them. Chips never move or disappear while I'm filling in the form; unticking one just leaves it unticked.
+  - **Find or add a person:** one box (with Add person on its right) both finds and adds. As I type, people not yet on the bill whose name (or any word of it) starts with what I typed show in a list under the box, an exact match first, then the most recent, up to 5. The first is highlighted, and **Enter** (or Add person) puts the highlighted one on the bill and clears the box for the next name. The arrow keys move the highlight, Escape hides the list, and tapping picks any of them. The list ends with **Add “Jo” as someone new** unless that exact name is already saved. When nobody matches, Enter adds the name as someone new, as before.
+  - **Same 5 people as Dinner at Aba:** up to two buttons for the people on my newest bills (two different groups, each with at least two people besides me who are still saved). One tap ticks them all; it only adds, never unticks anyone.
+  - **Show all 20 people** (when more people are saved than have chips) opens a pop-up: "Who was there", "5 of 21 ticked", a **Find a person** box, then Me and everyone A to Z with checkboxes. Ticks apply straight away; **Done**, Escape or a tap outside closes it and puts focus back on the button.
+  - **Who had it on a big bill:** with more than 8 people on the bill, each item's Who had it is one button instead of a chip per person, showing who's ticked ("Sam, Jo + 3 · Change", "Everyone · Change" or "Choose who had it"), with the **Everyone** chip beside it. The button opens the same pop-up: "Who had Burger", Everyone, then Me and the people on the bill A to Z.
 - **Money is stored in the currency's smallest unit** (cents; yen has none). Shares always add up to the exact total, and leftover units go to whoever paid.
 - **Currency:** shown next to the amount field with a **Change** button. The picker lists my recent currencies first, then every other one from the browser's built-in list. Amounts in different currencies are never added together or converted.
 - **Loading screen:** saved data can only be read in the browser, so until it's read every page shows the loading screen: "Bill Splitter" in Marcellus in the centre, a short gold line, and three softly pulsing Aegean-blue dots (still for people who ask for reduced motion). It's in the server's HTML, so it shows straight away on any page, and a returning user never sees a flash of the empty first-visit screen.
@@ -135,7 +141,7 @@ flowchart TD
     how -->|By item| itemsHow{"Paste or type the items?"}
     itemsHow -->|Paste| paste["Paste receipt text, press Read receipt"]
     paste --> prices{"Any prices found?"}
-    prices -->|No| errPaste["Error: 'Couldn't find any prices in that text.<br/>Check you copied the receipt, or type the items instead.'"]
+    prices -->|No| errPaste["Error: 'Couldn't find any prices in that text.<br/>Check you copied the receipt, or close this and type the items instead.'"]
     errPaste --> itemsHow
     prices -->|Yes| rows["Item rows added, pasted text kept"]
     itemsHow -->|Type| rows
@@ -194,15 +200,16 @@ Name                      [ Dinner at Aba  ]
 Date                      [ Oct 18, 2026   ]
 
 Who was there
-[✓ Me] [✓ Sam] [ Alex ] [✓ Jo]
-[ Name                    ] [Add person]
+[✓ Me] [✓ Sam] [ Alex ] [✓ Jo] [ Kim ] [ Lee ] [ Max ]
+[ Find or add a name      ] [Add person]
+[Same 5 people as Dinner at Aba]  [Show all 20 people]
 
 Who paid   (•) Me  ( ) Sam  ( ) Jo
 
 How to split   [✓ By item] [ Evenly ]
 
 Items
-  [Paste receipt text]  → Receipt text [ … ]  [Read receipt]
+  [Paste receipt text]  → pop-up: Receipt text [ … ]  [Close] [Read receipt]
   Name   [ Burger ]
   Price  [ 18.00  ]
   Who had it  [Me] [Sam ✓] [Jo] [Everyone]
@@ -223,7 +230,7 @@ Who owes you
 ```
 
 - **Type items** adds a blank item: name, then price, then who had it.
-- **Paste receipt text** opens a box with help on copying the text, then **Read receipt** fills in the items. See "Reading a receipt" below.
+- **Paste receipt text** opens a pop-up with the box, help on copying the text, and **Read receipt**, which fills in the items and closes it. See "Reading a receipt" below.
 - A shared item (appetizer, a pitcher) gets ticked for several people, or for **Everyone**, and is split evenly between them.
 - Tax and tip (total paid minus the items) are spread in proportion to each person's item subtotal.
 - The summary at the bottom updates as I type. When someone else paid, it reads "You owe Sam $33.85", and the others' shares are shown for reference.
@@ -232,14 +239,14 @@ Who owes you
 
 Built in Step 16 (`lib/receipt.ts`). Everything happens on the phone; nothing is uploaded.
 
-- **Paste receipt text** sits at the top of Items (By item only). It opens a box labelled "Receipt text", with help: "On iPhone, open the receipt photo, press and hold the text, tap Select All, then Copy. On Android, use Google Lens to copy the text." Then **Read receipt**.
+- **Paste receipt text** sits at the top of Items (By item only). It opens a **pop-up** (the same kind as Delete), "Paste receipt text", with a box labelled "Receipt text" and help: "On iPhone, open the receipt photo, press and hold the text, tap Select All, then Copy. On Android, use Google Lens to copy the text." Then **Close** and **Read receipt**. Reading closes the pop-up, the items appear, and focus moves to the first one. Problems stay in the pop-up, next to the box.
 - **Items are found by their prices** (`$5.00`, `223.93`, `$1,250.00`), not by line breaks, because the paste often arrives as one long line. Text without a price (order number, date, table) is ignored, and $0.00 lines (like "No onions") are skipped.
 - **A number before the name is the quantity:** "7 Deluxe Ayce Adult $223.93" or "2 x Beer $14.00". The item shows "7 × $31.99 on the receipt: tick 7 people", and a warning appears if a different number is ticked.
 - **Reading stops at the summary.** The summary starts at the first label followed by a price: Subtotal, Tax, GST, HST, VAT, Tip, Gratuity, Service charge, Total, Grand total, Amount due. So suggested-tip lines after the total ("18% Tip $61.41, You pay $402.56") are never read as dishes. An item merely named like a label ("Tip-top cake") isn't mistaken for it, because no price follows the label.
 - **Subtotal, Tax, Tip and Total are read as labels.** Subtotal checks the items: "Items add up to $250.00, but the receipt subtotal is $258.93. A line may be missing." Total is offered under Total paid ("Receipt total $341.15. Add any extra tip you left. [Use this]") but never filled in automatically, because most receipts print the total before tip.
 - **Names** are the words before the price, after any quantity. Translations after a price (e.g. 小锅) and leftover symbols are dropped. Names can be edited like any typed item.
 - **Read items are added below any items already there**, as normal items I can edit, remove or add to. An untouched blank first item is replaced. The pasted text stays in the box, even when switching between By item and Evenly. A message says what was found: "Found 5 items, subtotal $258.93. Check them, then tick who had each one."
-- **Errors:** an empty box gives "Paste the receipt text first, or type the items instead.", and text with no prices gives "Couldn't find any prices in that text. Check you copied the receipt, or type the items instead."
+- **Errors:** an empty box gives "Paste the receipt text first, or close this and type the items instead.", and text with no prices gives "Couldn't find any prices in that text. Check you copied the receipt, or close this and type the items instead."
 - **Tested** on the real hot pot receipt (one line, bilingual, quantities, gratuity, suggested tips after the total), a line-by-line receipt with no $ signs or quantities, and one with "2 x", a $0.00 modifier, thousands and a percent before the tip.
 ### One-time, evenly: `/new/one-time`
 
@@ -247,7 +254,7 @@ Fields: name, date (today), who was there, who paid, How to split (Evenly), then
 
 ### Recurring: `/new/recurring`
 
-Fields: name (faint example "e.g. Netflix"), date of this bill, amount and currency, roommates, who paid, and **Repeats**: Weekly, Every 2 weeks, Monthly, or Custom. Choosing Custom opens a light-blue panel inside Repeats, "Custom: how often it repeats (1 to 12 months)", with **Every** [N] and **Weeks or months** side by side, so the interval clearly belongs to Custom. Split evenly.
+Fields: name (faint example "e.g. Netflix"), date of this bill, amount and currency, roommates, who paid, and **Repeats**: Weekly, Every 2 weeks, Monthly, or Custom. Choosing Custom opens a light-blue panel inside Repeats, with one line: **Every** [ ] **[Weeks] [Months]**, so the interval clearly belongs to Custom. Split evenly.
 
 - Saving creates a recurring series that remembers the name, people, payer, currency and frequency. If my roommate always pays electricity, that's already set next time.
 - **Next due** = this bill's date + the interval. A monthly bill on the 29th–31st falls on the last day of shorter months.
@@ -314,7 +321,7 @@ Others' shares, between them and Sam: Jo $42.00
   An even split reads "Uber home (Oct 19) / $24.80 split 2 ways / Your total: $12.40".
 - **Home's "Who owes you"** adds up what each person owes across all bills I paid (per currency, never converted), with the bills it's for as links: "Josh $70.25. For Dinner at Aba ($40.25), Uber home ($30.00)".
 - **Edit** opens `/bills/[id]/edit` with the same form, filled in. If a person already marked paid ends up with a different share, they go back to unpaid: "Sam's share changed from $40.25 to $43.10, so they're unpaid again."
-- **At the bottom:** **Share summary** on the left and **Back to Home** (the blue main action) on the right, side by side. Share summary sends the whole bill to a group in one message: the bill, its total and who paid, then each person's share with their items (by item) and who has paid back. The payer isn't marked again, since "paid by" already says who. It copies the text and says "Summary copied.", ready to paste into the group chat. (It doesn't open the system share sheet: on a Mac that showed a "Plain Text" pop-up with the title and text run together.) For example:
+- **At the bottom:** **Share summary** on the left and **Back to Home** (the blue main action) on the right, side by side. Share summary sends the whole bill to a group in one message: the bill, its total and who paid, then each person's share with their items (by item) and who has paid back. The payer isn't marked again, since "paid by" already says who. A blank line separates each person. It copies the text and says "Summary copied.", ready to paste into the group chat. (It doesn't open the system share sheet: on a Mac that showed a "Plain Text" pop-up with the title and text run together.) For example:
 
   ```
   Dinner at Aba (Oct 5)
@@ -322,8 +329,10 @@ Others' shares, between them and Sam: Jo $42.00
 
   Josh: $58.16
     Lamb shoulder $38.00, Mezze (shared by 3) $8.00, tax and tip $12.16
+
   Julie: $10.11 (paid)
     Mezze (shared by 3) $8.00, tax and tip $2.11
+
   Me: $10.13
     Mezze (shared by 3) $8.00, tax and tip $2.13
   ```
@@ -346,12 +355,11 @@ Others' shares, between them and Sam: Jo $42.00
 | Who paid | Someone else paid and Me isn't ticked | "You're not on this bill, so you don't owe anything. Tick Me, or pick yourself as who paid." |
 | Who paid | The payer isn't ticked | "Sam paid, so tick Sam under Who was there, or choose who paid." |
 | Add person | Blank | "Type a name, then press Add person." |
-| Add person | Name already saved | "Sam is already in the list. Tap their name to include them." |
 | Add person | Name already on this bill | "Sam is already on this bill." |
 | Add person | "Me" or "You" | "You're already on the list as Me." |
 | Add person | A name typed but not added when Save is pressed | "Press Add person to put Jo on this bill, or clear the name." |
-| Paste box | Empty | "Paste the receipt text first, or type the items instead." |
-| Paste box | No prices found | "Couldn't find any prices in that text. Check you copied the receipt, or type the items instead." |
+| Paste box | Empty | "Paste the receipt text first, or close this and type the items instead." |
+| Paste box | No prices found | "Couldn't find any prices in that text. Check you copied the receipt, or close this and type the items instead." |
 | Item name | Blank | "Name this item, like Burger." |
 | Item price | Blank or not a number | "Enter a price, like 12.50." |
 | Item price | 0 or less | "Enter a price above 0." |
@@ -364,7 +372,7 @@ Others' shares, between them and Sam: Jo $42.00
 | Amount (even split, recurring) | 0 | "Enter an amount above 0." |
 | Date | Blank or not a real date | "Enter the date of the bill." |
 | Name | Blank | "Name this bill, like Dinner at Aba." On a recurring bill: "Name this bill, like Netflix." |
-| Repeats (custom) | Blank, or outside 1–52 weeks or 1–12 months | "Enter how often, like every 3 months." |
+| Repeats (custom) | Blank, or outside 1–52 weeks or 1–12 months | "Enter how often, from 1 to 12 months." (or "from 1 to 52 weeks") |
 | Save | Storage full or blocked | Shown near Save: "Couldn't save on this phone. Everything you typed is still here. Try again." |
 | Mark paid | Couldn't save | The box stays as it was, with "Couldn't save that. Try again." |
 | Delete bill | Couldn't save | The bill stays, with "Couldn't delete it. Try again." under the question. |
@@ -480,7 +488,7 @@ See all 6 bills                    (→ /bills, by month)
 - **Currency conversion:** it would need exchange rates from an outside service.
 - **Discounts and coupons on meals:** a total below the items counts as an error.
 - **Reading the photo inside the app** (an OCR package or an AI API): the phone's own text recognition plus paste covers it.
-- **Groups** ("Roommates"): add them later only if people using the app ask for them.
+- **Saved groups** ("Roommates"): "Same people as …" covers repeat groups for now.
 - **A page to manage people** (rename or delete)
 - **Automatic recurring bills and reminders**
 - **Search and filters** on the bills list

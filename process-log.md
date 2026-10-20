@@ -799,3 +799,52 @@ Also reflect these changes in `flows.md`.
 - Examples: first removed, then back but fainter, with "e.g."
 - Custom repeats looking like separate fields.
 - The "new names are saved" hint.
+
+## Step 21: Picking from lots of people, pop-ups for the receipt, a spaced summary, Custom on one line (2026-10-20)
+
+**Asked:**
+- "Is there a better way to organize names, especially when I start splitting with more people? Let's say there are 20 names." I brainstormed seven ideas, and you picked four:
+  1. a find-or-add box;
+  2. only who's ticked plus a few recent people, with "Show all";
+  3. "Same people as" a recent bill;
+  6. a compact "Who had it" on big bills.
+- Paste receipt text and Read receipt as a pop-up instead of expanding below.
+- A line break between the people in the summary text.
+- For Custom repeats, remove "Custom: how often it repeats…" and make it one line: Every [ ] [Weeks] [Months].
+
+**Made:**
+- **Who was there:**
+  - **Chips:** Me and the 6 people used most recently. Anyone found, added or ticked elsewhere gets a chip after them. Chips never move or vanish while the form is open, so focus is never lost; unticking just leaves a chip unticked.
+  - **Find or add a person:** the shared AddField became a combobox. Typing lists up to 5 people not yet on the bill, matching the start of the name or of any word ("jo" finds Jo, Josh and Mary Jones), an exact match first. The first is highlighted, and Enter or Add person picks it. The arrow keys move the highlight, Escape hides the list, and a tap picks any of them. "Add “Jo” as someone new" ends the list unless that exact name is saved. No match means Enter adds someone new, as before. Typing a saved name exactly puts that person on the bill, so "Sam is already in the list. Tap their name" is gone.
+  - **Same 5 people as Ski trip:** up to two buttons for the people on the newest bills (two different groups, each with two or more saved people besides me). It only ever adds people.
+  - **Show all 20 people** (when more people are saved than have chips) opens a pop-up: "Who was there", "5 of 21 ticked", **Find a person**, then Me and everyone A to Z as checkboxes, and **Done**.
+- **Who had it with more than 8 people:** one button per item ("Choose who had it", "Sam, Jo + 3 · Change" or "Everyone · Change") beside the Everyone chip. It opens the same pop-up, "Who had Burger", with Everyone, Me, then A to Z. After a failed Save, focus goes to that button.
+- **One shared pop-up** (`components/ui/dialog.tsx`):
+  - It's a native modal `<dialog>` with a title, optional description, and buttons at the bottom; a long middle scrolls.
+  - It's placed at the end of `<body>`, so Enter inside it can't submit the bill form.
+  - The delete confirmation now uses it too, plus a checklist pop-up built on it (`checklist-dialog.tsx`).
+- **Receipt pop-up:** "Paste receipt text" opens it, with Receipt text (and how to copy it), **Close** and **Read receipt**.
+  - Reading closes it and moves focus to the first item.
+  - Problems stay next to the box and are read out inside the pop-up. They now say "…or close this and type the items instead."
+  - The pasted text is kept for next time it's opened.
+- **Summary:** a blank line between each person in the copied summary.
+- **Custom repeats:**
+  - One line in the light-blue panel: Every [ ] [Weeks] [✓ Months]. TextField gained an inline label, and SegmentedControl gained a legend only screen readers hear.
+  - It fits on one line from 360px wide, and wraps at 320px.
+  - The error now gives the range: "Enter how often, from 1 to 12 months." (or 52 weeks).
+- **Found and fixed while testing:**
+  - The hidden inputs of the ticks made the Show all pop-up itself scrollable, which also gave it a stray Tab stop. Its list is now their positioning box.
+  - An unnamed item's pop-up said "Who had item I", because Marcellus's 1 looks Roman. It now says "Who had this item".
+- **Checks:**
+  - logic tests: chips, matching, find-or-add, Same people as, untick, the spaced summary;
+  - lint and a production build;
+  - all end-to-end checks. A new one uses 20 saved people and covers the chips, find with arrows and Enter, a tap, someone new, Same people as, Show all with find and Escape, and the compact Who had it (Save focus, pop-up, Done). The receipt check now covers the pop-up: focus, errors inside, Close returning focus, and the kept text;
+  - the accessibility audit: 0 issues, with new states for the suggestions, both pop-ups and the big bill. 26 keyboard checks pass, including the find box, Show all and Who had it opened by keyboard, with a focus ring;
+  - the read-only dev check on :3000 is clean;
+  - screenshots of each new screen.
+
+**Pushed back:**
+- Twenty names wouldn't fit the old chips.
+- Receipt paste looked odd expanded in place.
+- A line break between people in the summary.
+- The Custom heading wasn't needed.

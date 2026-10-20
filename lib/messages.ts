@@ -34,15 +34,18 @@ export function shareMessage(bill: Bill, personId: string): string {
 /**
  * The whole bill for the group chat: the bill, its total and who paid, then each
  * person's share (with their items on a by-item bill), and who has paid back. The
- * payer isn't marked again, since "paid by" already says who it was.
+ * payer isn't marked again, since "paid by" already says who it was. A blank line
+ * separates each person, so it's easy to find your own part in a chat.
  *
  *   Dinner at Aba (Oct 5)
  *   Total $78.40, paid by me
  *
  *   Josh: $58.16
  *     Lamb shoulder $38.00, Mezze (shared by 3) $8.00, tax and tip $12.16
+ *
  *   Julie: $10.11 (paid)
  *     Mezze (shared by 3) $8.00, tax and tip $2.11
+ *
  *   Me: $10.13
  *     Mezze (shared by 3) $8.00, tax and tip $2.13
  */
@@ -52,11 +55,11 @@ export function groupSummary(bill: Bill, people: Person[]): string {
   const payer = bill.payerId === ME ? "me" : name(bill.payerId);
   const lines = [`${bill.title} (${formatDate(bill.date)})`, `Total ${money(bill.total)}, paid by ${payer}`];
   if (bill.kind !== "meal") lines.push(`Split evenly between ${bill.shares.length}`);
-  lines.push("");
 
   // Everyone else first, me last.
   const shares = [...bill.shares].sort((a, b) => Number(a.personId === ME) - Number(b.personId === ME));
   for (const share of shares) {
+    lines.push("");
     const note = share.personId !== bill.payerId && share.paid ? " (paid)" : "";
     lines.push(`${name(share.personId)}: ${money(share.amount)}${note}`);
     const breakdown = breakdownFor(bill, share.personId);

@@ -53,7 +53,7 @@ flowchart TD
     how -->|By item| itemsHow{"Paste or type the items?"}
     itemsHow -->|Paste| paste["Paste receipt text, press Read receipt"]
     paste --> prices{"Any prices found?"}
-    prices -->|No| errPaste["Error: 'Couldn't find any prices in that text.<br/>Check you copied the receipt, or type the items instead.'"]
+    prices -->|No| errPaste["Error: 'Couldn't find any prices in that text.<br/>Check you copied the receipt, or close this and type the items instead.'"]
     errPaste --> itemsHow
     prices -->|Yes| rows["Item rows added, pasted text kept"]
     itemsHow -->|Type| rows
