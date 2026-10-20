@@ -308,7 +308,7 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
       {showGroups && (
         <ChecklistDialog
           title="Recent groups"
-          description="Tick one to put everyone from it on this bill."
+          description={null}
           findable={false}
           options={groups.map((group) => ({
             id: group.id,

@@ -21,8 +21,8 @@ type ChecklistDialogProps = {
   options: Option[];
   selected: string[];
   onToggle: (id: string, checked: boolean) => void;
-  /** Under the title. Defaults to how many are ticked: "5 of 21 ticked". */
-  description?: string;
+  /** Under the title. Defaults to how many are ticked: "5 of 21 ticked"; null for none. */
+  description?: string | null;
   /** Whether there's a Find a person box (not for a short list like groups). */
   findable?: boolean;
   /** A first row that ticks or unticks everyone, e.g. "Everyone". */
@@ -52,7 +52,7 @@ export function ChecklistDialog({
   return (
     <Dialog
       title={title}
-      description={description ?? `${ticked} of ${options.length} ticked`}
+      description={description === undefined ? `${ticked} of ${options.length} ticked` : description}
       onClose={onClose}
       top={
         findable ? (

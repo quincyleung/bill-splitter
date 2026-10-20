@@ -1025,3 +1025,18 @@ Also reflect these changes in `flows.md`.
   - screenshots with Fam Dinner (Huddy and Chloe), Ski trip and Internet.
 
 **Pushed back:** inline "Same N people" chips; recent events should be one tap away instead.
+
+## Step 30: Recent groups without the instruction line (2026-10-20)
+
+**Asked:** In Recent groups, remove the text "Tick one to put everyone…".
+
+**Made:**
+- **The pop-up** is now just "Recent groups", then the events. Each still shows its date and who was there underneath.
+- **The shared checklist pop-up** takes `description={null}` for no line under the title. It then has no `aria-describedby` either.
+- **Checks:**
+  - lint and a production build;
+  - all end-to-end checks. The groups check now asserts there's no description and no "Tick one" text;
+  - the accessibility audit: 0 issues, 30 keyboard checks pass;
+  - a screenshot.
+
+**Pushed back:** the instruction line wasn't needed.
