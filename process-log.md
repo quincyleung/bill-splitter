@@ -1139,3 +1139,17 @@ Also reflect these changes in `flows.md`.
   - screenshots.
 
 **Pushed back:** items took too much room.
+
+## Step 36: No hover highlight on an item's title row (2026-10-20)
+
+**Asked:** Looks good, but don't show the blue highlight when hovering over an item's title row.
+
+**Made:**
+- **The tint is gone:** the item title row (the minimize/open button) no longer turns light blue under the pointer.
+- **Kept:** keyboard focus still shows the focus ring, and the slight press effect stays.
+- **Checks:**
+  - lint and a production build;
+  - all end-to-end checks. The minimize check now moves the pointer onto the title row and confirms its background stays clear;
+  - the accessibility audit: 0 issues, 33 keyboard checks pass.
+
+**Pushed back:** the hover highlight.

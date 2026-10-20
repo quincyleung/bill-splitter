@@ -92,7 +92,7 @@ export function ItemsField({ draft, people, errors, setDraft, requestFocus, addI
                     aria-expanded={open}
                     aria-controls={open ? bodyId : undefined}
                     onClick={() => updateItem(item.key, { collapsed: open })}
-                    className="press -my-2 -ml-2.5 flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-field px-2.5 text-left text-ink hover:bg-accent-soft"
+                    className="press -my-2 -ml-2.5 flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-field px-2.5 text-left text-ink"
                   >
                     <ChevronIcon className={`size-5 shrink-0 motion-safe:transition-transform ${open ? "" : "-rotate-90"}`} />
                     <span className="type-lead min-w-0 flex-1 break-words">{title}</span>
