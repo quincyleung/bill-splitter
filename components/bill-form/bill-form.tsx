@@ -29,6 +29,7 @@ import {
   newDraft,
   pickerIds,
   type Preset,
+  type RecentGroup,
   recentGroups,
   saveDraft,
   savedPersonNamed,
@@ -36,11 +37,11 @@ import {
   tickPeople,
   untickPeople,
 } from "@/lib/bill-draft";
-import { todayIso } from "@/lib/dates";
+import { formatDate, todayIso } from "@/lib/dates";
 import { createId } from "@/lib/id";
 import { type AppData, ME } from "@/lib/model";
 import { DEFAULT_CURRENCY, formatMoney, toInputAmount } from "@/lib/money";
-import { byName } from "@/lib/people";
+import { byName, listNames } from "@/lib/people";
 import { recurringStatuses } from "@/lib/recurring";
 import { itemsThatFit } from "@/lib/rows";
 import { updateData } from "@/lib/store";
@@ -89,6 +90,8 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
   const [saveError, setSaveError] = useState<string | null>(null);
   const [showAll, setShowAll] = useState(false);
   const showAllRef = useRef<HTMLButtonElement>(null);
+  const [showGroups, setShowGroups] = useState(false);
+  const showGroupsRef = useRef<HTMLButtonElement>(null);
   // A filled-in recurring bill only needs this time's amount, so start there.
   const [focusRequest, setFocusRequest] = useState<{ selector: string } | null>(() =>
     draft.seriesId ? { selector: byId(ids.total) } : null,
@@ -156,8 +159,8 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
     requestFocus(byId(ids.addPerson)); // ready for the next name
   }
 
-  /** "Same 5 people as Ski trip": ticking puts them all on the bill, unticking takes them all off. */
-  function setGroup(group: { title: string; ids: string[] }, on: boolean) {
+  /** A recent group ("Fam Dinner"): ticking puts them all on the bill, unticking takes them all off. */
+  function setGroup(group: RecentGroup, on: boolean) {
     setDraft((current) => (on ? tickPeople(current, people, group.ids) : untickPeople(current, people, group.ids)));
     setAnnouncement(
       on
@@ -286,14 +289,11 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
         </div>
         {(groups.length > 0 || people.length > draft.recentChips) && (
           <div className="mt-3 flex flex-wrap gap-2">
-            {groups.map((group) => (
-              <PersonChip
-                key={group.ids.join()}
-                label={`Same ${group.ids.length} people as ${group.title}`}
-                checked={group.ids.every((id) => draft.ticked.includes(id))}
-                onChange={(on) => setGroup(group, on)}
-              />
-            ))}
+            {groups.length > 0 && (
+              <Button ref={showGroupsRef} variant="secondary" aria-haspopup="dialog" onClick={() => setShowGroups(true)}>
+                Show groups
+              </Button>
+            )}
             {people.length > draft.recentChips && (
               <Button ref={showAllRef} variant="secondary" aria-haspopup="dialog" onClick={() => setShowAll(true)}>
                 Show all
@@ -305,6 +305,27 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
           {announcement}
         </p>
       </FieldGroup>
+      {showGroups && (
+        <ChecklistDialog
+          title="Recent groups"
+          description="Tick one to put everyone from it on this bill."
+          findable={false}
+          options={groups.map((group) => ({
+            id: group.id,
+            label: group.title,
+            detail: `${formatDate(group.date)} · ${listNames(group.ids.map(name))}`,
+          }))}
+          selected={groups.filter((group) => group.ids.every((id) => draft.ticked.includes(id))).map((group) => group.id)}
+          onToggle={(id, on) => {
+            const group = groups.find((g) => g.id === id);
+            if (group) setGroup(group, on);
+          }}
+          onClose={() => {
+            setShowGroups(false);
+            showGroupsRef.current?.focus();
+          }}
+        />
+      )}
       {showAll && (
         <ChecklistDialog
           title={peopleLegend}

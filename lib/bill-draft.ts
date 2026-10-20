@@ -204,20 +204,23 @@ export function findPeople(query: string, draft: Draft, people: Person[]): { id:
   return taken ? matches : [...matches, { id: NEW_PERSON, label: `Add “${typed}” as someone new` }];
 }
 
+export type RecentGroup = { id: string; title: string; date: string; ids: string[] };
+
 /**
- * "Same people as Dinner at Aba": the people on the newest bills, up to two different
- * groups, each with at least two people besides me who are still saved.
+ * Show groups: the people on the newest bills ("Fam Dinner": Huddy and Chloe), up to 8
+ * different groups, each with at least two people besides me who are still saved. A
+ * group that's on several bills is listed once, under its newest bill.
  */
-export function recentGroups(data: AppData, limit = 2): { title: string; ids: string[] }[] {
+export function recentGroups(data: AppData, limit = 8): RecentGroup[] {
   const saved = new Set(data.people.map((p) => p.id));
   const seen = new Set<string>();
-  const groups: { title: string; ids: string[] }[] = [];
+  const groups: RecentGroup[] = [];
   for (const bill of [...data.bills].sort((a, b) => b.createdAt.localeCompare(a.createdAt))) {
     const ids = bill.shares.map((s) => s.personId).filter((id) => id !== ME && saved.has(id));
     const key = [...ids].sort().join(",");
     if (ids.length < 2 || seen.has(key)) continue;
     seen.add(key);
-    groups.push({ title: bill.title, ids });
+    groups.push({ id: bill.id, title: bill.title, date: bill.date, ids });
     if (groups.length === limit) break;
   }
   return groups;

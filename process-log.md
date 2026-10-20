@@ -992,9 +992,9 @@ Also reflect these changes in `flows.md`.
 **Asked:** The date fix worked, but the date now sits at the top inside the box. Centre it vertically.
 
 **Made:**
-- **The cause:** iOS's own date style centres the date with a flex box (items centred). Drawing the box like the others (`appearance: none`) dropped that, and the field's \`block\` class made it a plain block, so the date sat at the top.
+- **The cause:** iOS's own date style centres the date with a flex box (items centred). Drawing the box like the others (`appearance: none`) dropped that, and the field's `block` class made it a plain block, so the date sat at the top.
 - **The fix:** on iPhone and iPad only, the date box is a flex box with its items centred again, plus a line as tall as the box (44px less the border) as a fallback.
-  - The rule now sits outside Tailwind's layers, so it wins over the field's \`block\` class. Inside the base layer it would lose to the utilities.
+  - The rule now sits outside Tailwind's layers, so it wins over the field's `block` class. Inside the base layer it would lose to the utilities.
   - Confirmed in the built CSS.
 - **Not tested on an iPhone here** (no iOS Simulator on this Mac). You confirmed the overflow fix on your phone.
 - **Checks:**
@@ -1004,3 +1004,24 @@ Also reflect these changes in `flows.md`.
   - a desktop screenshot of the form, which looks unchanged.
 
 **Pushed back:** the date sitting at the top of its box.
+
+## Step 29: Show groups: pick a recent event to tick everyone who was there (2026-10-20)
+
+**Asked:** Instead of listing "Same 5 people as Ski trip" chips, have a **Show groups** button. It should show recent events, so I can tap, say, Fam Dinner (Huddy and Chloe) and have everyone who was there ticked.
+
+**Made:**
+- **Show groups** (beside Show all, when there are any groups) opens a pop-up, "Recent groups": "Tick one to put everyone from it on this bill."
+  - It lists up to 8 recent events, newest first. Each is a checkbox with the bill's name and, underneath, its date and who was there ("Fam Dinner" / "Oct 12 · Huddy and Chloe").
+  - Ticking one puts them all on the bill; unticking takes them all off (and off any items). Several can be ticked together, and a group shows ticked while all its people are on.
+  - Done, Escape or a tap outside closes it, with focus back on Show groups.
+  - Groups are as before: each set of people once (under its newest bill), with at least two people besides me who are still saved.
+- **The "Same N people as …" chips are gone.**
+- **Shared checklist pop-up:** it gained an optional second line per row, a custom description, and an option to have no find box. Two-line rows get a little space, so a focus ring doesn't touch the next row.
+- **Checks:**
+  - logic tests: groups carry their bill and date, and the limit;
+  - lint and a production build;
+  - all end-to-end checks. The 20-people check now opens Show groups and checks the title, description, no find box, and the "Ski trip / Oct 10 · Ana, Bo, Cy, Di, and Ed" row; it ticks, unticks and ticks again, and Done returns focus;
+  - the accessibility audit: 0 issues, with a new Recent groups state. 30 keyboard checks pass, including Show groups opening with Enter (focus with a ring on the first group), Space ticking it, and Escape returning focus;
+  - screenshots with Fam Dinner (Huddy and Chloe), Ski trip and Internet.
+
+**Pushed back:** inline "Same N people" chips; recent events should be one tap away instead.
