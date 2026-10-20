@@ -44,18 +44,18 @@ function HomeTitle() {
 
 /**
  * Just "Split a bill" and the two cards: no app name, no illustration, no explanation.
- * Centred on the line a third of the way down the screen (one share of the space above,
- * two below, so it holds on any phone height), with wider side margins.
+ * Near the middle of the screen but slightly above it (two shares of the space above,
+ * three below, so it holds on any phone height), with wider side margins.
  */
 function FirstVisit() {
   return (
     <div className="flex min-h-[calc(100dvh-4rem)] flex-col px-4">
-      <div aria-hidden="true" className="flex-1" />
+      <div aria-hidden="true" className="flex-[2]" />
       <PageTitle>Split a bill</PageTitle>
       <div className="mt-6">
         <QuickStarts />
       </div>
-      <div aria-hidden="true" className="flex-[2]" />
+      <div aria-hidden="true" className="flex-[3]" />
     </div>
   );
 }

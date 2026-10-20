@@ -620,3 +620,14 @@ Also reflect these changes in `flows.md`.
   - all 18 end-to-end checks pass.
 
 **Pushed back:** Nothing.
+
+## Step 17, continued: First visit just above the middle (2026-10-19)
+
+**Asked:** The first-visit content is now too high. Move it lower, near the centre but still slightly above it.
+
+**Made:**
+- The space above and below the first-visit block now splits two to three (it was one to two). The block's centre now sits about 42% of the way down on both 844px and 667px tall screens: near the middle, a little above it.
+- `flows.md`: the Flow 1 wireframe note.
+- **Checks:** lint, build, and all 18 end-to-end checks. The placement check now expects the centre 38–48% of the way down. Screenshots at both heights.
+
+**Pushed back:** A third of the way down was too high.
