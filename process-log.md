@@ -969,3 +969,20 @@ Also reflect these changes in `flows.md`.
   - a desktop screenshot of the form, which looks unchanged.
 
 **Pushed back:** the date field overflowing on a real phone.
+
+## Step 27: Deleting every bill keeps the usual Home, with a blank Recent bills (2026-10-20)
+
+**Asked:** If I delete my bills, don't take me back to onboarding; show a blank state instead.
+
+**Made:**
+- **First visit means nothing saved:** Home's first-visit screen now needs nothing ever saved: no bills, no people, no recurring bills (`isFirstVisit` in `lib/bills.ts`). Deleting bills keeps the people I split with, so after deleting every bill Home stays the usual one: "Bill Splitter", "Nobody owes anyone right now.", the two new-bill cards, and Recent bills with "No bills right now. New ones will show here."
+- **Start fresh** (which clears everything) still brings back the first visit.
+- **`flows.md`:** the Home route, the "first visit or coming back" rule, and a "No bills left" state.
+- **Checks:**
+  - a logic test for the first-visit rule;
+  - lint and a production build;
+  - all end-to-end checks. A new one deletes the only bill through ⋯ and the pop-up, then checks Home is "Bill Splitter" with the blank Recent bills, not "Split a bill";
+  - the accessibility audit: 0 issues, with a new state for Home with no bills. 27 keyboard checks pass;
+  - a screenshot.
+
+**Pushed back:** deleting bills shouldn't feel like starting over.

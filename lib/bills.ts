@@ -32,6 +32,15 @@ export function withPaid(bill: Bill, personId: string, paid: boolean, now: Date)
   };
 }
 
+/**
+ * A first visit: nothing has ever been saved. Deleting every bill keeps the people I've
+ * split with, so Home stays the usual one (with no bills) instead of going back to the
+ * welcome. Only Start fresh, which clears everything, brings the welcome back.
+ */
+export function isFirstVisit(data: AppData): boolean {
+  return data.bills.length === 0 && data.people.length === 0 && data.recurring.length === 0;
+}
+
 /** Newest first, by when the bill was added. */
 export function newestFirst(bills: Bill[]): Bill[] {
   return [...bills].sort((a, b) => b.createdAt.localeCompare(a.createdAt));

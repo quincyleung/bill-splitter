@@ -1,10 +1,11 @@
 "use client";
 
-// Home has two faces. A first visit gets just "Split a bill" and the two quick starts.
-// Coming back gets a big "Bill Splitter", then, in order of weight: the new-bill cards,
-// who still owes me and for how long, whom I owe, recurring bills that are due, and
-// the five most recent bills (latest at the top). Saved data decides which, so until
-// it's read the page shows the neutral loading shell, never the wrong one.
+// Home has two faces. A first visit (nothing saved yet) gets just "Split a bill" and the
+// two quick starts. Coming back gets a big "Bill Splitter", then, in order of weight: the
+// new-bill cards, who still owes me and for how long, whom I owe, recurring bills that
+// are due, and the five most recent bills (latest at the top), or a note that there are
+// none, after deleting them all. Saved data decides which, so until it's read the page
+// shows the neutral loading shell, never the wrong one.
 
 import { BalanceList } from "@/components/home/balance-list";
 import { QuickStarts } from "@/components/home/quick-starts";
@@ -14,7 +15,7 @@ import { LoadingShell } from "@/components/loading-shell";
 import { UnreadableNotice } from "@/components/unreadable-notice";
 import { PageTitle } from "@/components/ui/page-title";
 import { iOwe, owedToMe, totalOf } from "@/lib/balances";
-import { newestFirst } from "@/lib/bills";
+import { isFirstVisit, newestFirst } from "@/lib/bills";
 import { todayIso } from "@/lib/dates";
 import type { AppData } from "@/lib/model";
 import { formatMoney } from "@/lib/money";
@@ -34,7 +35,7 @@ export function HomeView() {
       </>
     );
   }
-  return state.data.bills.length === 0 ? <FirstVisit /> : <Returning data={state.data} />;
+  return isFirstVisit(state.data) ? <FirstVisit /> : <Returning data={state.data} />;
 }
 
 /** Home's title once there's anything saved: the app's name, big. Home and the loading screen are the only places it appears. */
