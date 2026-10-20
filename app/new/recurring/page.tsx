@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import { NewBill } from "@/components/bill-form/new-bill";
 import { LoadingShell } from "@/components/loading-shell";
+import { BackLink } from "@/components/back-link";
 import { PageTitle } from "@/components/ui/page-title";
 
 export const metadata: Metadata = { title: "Recurring bill" };
@@ -11,6 +12,7 @@ export const metadata: Metadata = { title: "Recurring bill" };
 export default function NewRecurringPage({ searchParams }: PageProps<"/new/recurring">) {
   return (
     <>
+      <BackLink />
       <PageTitle>Recurring bill</PageTitle>
       <div className="mt-6">
         <Suspense fallback={<LoadingShell />}>

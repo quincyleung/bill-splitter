@@ -84,9 +84,9 @@
  * Type roles, as in the recipe-book: carved Roman capitals for titles, a relaxed humanist
  * sans for everything else. Every piece of text uses one of these, so the same kind of
  * thing always looks the same:
- *   type-display  Home's "Bill Splitter"            Marcellus 40px
+ *   type-display  "Bill Splitter" (Home, loading)  Marcellus 40px
  *   type-heading  page titles (h1)                  Marcellus 28px
- *   type-title    card titles, the app name         Marcellus 22px
+ *   type-title    card titles, pop-up questions     Marcellus 22px
  *   type-lead     a key figure: "Josh owes you…"    Manrope 20px semibold
  *   type-row      a list row's name and amount      Manrope 17px medium
  *   (body)        sentences                          Manrope 17px regular
@@ -164,5 +164,57 @@
   transition-duration: 150ms;
   &:active:not(:disabled) {
     scale: 0.97;
+  }
+}
+
+/* The loading screen's gentle entrance and pulsing dots (see components/loading-shell.tsx). */
+@keyframes splash-rise {
+  from {
+    opacity: 0;
+    translate: 0 6px;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
+@keyframes splash-dot {
+  0%,
+  80%,
+  100% {
+    opacity: 0.25;
+    scale: 0.75;
+  }
+  40% {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+.splash-rise {
+  animation: splash-rise 700ms ease-out both;
+}
+
+.splash-dots > span {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--accent);
+  animation: splash-dot 1.2s ease-in-out infinite both;
+}
+
+.splash-dots > span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.splash-dots > span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-rise,
+  .splash-dots > span {
+    animation: none;
   }
 }

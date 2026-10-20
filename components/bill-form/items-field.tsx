@@ -64,7 +64,7 @@ export function ItemsField({ draft, people, errors, setDraft, requestFocus, addI
                     <TextField
                       id={`name-${item.key}`}
                       label="Name"
-                      hint="Like Burger"
+                      placeholder="Burger"
                       value={item.name}
                       onChange={(event) => updateItem(item.key, { name: event.target.value })}
                       error={errors[errorKey.name(item.key)]}

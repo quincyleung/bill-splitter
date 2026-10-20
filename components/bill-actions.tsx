@@ -1,7 +1,7 @@
 "use client";
 
 // The bill page's actions: the ⋯ menu beside the name (with Delete bill), the
-// "are you sure" question, and Share summary for the group chat.
+// "are you sure" pop-up, and Share summary for the group chat.
 
 import { useRouter } from "next/navigation";
 import { type RefObject, useEffect, useId, useRef, useState } from "react";
@@ -91,15 +91,23 @@ export function BillMenu({ title, onDelete, triggerRef }: BillMenuProps) {
   );
 }
 
-/** "Delete Dinner at Aba? This can't be undone." with a red Delete bill and Cancel. Takes focus when it opens. */
-export function DeleteQuestion({ bill, onCancel }: { bill: Bill; onCancel: () => void }) {
+/**
+ * The "are you sure" pop-up: "Delete Dinner at Aba?", "This can't be undone.", then
+ * Cancel and a red Delete bill. A native modal <dialog>: the page behind is dimmed and
+ * can't be reached, focus starts on Cancel (the safe choice), and Escape or tapping
+ * outside closes it.
+ */
+export function DeleteDialog({ bill, onCancel }: { bill: Bill; onCancel: () => void }) {
   const router = useRouter();
-  const questionId = useId();
+  const titleId = useId();
+  const descriptionId = useId();
   const [error, setError] = useState<string | null>(null);
-  const ref = useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
-    ref.current?.focus();
+    const dialog = ref.current;
+    if (dialog && !dialog.open) dialog.showModal();
+    return () => dialog?.close();
   }, []);
 
   function remove() {
@@ -112,32 +120,50 @@ export function DeleteQuestion({ bill, onCancel }: { bill: Bill; onCancel: () =>
     router.push("/");
   }
 
+  // Close the dialog first: while a modal dialog is open, focus can't move outside it,
+  // so focus only gets back to ⋯ once it's closed.
+  function cancel() {
+    ref.current?.close();
+    onCancel();
+  }
+
   return (
-    <div
+    <dialog
       ref={ref}
-      tabIndex={-1}
-      role="group"
-      aria-labelledby={questionId}
-      className="mt-4 rounded-card border border-danger bg-surface p-5 outline-none"
+      aria-labelledby={titleId}
+      aria-describedby={descriptionId}
+      onCancel={(event) => {
+        event.preventDefault(); // Escape: close through the same path as Cancel
+        cancel();
+      }}
+      onClick={(event) => {
+        if (event.target === event.currentTarget) cancel(); // a tap on the dimmed backdrop
+      }}
+      className="fixed inset-0 m-auto h-fit w-[calc(100%-2rem)] max-w-sm rounded-card border border-line bg-surface p-0 text-ink backdrop:bg-ink/40"
     >
-      <p id={questionId} className="font-semibold text-ink">
-        Delete {bill.title}? This can&apos;t be undone.
-      </p>
-      <div className="mt-3 flex flex-wrap gap-2">
-        <Button variant="danger" onClick={remove}>
-          Delete bill
-        </Button>
-        <Button variant="secondary" onClick={onCancel}>
-          Cancel
-        </Button>
-      </div>
-      {error && (
-        <p role="alert" className="type-small mt-3 flex items-start gap-2 font-semibold text-danger">
-          <AlertIcon className="mt-0.5 size-4 shrink-0" />
-          {error}
+      <div className="p-6">
+        <h2 id={titleId} className="type-title text-ink">
+          Delete {bill.title}?
+        </h2>
+        <p id={descriptionId} className="mt-2 text-ink-muted">
+          This can&apos;t be undone.
         </p>
-      )}
-    </div>
+        {error && (
+          <p role="alert" className="type-small mt-3 flex items-start gap-2 font-semibold text-danger">
+            <AlertIcon className="mt-0.5 size-4 shrink-0" />
+            {error}
+          </p>
+        )}
+        <div className="mt-6 flex flex-wrap justify-end gap-2">
+          <Button variant="secondary" onClick={cancel}>
+            Cancel
+          </Button>
+          <Button variant="danger" onClick={remove}>
+            Delete bill
+          </Button>
+        </div>
+      </div>
+    </dialog>
   );
 }
 
@@ -146,13 +172,17 @@ export function DeleteQuestion({ bill, onCancel }: { bill: Bill; onCancel: () =>
  * (with their items). Opens the phone's share sheet, or copies it where there isn't one.
  */
 export function ShareSummaryButton({ bill, people }: { bill: Bill; people: Person[] }) {
+  const buttonRef = useRef<HTMLButtonElement>(null);
   async function share() {
     const result = await shareText(bill.title, groupSummary(bill, people));
-    if (result === "copied") showToast("Copied the summary. Paste it into your group chat.");
+    // The share sheet or copy step can leave focus at the top of the page, which would
+    // reveal the "Skip to main content" link. Put it back on this button.
+    buttonRef.current?.focus({ preventScroll: true });
+    if (result === "copied") showToast("Summary copied.");
     if (result === "failed") showToast("Couldn't share or copy. Try again.");
   }
   return (
-    <Button variant="secondary" fullWidth onClick={share}>
+    <Button ref={buttonRef} variant="secondary" fullWidth onClick={share}>
       Share summary
     </Button>
   );

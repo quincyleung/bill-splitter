@@ -35,23 +35,23 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 | `/bills/[id]/edit` | Edit a bill |
 | `/people/[id]` | One person: bills both ways, net balance, Settle up |
 
-- **Navigation:** no tabs and no header bar. On every page except Home, the app name sits at the top on the same background and goes back to Home. Home has none: a first visit is just "Split a bill", and coming back, "Bill Splitter" is Home's own big title. Home's quick starts are how a bill starts, and each page's title says where you are.
+- **Navigation:** no tabs and no header bar. "Bill Splitter" appears only on the loading screen and as Home's big title (once there are bills); a first visit has just "Split a bill". Every other page has a small **← Home** link at the top (bill pages also have Back to Home at the bottom). Home's quick starts are how a bill starts, and each page's title says where you are. The "Skip to main content" link appears only when reached with the keyboard (Tab), never after a click or tap.
 - **Who paid:** every bill has one payer, picked with radio dots so it doesn't look like the tick-many people chips. It defaults to Me, and can be anyone ticked on the bill.
 - **Debts:** if I paid, everyone else on the bill owes me their share. If someone else paid, I owe them my share. What the others owe them is shown for reference but not tracked.
 - **Me:** I'm in every split by default, with my own items. I can untick myself only on a bill I paid.
 - **People are saved automatically** with the bill: anyone typed in with **Add person** who's still ticked when I press Save. Someone I've just added is ticked straight away, and Enter adds them and keeps the cursor there, so names can be typed one after another. People saved from earlier bills stay unticked until I tap them. The picker lists the people I used most recently first.
 - **Money is stored in the currency's smallest unit** (cents; yen has none). Shares always add up to the exact total, and leftover units go to whoever paid.
 - **Currency:** shown next to the amount field with a **Change** button. The picker lists my recent currencies first, then every other one from the browser's built-in list. Amounts in different currencies are never added together or converted.
-- **Loading state:** saved data can only be read in the browser, so each page shows a neutral shell until it has loaded. A returning user never sees a flash of the empty first-visit screen.
+- **Loading screen:** saved data can only be read in the browser, so until it's read every page shows the loading screen: "Bill Splitter" in Marcellus in the centre, a short gold line, and three softly pulsing Aegean-blue dots (still for people who ask for reduced motion). It's in the server's HTML, so it shows straight away on any page, and a returning user never sees a flash of the empty first-visit screen.
 - **Number fields** open the decimal keypad and accept `12`, `12.5` or `$12.50`.
 - **Look:** the Greek Summer design system from the recipe-book project: navy on warm white, Aegean blue only for the main action, light-blue fill for anything selected, pill buttons and chips, 12px fields, 20px cards with a thin limestone line and no shadows. Light only, no illustrations.
 - **Type:** one set of roles, so the same kind of thing always looks the same (defined in `app/globals.css`):
 
   | Role | Used for | Style |
   |---|---|---|
-  | Display | Home's "Bill Splitter" | Marcellus 40px |
+  | Display | "Bill Splitter" on Home and the loading screen | Marcellus 40px |
   | Heading | page titles | Marcellus 28px |
-  | Title | card titles, the app name | Marcellus 22px |
+  | Title | card titles, the delete pop-up's question | Marcellus 22px |
   | Lead | a key figure: "Josh owes you $58.16", a share | Manrope 20px semibold |
   | Row | every list row's name and amount | Manrope 17px medium |
   | Body | sentences, inputs | Manrope 17px regular |
@@ -61,8 +61,8 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 
   Money is never in Marcellus (its numerals look very different). It takes the role of where it sits, always with even-width digits.
 - **Labels:** no question marks ("Who paid", not "Who paid?"), and no "(optional)": every field on a bill is needed, including each item's name.
-- **Hints:** fields show an example under their label, such as "Like Dinner at Nopa" or "Like 12.50". Placeholders never stand in for labels. There are no sample bills, because fake bills would mix into real balances.
-- **On Save:** errors appear next to their fields, focus moves to the first one, and nothing typed is cleared.
+- **Examples:** a name field shows an example as faint text inside the box until I type ("Dinner at Aba", "Electricity", "Burger"). The label above is always a real label; the example is extra. Instructions that aren't examples ("The amount on your card slip, after tip", "New names are saved for next time.") stay as a line under the label. There are no sample bills, because fake bills would mix into real balances.
+- **On Save:** errors appear next to their fields, focus moves to the first one, and nothing typed is cleared. When it saves, the loading screen shows for half a second and then the new bill opens. The form is reset only after it's out of sight, so it's never seen clearing. There's no "Saved" message: the bill is the confirmation.
 
 ## Reading the diagrams
 
@@ -74,7 +74,7 @@ Each flow starts with a Mermaid diagram. States are named in the box text, and e
 
 ```mermaid
 flowchart TD
-  start(["Open the app for the first time"]) --> loading["Loading: a blank page"]
+  start(["Open the app for the first time"]) --> loading["Loading screen: 'Bill Splitter'<br/>in the centre"]
   loading --> canSave{"Can this browser save data?"}
   canSave -->|No| errStorage["Error: banner 'This browser isn't saving data,<br/>so bills will disappear when you close it.'"]
   errStorage --> welcome
@@ -115,11 +115,11 @@ Split a bill                (near the middle of the screen, slightly above it,
 
 | State | What I see |
 |---|---|
-| Loading | A blank page until saved data is read, with no app name and no buttons. |
+| Loading | The loading screen ("Bill Splitter" in the centre) until saved data is read. |
 | Empty | Just "Split a bill" and the two quick starts: no app name, no illustration, no explanation. No sign-up, no tutorial, no asking for my name. |
 | Partly filled | On the first form, "Who was there" shows only **Me** plus a name field with an **Add person** button on its right, because nobody is saved yet. Anyone I add is ticked straight away. |
 | Error | Storage blocked (private browsing, or storage turned off) → banner: "This browser isn't saving data, so bills will disappear when you close it. Turn off private browsing to keep them." The app still works for this session. |
-| Success | The first bill saves and opens `/bills/[id]` with a "Saved" message. **On hold (see Decision 12):** below the amounts, a one-time tip: "Add Bill Splitter to your Home Screen so your bills are kept. On iPhone: Share, then Add to Home Screen." It has a **Dismiss** button, and Dismiss hides it for good. It never appears before or during the first bill, and not at all if the app is already on the Home Screen. From then on, Home is the dashboard (Flow 3). |
+| Success | The first bill saves and opens `/bills/[id]`; the bill itself is the confirmation, so there's no "Saved" message. **On hold (see Decision 12):** below the amounts, a one-time tip: "Add Bill Splitter to your Home Screen so your bills are kept. On iPhone: Share, then Add to Home Screen." It has a **Dismiss** button, and Dismiss hides it for good. It never appears before or during the first bill, and not at all if the app is already on the Home Screen. From then on, Home is the dashboard (Flow 3). |
 
 ## Flow 2: Main task (add → split → who owes whom → paid)
 
@@ -163,7 +163,7 @@ flowchart TD
   check -->|No| stored{"Saved on this phone?"}
   stored -->|No| errSave["Error: 'Couldn't save on this phone.<br/>Everything you typed is still here.'"]
   errSave --> check
-  stored -->|Yes| bill["Success: bill page /bills/[id] says 'Saved'"]
+  stored -->|Yes| bill["Success: the bill page /bills/[id] opens"]
   bill --> payer{"Who paid?"}
   payer -->|Me| owedToMe["Each person owes me their share<br/>Copy message to each of them"]
   owedToMe --> markPaid["Mark paid as each person pays me"]
@@ -315,7 +315,7 @@ Others' shares, between them and Sam: Jo $42.00
   An even split reads "Uber home (Oct 19) / $24.80 split 2 ways / Your total: $12.40".
 - **Home's "Who owes you"** adds up what each person owes across all bills I paid (per currency, never converted), with the bills it's for as links: "Josh $70.25. For Dinner at Aba ($40.25), Uber home ($30.00)".
 - **Edit** opens `/bills/[id]/edit` with the same form, filled in. If a person already marked paid ends up with a different share, they go back to unpaid: "Sam's share changed from $40.25 to $43.10, so they're unpaid again."
-- **At the bottom:** **Share summary** on the left and **Back to Home** (the blue main action) on the right, side by side. Share summary sends the whole bill to a group in one message: the bill, its total and who paid, then each person's share with their items (by item) and who has paid. On a phone it opens the share sheet, so it can go straight to the group chat. Where there's no share sheet, it copies the text ("Copied the summary. Paste it into your group chat."). For example:
+- **At the bottom:** **Share summary** on the left and **Back to Home** (the blue main action) on the right, side by side. Share summary sends the whole bill to a group in one message: the bill, its total and who paid, then each person's share with their items (by item) and who has paid back. The payer isn't marked again, since "paid by" already says who. On a phone it opens the share sheet, so it can go straight to the group chat. Where there's no share sheet, it copies the text ("Summary copied."). For example:
 
   ```
   Dinner at Aba (Oct 5)
@@ -325,10 +325,10 @@ Others' shares, between them and Sam: Jo $42.00
     Lamb shoulder $38.00, Mezze (shared by 3) $8.00, tax and tip $12.16
   Julie: $10.11 (paid)
     Mezze (shared by 3) $8.00, tax and tip $2.11
-  Me: $10.13 (paid the bill)
+  Me: $10.13
     Mezze (shared by 3) $8.00, tax and tip $2.13
   ```
-- **More options (⋯)** sits on the right of the bill's name. It opens a small menu with **Delete bill** (Escape or tapping outside closes it). Delete asks first, under the title: "Delete Dinner at Aba? This can't be undone.", with a red **Delete bill** and **Cancel**. Focus moves into the question, and back to ⋯ on Cancel. Deleting goes back to Home with "Deleted Dinner at Aba." If it was the only bill in a recurring series, the series goes too. Saved people stay. Red is used only for this confirmation.
+- **More options (⋯)** sits on the right of the bill's name. It opens a small menu with **Delete bill** (Escape or tapping outside closes it). Delete asks first in a **pop-up** (a modal dialog in the middle of the screen, the page behind dimmed): "Delete Dinner at Aba?", "This can't be undone.", then **Cancel** and a red **Delete bill**. Focus starts on Cancel, the safe choice; Escape, Cancel or tapping outside closes it and puts focus back on ⋯. Deleting goes back to Home with "Deleted Dinner at Aba." If it was the only bill in a recurring series, the series goes too. Saved people stay. Red is used only for this confirmation.
 
 ### States
 
@@ -337,7 +337,7 @@ Others' shares, between them and Sam: Jo $42.00
 | Empty | Me is ticked and paying in every mode. By item: Items offers Paste or Type, and the summary says "Add who was there and what they had." Evenly and recurring: the amount is blank. |
 | Partly filled | By item: items entered but no total yet, so the summary shows item subtotals with "+ tax and tip once you enter the total". Evenly and recurring: even shares appear once there's an amount and at least one other person. In every mode, the draft is saved as I go. |
 | Error | Pressing Save with problems shows each message next to its field and moves focus to the first. Nothing is cleared. |
-| Success | Opens `/bills/[id]` with a "Saved" message that screen readers announce. When every share is paid: "All paid up", and the bill moves to Settled. |
+| Success | The loading screen, then the bill at `/bills/[id]`. No "Saved" message: the bill is the confirmation, and screen readers hear its title as the page changes. When every share is paid: "All paid up", and the bill moves to Settled. |
 
 ### Errors
 
@@ -458,7 +458,7 @@ See all 6 bills                    (→ /bills, by month)
 
 | State | What I see |
 |---|---|
-| Loading | The neutral shell. Never the empty welcome screen. |
+| Loading | The loading screen. Never the empty first-visit screen. |
 | Open bills | "Bill Splitter" with the sections above. |
 | Partly settled | Each bill shows "1 of 3 paid", and paid shares drop out of Who owes you. |
 | All settled | "Nobody owes anyone right now." The new-bill cards, Recurring bills and Recent bills stay. |

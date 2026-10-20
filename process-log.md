@@ -678,3 +678,61 @@ Also reflect these changes in `flows.md`.
   - A screenshot of the bill page.
 
 **Pushed back:** Delete was too prominent at the bottom. Sharing one message per person was tedious for a group.
+
+## Step 19: Loading screen, the name only on Home, a delete pop-up, smaller fixes (2026-10-20)
+
+**Asked:**
+- After Share summary, just say "Summary copied."
+- Drop "(paid the bill)" from the summary, since "paid by" already says who paid.
+- Add a pretty loading screen with "Bill Splitter" in the centre, and remove the name everywhere else. Then: add it back on Home, but nowhere else.
+- Fix a console error ("A tree hydrated but some attributes … didn't match").
+- Make the delete confirmation a pop-up instead of extending down.
+- Remove the "Saved" pop-up, since the bill opens anyway.
+- Put the example name inside the box ("Dinner at Aba") instead of under the label.
+- After Save, show the loading screen instead of the form being cleared.
+- Clicking the words "Share summary" shows a pop-up saying "main text". Fix it.
+
+**Made:**
+- **Share summary:** the toast is "Summary copied.". The summary marks only who has paid back ("(paid)"); the payer isn't marked again.
+- **Loading screen** (`components/loading-shell.tsx`):
+  - "Bill Splitter" in Marcellus 40px in the centre, a short gold line, and three softly pulsing Aegean-blue dots. It doesn't animate for people who've turned on reduce motion.
+  - It's in the server's HTML, so it shows straight away on any page and covers it until saved data is read.
+- **The name:**
+  - The header is gone (`site-header.tsx` deleted). "Bill Splitter" appears only on the loading screen and as Home's big title once there are bills. A first visit is still just "Split a bill".
+  - Every other page has a small "← Home" link at the top (`components/back-link.tsx`).
+- **Delete pop-up:**
+  - It's a native modal `<dialog>`: centred, the page behind dimmed and unreachable. It shows "Delete Uber home?", "This can't be undone.", then Cancel and a red Delete bill.
+  - Focus starts on Cancel. Escape, Cancel or tapping outside closes it.
+  - **Bug found and fixed:** focus didn't return to ⋯ because I moved it while the dialog was still open, and a modal dialog blocks that. It now closes first, then moves focus.
+- **No "Saved" pop-up.**
+- **After Save:**
+  - The loading screen shows for half a second, then the bill opens.
+  - The form resets only once its page is hidden (Next keeps it alive in the background). It does that from an effect cleanup with a stable callback, so it's never seen clearing.
+- **Examples inside the box:** "Dinner at Aba" (one-time Name), "Electricity" (recurring Name) and "Burger" (item Name) are now placeholder text. The "Like …" lines are gone, and the labels stay real labels. Instructions like "The amount on your card slip, after tip" stay as lines under the label.
+- **The "main text" pop-up:**
+  - I couldn't reproduce it, but the likely cause is the hidden "Skip to main content" link showing after focus jumped to the top of the page.
+  - The skip link now appears only for keyboard focus (`focus-visible`), and Share summary puts focus back on itself afterwards.
+  - The end-to-end test now does a real mouse click on the button's words and checks focus stays on the button with the skip link hidden.
+- **The console error:**
+  - **My mistake:** you keep `npm run dev` running on :3000, so my earlier "dev checks" on another port never started (Next refuses a second dev server), and I wrongly reported them clean. My `rm -rf .next` before builds also deleted `.next/dev` under your live server, which can leave its HTML and the browser's code out of step: a likely cause of the error.
+  - **The real check:** I ran it against your server on :3000, read-only, from a clean headless Chrome. Every page rendered its title with and without data, there were no console errors or hydration warnings, the delete pop-up opened, and the dev log was clean.
+  - **Added:** `suppressHydrationWarning` on `<html>` and `<body>` only, for attributes browser extensions add there. Everything inside is still checked.
+  - **Saved a note** to my memory: never delete `.next/dev`, and check dev mode through :3000.
+- **`flows.md`:** navigation (the name only on Home and loading, ← Home, the keyboard-only skip link), the loading screen, Save, examples, the delete pop-up, the summary and toast, the type roles, and the Flow 1 and Flow 2 diagrams (in `README.md` too).
+- **Checks:**
+  - lint and a production build;
+  - the group summary tests;
+  - all 18 end-to-end checks. New ones cover: the loading screen in the server's HTML and gone after load; no name or header on bill pages, with ← Home; Save showing the loading screen, not a cleared form; the placeholder; the modal pop-up (focus on Cancel, Escape and Cancel returning focus to ⋯, red confirm); "Summary copied."; and the real-click Share summary check;
+  - the clean-browser dev check on :3000;
+  - screenshots of the loading screen, a bill page and the delete pop-up.
+
+**Pushed back:**
+- Shorter toast.
+- Payer not repeated in the summary.
+- A loading screen.
+- The name only on Home.
+- Delete as a pop-up.
+- No "Saved" message.
+- Examples in the box.
+- No visible form reset after Save.
+- A stray pop-up on Share summary.

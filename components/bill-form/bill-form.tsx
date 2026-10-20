@@ -14,7 +14,6 @@ import { MoneyField } from "@/components/ui/money-field";
 import { PersonChip } from "@/components/ui/person-chip";
 import { SegmentedControl } from "@/components/ui/segmented-control";
 import { TextField } from "@/components/ui/text-field";
-import { showToast } from "@/components/ui/toast";
 import {
   addPersonError,
   checkDraft,
@@ -34,14 +33,16 @@ import { type AppData, ME } from "@/lib/model";
 import { DEFAULT_CURRENCY, formatMoney, toInputAmount } from "@/lib/money";
 import { recurringStatuses } from "@/lib/recurring";
 import { updateData } from "@/lib/store";
+import { LoadingShell } from "@/components/loading-shell";
 import { ItemsField } from "./items-field";
 import { ShareSummary } from "./share-summary";
 
 const FIRST_INVALID = '[aria-invalid="true"], [data-invalid] input';
 
-const TITLE_HINTS: Record<Preset, string> = {
-  "one-time": "Like Dinner at Aba or Uber home",
-  recurring: "Like Electricity",
+/** Examples shown inside the Name box until you type (the label above stays the real label). */
+const TITLE_EXAMPLES: Record<Preset, string> = {
+  "one-time": "Dinner at Aba",
+  recurring: "Electricity",
 };
 
 type BillFormProps = {
@@ -66,6 +67,15 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
     return next ? draftFromSeries(next.series, next.nextDue, people, createId) : newDraft(preset, today, createId);
   });
   const [submitted, setSubmitted] = useState(false);
+  // After Save: show the loading screen, then the new bill. The form is reset only once
+  // this page is hidden (Next keeps it alive in the background), so it's never seen clearing.
+  const [saved, setSaved] = useState(false);
+  const savedRef = useRef(false);
+  useEffect(() => {
+    return () => {
+      if (savedRef.current) onSaved();
+    };
+  }, [onSaved]);
   const [addError, setAddError] = useState<string | null>(null);
   const [announcement, setAnnouncement] = useState("");
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -144,16 +154,20 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
       setSaveError("Couldn't save on this phone. Everything you typed is still here. Try again.");
       return;
     }
-    showToast("Saved");
-    onSaved();
-    router.push(`/bills/${billId}`);
+    // No "Saved" message: the loading screen, then the bill itself, is the confirmation.
+    savedRef.current = true;
+    setSaved(true);
+    // Long enough to read the loading screen as a step, not a flicker.
+    setTimeout(() => router.push(`/bills/${billId}`), 500);
   }
+
+  if (saved) return <LoadingShell />;
 
   return (
     <form ref={formRef} noValidate onSubmit={handleSubmit} className="space-y-6">
       <TextField
         label="Name"
-        hint={TITLE_HINTS[preset]}
+        placeholder={TITLE_EXAMPLES[preset]}
         value={draft.title}
         onChange={(event) => update({ title: event.target.value })}
         error={errors.title}

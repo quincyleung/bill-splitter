@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { LoadingShell } from "@/components/loading-shell";
 import { UnreadableNotice } from "@/components/unreadable-notice";
 import type { Preset } from "@/lib/bill-draft";
@@ -16,6 +16,8 @@ import { BillForm } from "./bill-form";
 export function NewBill({ preset, seriesId }: { preset: Preset; seriesId?: string }) {
   const state = useAppData();
   const [formKey, setFormKey] = useState(0);
+  // Stable, so the form's "reset me once I'm hidden" effect doesn't fire on every render.
+  const resetForm = useCallback(() => setFormKey((key) => key + 1), []);
 
   if (state.status === "loading") return <LoadingShell />;
   if (state.status === "unreadable") return <UnreadableNotice raw={state.raw} />;
@@ -26,7 +28,7 @@ export function NewBill({ preset, seriesId }: { preset: Preset; seriesId?: strin
       preset={preset}
       data={state.data}
       seriesId={seriesId}
-      onSaved={() => setFormKey((key) => key + 1)}
+      onSaved={resetForm}
     />
   );
 }

@@ -37,7 +37,7 @@ export function HomeView() {
   return state.data.bills.length === 0 ? <FirstVisit /> : <Returning data={state.data} />;
 }
 
-/** Home's title once there's anything saved: the app's name, big. */
+/** Home's title once there's anything saved: the app's name, big. Home and the loading screen are the only places it appears. */
 function HomeTitle() {
   return <h1 className="type-display pt-6 text-ink">Bill Splitter</h1>;
 }

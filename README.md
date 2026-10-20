@@ -12,7 +12,7 @@ States are named in the box text, and each kind also has its own outline: **Erro
 
 ```mermaid
 flowchart TD
-  start(["Open the app for the first time"]) --> loading["Loading: a blank page"]
+  start(["Open the app for the first time"]) --> loading["Loading screen: 'Bill Splitter'<br/>in the centre"]
   loading --> canSave{"Can this browser save data?"}
   canSave -->|No| errStorage["Error: banner 'This browser isn't saving data,<br/>so bills will disappear when you close it.'"]
   errStorage --> welcome
@@ -81,7 +81,7 @@ flowchart TD
   check -->|No| stored{"Saved on this phone?"}
   stored -->|No| errSave["Error: 'Couldn't save on this phone.<br/>Everything you typed is still here.'"]
   errSave --> check
-  stored -->|Yes| bill["Success: bill page /bills/[id] says 'Saved'"]
+  stored -->|Yes| bill["Success: the bill page /bills/[id] opens"]
   bill --> payer{"Who paid?"}
   payer -->|Me| owedToMe["Each person owes me their share<br/>Copy message to each of them"]
   owedToMe --> markPaid["Mark paid as each person pays me"]

@@ -1,7 +1,7 @@
 "use client";
 
 import { use, useRef, useState } from "react";
-import { BillMenu, DeleteQuestion, ShareSummaryButton } from "@/components/bill-actions";
+import { BillMenu, DeleteDialog, ShareSummaryButton } from "@/components/bill-actions";
 import { LoadingShell } from "@/components/loading-shell";
 import { UnreadableNotice } from "@/components/unreadable-notice";
 import { Button } from "@/components/ui/button";
@@ -91,7 +91,7 @@ function BillDetails({ bill, people, series }: { bill: Bill; people: Person[]; s
         {series && ` · Repeats ${frequencyLabel(series.frequency)}`}
       </p>
       {confirmingDelete && (
-        <DeleteQuestion
+        <DeleteDialog
           bill={bill}
           onCancel={() => {
             setConfirmingDelete(false);

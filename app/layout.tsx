@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { Manrope, Marcellus } from "next/font/google";
-import { Suspense } from "react";
-import { HeaderBar, SiteHeader } from "@/components/site-header";
 import { StorageBanner } from "@/components/storage-banner";
 import { Toaster } from "@/components/ui/toast";
 import "./globals.css";
@@ -17,19 +15,19 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" className={`${marcellus.variable} ${manrope.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col bg-canvas font-sans text-ink">
+    // suppressHydrationWarning: browser extensions (password managers, Grammarly, dark-mode
+    // tools) add attributes to <html> and <body> before React loads. This ignores those
+    // attribute differences on these two elements only; everything inside is still checked.
+    <html lang="en" suppressHydrationWarning className={`${marcellus.variable} ${manrope.variable} h-full antialiased`}>
+      <body suppressHydrationWarning className="flex min-h-full flex-col bg-canvas font-sans text-ink">
         <a
           href="#main"
-          className="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:left-4 focus:z-50 focus:rounded-full focus:bg-surface focus:px-4 focus:py-3 focus:font-semibold"
+          className="sr-only focus-visible:not-sr-only focus-visible:absolute focus-visible:top-3 focus-visible:left-4 focus-visible:z-50 focus-visible:rounded-full focus-visible:bg-surface focus-visible:px-4 focus-visible:py-3 focus-visible:font-semibold"
         >
           Skip to main content
         </a>
-        <Suspense fallback={<HeaderBar />}>
-          <SiteHeader />
-        </Suspense>
         <StorageBanner />
-        <main id="main" tabIndex={-1} className="mx-auto w-full max-w-xl flex-1 px-4 pt-4 pb-12 outline-none">
+        <main id="main" tabIndex={-1} className="mx-auto w-full max-w-xl flex-1 px-4 pt-5 pb-12 outline-none">
           {children}
         </main>
         <Toaster />

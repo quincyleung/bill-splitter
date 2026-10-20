@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { BackLink } from "@/components/back-link";
 import { Card } from "@/components/ui/card";
 import { PageTitle } from "@/components/ui/page-title";
 
@@ -6,6 +7,7 @@ import { PageTitle } from "@/components/ui/page-title";
 export function PagePlaceholder({ title, children }: { title: string; children: ReactNode }) {
   return (
     <>
+      <BackLink />
       <PageTitle>{title}</PageTitle>
       <div className="mt-4">
         <Card>

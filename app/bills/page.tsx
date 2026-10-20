@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { AllBills } from "@/components/bills/all-bills";
+import { BackLink } from "@/components/back-link";
 import { PageTitle } from "@/components/ui/page-title";
 
 export const metadata: Metadata = { title: "All bills" };
@@ -7,6 +8,7 @@ export const metadata: Metadata = { title: "All bills" };
 export default function AllBillsPage() {
   return (
     <>
+      <BackLink />
       <PageTitle>All bills</PageTitle>
       <div className="mt-6">
         <AllBills />
