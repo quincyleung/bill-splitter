@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { ChecklistDialog } from "@/components/ui/checklist-dialog";
 import { FieldGroup } from "@/components/ui/field-group";
 import { MoneyField } from "@/components/ui/money-field";
+import { MoreMenu } from "@/components/ui/more-menu";
 import { PersonChip } from "@/components/ui/person-chip";
 import { TextField } from "@/components/ui/text-field";
 import { type Draft, type DraftItem, type Errors, errorKey, nameOf, newItem } from "@/lib/bill-draft";
@@ -31,6 +32,7 @@ const COMPACT_OVER = 8;
 export function ItemsField({ draft, people, errors, setDraft, requestFocus, addItemId }: ItemsFieldProps) {
   // The item whose "Who had it" pop-up is open.
   const [picking, setPicking] = useState<string | null>(null);
+  const [announcement, setAnnouncement] = useState("");
   const compact = draft.ticked.length > COMPACT_OVER;
   const name = (id: string) => nameOf(id, draft, people);
   // In the pop-up: Me first, then A to Z.
@@ -60,8 +62,9 @@ export function ItemsField({ draft, people, errors, setDraft, requestFocus, addI
     requestFocus(`#name-${item.key}`);
   }
 
-  function removeItem(key: string) {
+  function removeItem(key: string, index: number) {
     setDraft((current) => ({ ...current, items: current.items.filter((item) => item.key !== key) }));
+    setAnnouncement(`Item ${index + 1} deleted.`);
     requestFocus(`[id="${addItemId}"]`);
   }
 
@@ -76,7 +79,14 @@ export function ItemsField({ draft, people, errors, setDraft, requestFocus, addI
           return (
             <li key={item.key}>
               <Card>
-                <FieldGroup legend={`Item ${index + 1}`}>
+                {/* ⋯ (Delete item) in the card's corner, beside the title. Before the fields,
+                    so it's first in the tab order too. */}
+                {draft.items.length > 1 && (
+                  <div className="absolute top-3 right-2.5">
+                    <MoreMenu title={`item ${index + 1}`} deleteLabel="Delete item" onDelete={() => removeItem(item.key, index)} />
+                  </div>
+                )}
+                <FieldGroup legend={`Item ${index + 1}`} size="title">
                   <div className="space-y-4">
                     {perPerson !== null && (
                       <p className="type-small text-ink-muted">
@@ -175,11 +185,6 @@ export function ItemsField({ draft, people, errors, setDraft, requestFocus, addI
                         </div>
                       )}
                     </FieldGroup>
-                    {draft.items.length > 1 && (
-                      <Button variant="secondary" onClick={() => removeItem(item.key)}>
-                        Remove item {index + 1}
-                      </Button>
-                    )}
                   </div>
                 </FieldGroup>
               </Card>
@@ -192,6 +197,9 @@ export function ItemsField({ draft, people, errors, setDraft, requestFocus, addI
           Add item
         </Button>
       </div>
+      <p role="status" className="sr-only">
+        {announcement}
+      </p>
     </FieldGroup>
   );
 }

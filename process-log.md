@@ -899,3 +899,31 @@ Also reflect these changes in `flows.md`.
 **Pushed back:**
 - The amount was shown twice.
 - The count on Show all wasn't needed.
+
+## Step 24: Items: ⋯ to delete, and Item 1, Item 2 as titles (2026-10-20)
+
+**Asked:**
+- Instead of a Remove button under each item, put a ⋯ menu on the right that lets you delete it. There are too many buttons at the bottom, especially for a big group.
+- Give "Item 1", "Item 2" a clear hierarchy above Name and Price; they looked too similar.
+
+**Made:**
+- **⋯ on each item:**
+  - It sits on the right of the item's title, shown when there's more than one item.
+  - Its menu has a red **Delete item**.
+  - Deleting needs no confirmation (nothing is saved yet). Focus moves to Add item, and screen readers hear "Item 2 deleted."
+  - The Remove item buttons are gone.
+- **One shared menu:** the bill page's ⋯ is now the same component (`components/ui/more-menu.tsx`, "Delete bill"), so both behave alike: Enter opens it with focus on the action, and Escape, a tap outside or focus leaving closes it.
+- **Item titles:**
+  - "Item 1" is in the Lead style (Manrope 20px semibold, navy), above the 12px uppercase field labels, with more space below it.
+  - FieldGroup gained `size="title"`, and Card is now `relative` so the ⋯ can sit in its corner.
+  - Marcellus wasn't used, because its 1 looks like a Roman I.
+- **A slip I fixed:** I ran Prettier on the changed files, but the project has no Prettier config, so it rewrapped them to 80 columns. I rebuilt those files from the last commit plus only my edits, so the diff has just the real changes.
+- **Checks:**
+  - lint and a production build;
+  - all end-to-end checks. A new one covers 20px semibold titles above 12px uppercase labels, no Remove buttons, no ⋯ on a single item, ⋯ on the title's line at the right, a red Delete item, deleting item 2 with focus to Add item, renumbering, and the announcement;
+  - the accessibility audit: 0 issues, including a new state with an item's menu open. 29 keyboard checks pass, including an item's ⋯ by keyboard;
+  - screenshots.
+
+**Pushed back:**
+- Too many buttons at the bottom of items.
+- Item titles that looked like field labels.

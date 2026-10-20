@@ -58,7 +58,7 @@ Main task: add a bill → choose who was there, who paid and how to split it →
   | Display | "Bill Splitter" on Home and the loading screen | Marcellus 40px |
   | Heading | page titles | Marcellus 28px |
   | Title | card titles, the delete pop-up's question | Marcellus 22px |
-  | Lead | a key figure: "Josh owes you $58.16", a share | Manrope 20px semibold |
+  | Lead | a key figure: "Josh owes you $58.16", a share; a numbered card's title: "Item 2" | Manrope 20px semibold |
   | Row | every list row's name and amount | Manrope 17px medium |
   | Body | sentences, inputs | Manrope 17px regular |
   | Control | buttons, chips, checkboxes | Manrope 15px semibold |
@@ -210,10 +210,11 @@ How to split   [✓ By item] [ Evenly ]
 
 Items
   [Paste receipt text]  → pop-up: Receipt text [ … ]  [Close] [Read receipt]
-  Name   [ Burger ]
-  Price  [ 18.00  ]
-  Who had it  [Me] [Sam ✓] [Jo] [Everyone]
-  [Remove item]
+  ┌ Item 1                                  [⋯] ┐   ⋯ → Delete item
+  │ NAME        [ Burger ]                       │
+  │ PRICE       [ 18.00  ]                       │
+  │ WHO HAD IT  [Me] [Sam ✓] [Jo] [Everyone]     │
+  └──────────────────────────────────────────────┘
   [+ Add item]
 Items $84.00 · matches receipt subtotal
 
@@ -230,6 +231,8 @@ Who owes you
 ```
 
 - **Type items** adds a blank item: name, then price, then who had it.
+- **Each item is a card** titled **Item 1**, **Item 2**… in the Lead style (Manrope 20px semibold), clearly above its small uppercase field labels (Name, Price, Who had it). Marcellus isn't used here, because its 1 looks like a Roman I.
+- **Deleting an item:** ⋯ on the right of the item's title (when there's more than one item) opens a menu with a red **Delete item**, the same menu as a bill's ⋯. There's no button at the bottom of each item, so a long bill isn't a stack of buttons. Deleting needs no confirmation (nothing is saved yet); focus moves to Add item, and screen readers hear "Item 2 deleted."
 - **Paste receipt text** opens a pop-up with the box, help on copying the text, and **Read receipt**, which fills in the items and closes it. See "Reading a receipt" below.
 - A shared item (appetizer, a pitcher) gets ticked for several people, or for **Everyone**, and is split evenly between them.
 - Tax and tip (total paid minus the items) are spread in proportion to each person's item subtotal.

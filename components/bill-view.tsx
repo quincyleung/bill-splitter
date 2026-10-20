@@ -1,7 +1,7 @@
 "use client";
 
 import { use, useRef, useState } from "react";
-import { BillMenu, DeleteDialog, ShareSummaryButton } from "@/components/bill-actions";
+import { DeleteDialog, ShareSummaryButton } from "@/components/bill-actions";
 import { LoadingShell } from "@/components/loading-shell";
 import { UnreadableNotice } from "@/components/unreadable-notice";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,7 @@ import { ButtonLink } from "@/components/ui/button-link";
 import { Card } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { AlertIcon } from "@/components/ui/icons";
+import { MoreMenu } from "@/components/ui/more-menu";
 import { PageTitle } from "@/components/ui/page-title";
 import { showToast } from "@/components/ui/toast";
 import { billHeadline, trackedShares, withPaid } from "@/lib/bills";
@@ -84,7 +85,7 @@ function BillDetails({ bill, people, series }: { bill: Bill; people: Person[]; s
     <>
       <div className="flex items-start justify-between gap-3">
         <PageTitle>{bill.title}</PageTitle>
-        <BillMenu title={bill.title} onDelete={() => setConfirmingDelete(true)} triggerRef={menuButtonRef} />
+        <MoreMenu title={bill.title} deleteLabel="Delete bill" onDelete={() => setConfirmingDelete(true)} triggerRef={menuButtonRef} />
       </div>
       <p className="mt-1 text-ink-muted">
         {formatDate(bill.date)} · {money(bill.total)} · {youPaid ? "You paid" : `${name(bill.payerId)} paid`}

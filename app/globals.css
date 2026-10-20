@@ -92,7 +92,8 @@
  *   type-display  "Bill Splitter" (Home, loading)  Marcellus 40px
  *   type-heading  page titles (h1)                  Marcellus 28px
  *   type-title    card titles, pop-up questions     Marcellus 22px
- *   type-lead     a key figure: "Josh owes you…"    Manrope 20px semibold
+ *   type-lead     a key figure: "Josh owes you…";   Manrope 20px semibold
+ *                 a numbered card's title: "Item 2"
  *   type-row      a list row's name and amount      Manrope 17px medium
  *   (body)        sentences                          Manrope 17px regular
  *   type-control  buttons, chips, checkboxes        Manrope 15px semibold
