@@ -41,9 +41,9 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 - **Me:** I'm in every split by default, with my own items. I can untick myself only on a bill I paid.
 - **People are saved automatically** with the bill: anyone typed in with **Add person** who's still ticked when I press Save. Someone I've just added is ticked straight away, and Enter adds them and keeps the cursor there, so names can be typed one after another. People saved from earlier bills stay unticked until I tap them.
 - **Picking people when there are lots of them** (built in Step 21, for groups of 20 or more):
-  - **Chips:** Who was there shows **Me** and the **6 people I used most recently**. Anyone else I find, add or tick gets a chip after them. Chips never move or disappear while I'm filling in the form; unticking one just leaves it unticked.
+  - **Chips:** Who was there shows **Me** and **two rows of the people I used most recently**: as many as fit on this screen (measured with every chip ticked, so ticking never pushes one onto a third row). Everyone else is behind **Show all**. Anyone else I find, add or tick gets a chip after those two rows, so everyone on the bill is always visible. Chips never move or disappear while I'm filling in the form; unticking one just leaves it unticked. (Who paid still shows everyone on the bill.)
   - **Find or add a person:** one box (with Add person on its right) both finds and adds. As I type, people not yet on the bill whose name (or any word of it) starts with what I typed show in a list under the box, an exact match first, then the most recent, up to 5. The first is highlighted, and **Enter** (or Add person) puts the highlighted one on the bill and clears the box for the next name. The arrow keys move the highlight, Escape hides the list, and tapping picks any of them. The list ends with **Add “Jo” as someone new** unless that exact name is already saved. When nobody matches, Enter adds the name as someone new, as before.
-  - **Same 5 people as Dinner at Aba:** up to two buttons for the people on my newest bills (two different groups, each with at least two people besides me who are still saved). One tap ticks them all; it only adds, never unticks anyone.
+  - **Same 5 people as Dinner at Aba:** up to two chips for the people on my newest bills (two different groups, each with at least two people besides me who are still saved). Ticking one puts them all on the bill; unticking it takes them all off again (and off any items). It shows ticked while all of them are on the bill.
   - **Show all 20 people** (when more people are saved than have chips) opens a pop-up: "Who was there", "5 of 21 ticked", a **Find a person** box, then Me and everyone A to Z with checkboxes. Ticks apply straight away; **Done**, Escape or a tap outside closes it and puts focus back on the button.
   - **Who had it on a big bill:** with more than 8 people on the bill, each item's Who had it is one button instead of a chip per person, showing who's ticked ("Sam, Jo + 3 · Change", "Everyone · Change" or "Choose who had it"), with the **Everyone** chip beside it. The button opens the same pop-up: "Who had Burger", Everyone, then Me and the people on the bill A to Z.
 - **Money is stored in the currency's smallest unit** (cents; yen has none). Shares always add up to the exact total, and leftover units go to whoever paid.
@@ -202,7 +202,7 @@ Date                      [ Oct 18, 2026   ]
 Who was there
 [✓ Me] [✓ Sam] [ Alex ] [✓ Jo] [ Kim ] [ Lee ] [ Max ]
 [ Find or add a name      ] [Add person]
-[Same 5 people as Dinner at Aba]  [Show all 20 people]
+[ Same 5 people as Dinner at Aba ]  [Show all 20 people]
 
 Who paid   (•) Me  ( ) Sam  ( ) Jo
 

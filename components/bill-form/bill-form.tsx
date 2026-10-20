@@ -5,7 +5,8 @@
 // next to their field after Save, and nothing typed is ever cleared.
 
 import { useRouter } from "next/navigation";
-import { type FormEvent, useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+import { type FormEvent, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 import { AddField } from "@/components/ui/add-field";
 import { Button } from "@/components/ui/button";
 import { ChecklistDialog } from "@/components/ui/checklist-dialog";
@@ -17,6 +18,7 @@ import { SegmentedControl } from "@/components/ui/segmented-control";
 import { TextField } from "@/components/ui/text-field";
 import {
   addPersonError,
+  byRecent,
   checkDraft,
   type Draft,
   draftFromSeries,
@@ -28,13 +30,12 @@ import {
   newDraft,
   pickerIds,
   type Preset,
-  RECENT_CHIPS,
   recentGroups,
   saveDraft,
   savedPersonNamed,
   splitsByItem,
   tickPeople,
-  untickPerson,
+  untickPeople,
 } from "@/lib/bill-draft";
 import { todayIso } from "@/lib/dates";
 import { createId } from "@/lib/id";
@@ -42,6 +43,7 @@ import { type AppData, ME } from "@/lib/model";
 import { DEFAULT_CURRENCY, formatMoney, toInputAmount } from "@/lib/money";
 import { byName } from "@/lib/people";
 import { recurringStatuses } from "@/lib/recurring";
+import { itemsThatFit } from "@/lib/rows";
 import { updateData } from "@/lib/store";
 import { LoadingShell } from "@/components/loading-shell";
 import { ItemsField } from "./items-field";
@@ -93,6 +95,30 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
     draft.seriesId ? { selector: byId(ids.total) } : null,
   );
   const formRef = useRef<HTMLFormElement>(null);
+  const chipRowRef = useRef<HTMLDivElement>(null);
+  const measureRef = useRef<HTMLDivElement>(null);
+
+  // Who was there shows as many recent people as fit in two rows. Each chip is measured
+  // ticked (its widest, with the check mark), so ticking never pushes one to a third row.
+  // Measured before the first paint, and again if the screen's width changes.
+  useLayoutEffect(() => {
+    const row = chipRowRef.current;
+    const measure = measureRef.current;
+    if (!row || !measure) return;
+    const fit = () => {
+      if (row.clientWidth === 0) return; // the page is hidden (Next keeps visited pages alive)
+      const widths = [...measure.children].map((chip) => chip.getBoundingClientRect().width);
+      const gap = parseFloat(getComputedStyle(row).columnGap) || 0;
+      // The first chip is Me; the rest are the recent people that fit beside it.
+      const recentChips = Math.max(itemsThatFit(widths, row.clientWidth, gap, 2) - 1, 0);
+      setDraft((current) => (current.recentChips === recentChips ? current : { ...current, recentChips }));
+    };
+    fit();
+    const observer = new ResizeObserver(fit);
+    observer.observe(row);
+    observer.observe(measure);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (focusRequest) formRef.current?.querySelector<HTMLElement>(focusRequest.selector)?.focus();
@@ -120,7 +146,7 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
 
   // Unticking someone takes them off every item too.
   function setTicked(id: string, on: boolean) {
-    setDraft((current) => (on ? tickPeople(current, people, [id]) : untickPerson(current, people, id)));
+    setDraft((current) => (on ? tickPeople(current, people, [id]) : untickPeople(current, people, [id])));
   }
 
   /** A suggestion picked in "Find or add a person": someone saved, or the typed name as someone new. */
@@ -132,9 +158,14 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
     requestFocus(byId(ids.addPerson)); // ready for the next name
   }
 
-  function tickGroup(group: { title: string; ids: string[] }) {
-    setDraft((current) => tickPeople(current, people, group.ids));
-    setAnnouncement(`Added the ${group.ids.length} people from ${group.title}.`);
+  /** "Same 5 people as Ski trip": ticking puts them all on the bill, unticking takes them all off. */
+  function setGroup(group: { title: string; ids: string[] }, on: boolean) {
+    setDraft((current) => (on ? tickPeople(current, people, group.ids) : untickPeople(current, people, group.ids)));
+    setAnnouncement(
+      on
+        ? `Added the ${group.ids.length} people from ${group.title}.`
+        : `Took the ${group.ids.length} people from ${group.title} off this bill.`,
+    );
   }
 
   function addPerson(): void {
@@ -206,10 +237,25 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
         error={errors.date}
       />
 
-      {/* Me and the 6 most recent people as chips, then anyone found, added or picked.
-          With lots of saved people, the rest are a search, a recent group, or Show all away. */}
+      {/* Me and two rows of the most recent people as chips, then anyone found, added or
+          picked. With lots of saved people, the rest are a search, a recent group, or Show all away. */}
       <FieldGroup legend={peopleLegend}>
-        <div className="flex flex-wrap gap-2">
+        {/* Invisible copies of the chips, ticked and on one line, for measuring how many fit in
+            two rows. At the end of <body>, so they're never mistaken for the real chips. */}
+        {createPortal(
+          <div
+            ref={measureRef}
+            aria-hidden="true"
+            inert
+            className="invisible fixed top-0 left-0 flex h-0 w-max gap-2 overflow-hidden whitespace-nowrap"
+          >
+            {[ME, ...byRecent(people).slice(0, 40).map((person) => person.id)].map((id) => (
+              <PersonChip key={id} label={name(id)} checked onChange={() => {}} tabIndex={-1} />
+            ))}
+          </div>,
+          document.body,
+        )}
+        <div ref={chipRowRef} className="flex flex-wrap gap-2">
           {chips.map((id) => (
             <PersonChip
               key={id}
@@ -240,14 +286,17 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
             maxLength={40}
           />
         </div>
-        {(groups.length > 0 || everyone.length - 1 > RECENT_CHIPS) && (
+        {(groups.length > 0 || people.length > draft.recentChips) && (
           <div className="mt-3 flex flex-wrap gap-2">
             {groups.map((group) => (
-              <Button key={group.ids.join()} variant="secondary" onClick={() => tickGroup(group)}>
-                Same {group.ids.length} people as {group.title}
-              </Button>
+              <PersonChip
+                key={group.ids.join()}
+                label={`Same ${group.ids.length} people as ${group.title}`}
+                checked={group.ids.every((id) => draft.ticked.includes(id))}
+                onChange={(on) => setGroup(group, on)}
+              />
             ))}
-            {everyone.length - 1 > RECENT_CHIPS && (
+            {people.length > draft.recentChips && (
               <Button ref={showAllRef} variant="secondary" aria-haspopup="dialog" onClick={() => setShowAll(true)}>
                 Show all {everyone.length - 1} people
               </Button>

@@ -1,6 +1,7 @@
 "use client";
 
-// One person in "Who was there", "Who had it" or "Who paid". A real checkbox
+// One person in "Who was there", "Who had it" or "Who paid" (or a group of them: "Same 5
+// people as Ski trip"). A real checkbox
 // underneath, so it's announced as "Sam, checkbox, checked": ticked shows a check mark
 // as well as the light blue fill and navy edge, so the state doesn't rely on colour.
 // type="radio" is for pick-one questions like "Who paid": it shows a Greek Summer radio

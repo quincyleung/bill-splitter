@@ -42,6 +42,11 @@ export type Draft = {
    * ticked from Show all or Same people as. Only ever grows, so chips never jump around.
    */
   shown: string[];
+  /**
+   * How many of the most recent people get a chip: as many as fit in two rows on this
+   * screen. The form measures it; RECENT_CHIPS until then.
+   */
+  recentChips: number;
   payerId: string;
   split: SplitMethod;
   items: DraftItem[];
@@ -72,6 +77,7 @@ export function newDraft(preset: Preset, today: string, makeId: () => string): D
     added: [],
     ticked: [ME],
     shown: [],
+    recentChips: RECENT_CHIPS,
     payerId: ME,
     split: PRESETS[preset].split,
     items: [newItem(makeId)],
@@ -121,23 +127,24 @@ export function nameOf(id: string, draft: Draft, people: Person[]): string {
   return draft.added.find((p) => p.id === id)?.name ?? people.find((p) => p.id === id)?.name ?? "Someone";
 }
 
-/** How many saved people get a chip before anyone is picked: the most recent ones. */
+/** Recent people with a chip before the form has measured how many fit in two rows. */
 export const RECENT_CHIPS = 6;
 
 /** Saved people, the ones used most recently first. */
-function byRecent(people: Person[]): Person[] {
+export function byRecent(people: Person[]): Person[] {
   return [...people].sort((a, b) => b.lastUsedAt.localeCompare(a.lastUsedAt));
 }
 
 /**
- * Chips in "Who was there": Me, the 6 people used most recently, then anyone else put on
- * this form (found, added, or from Show all or Same people as) in the order they came.
+ * Chips in "Who was there": Me and the most recent people (two rows' worth), then anyone
+ * else put on this form (found, added, or from Show all or Same people as) in the order
+ * they came. Anyone on the bill always has a chip.
  */
 export function pickerIds(draft: Draft, people: Person[]): string[] {
   const recent = byRecent(people)
-    .slice(0, RECENT_CHIPS)
+    .slice(0, draft.recentChips)
     .map((p) => p.id);
-  return [...new Set([ME, ...recent, ...draft.shown])];
+  return [...new Set([ME, ...recent, ...draft.shown, ...draft.ticked])];
 }
 
 /** Everyone who can be picked: Me, people added on this form, and every saved person. */
@@ -158,12 +165,15 @@ export function tickPeople(draft: Draft, people: Person[], ids: string[]): Draft
   return { ...next, ticked: inChipOrder(next, people, new Set([...draft.ticked, ...ids])) };
 }
 
-/** Takes someone off the bill, and off every item. Their chip stays, unticked. */
-export function untickPerson(draft: Draft, people: Person[], id: string): Draft {
+/** Takes people off the bill, and off every item. Their chips stay, unticked. */
+export function untickPeople(draft: Draft, people: Person[], ids: string[]): Draft {
+  // Someone whose chip was only there because they were ticked keeps it.
+  const chipsAnyway = pickerIds({ ...draft, ticked: [] }, people);
+  const kept = { ...draft, shown: [...draft.shown, ...ids.filter((id) => draft.ticked.includes(id) && !chipsAnyway.includes(id))] };
   return {
-    ...draft,
-    ticked: inChipOrder(draft, people, new Set(draft.ticked.filter((t) => t !== id))),
-    items: draft.items.map((item) => ({ ...item, personIds: item.personIds.filter((p) => p !== id) })),
+    ...kept,
+    ticked: inChipOrder(kept, people, new Set(draft.ticked.filter((t) => !ids.includes(t)))),
+    items: draft.items.map((item) => ({ ...item, personIds: item.personIds.filter((p) => !ids.includes(p)) })),
   };
 }
 

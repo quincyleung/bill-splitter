@@ -848,3 +848,34 @@ Also reflect these changes in `flows.md`.
 - Receipt paste looked odd expanded in place.
 - A line break between people in the summary.
 - The Custom heading wasn't needed.
+
+## Step 22: Two rows of recent people; "Same people as" can be unticked (2026-10-20)
+
+**Asked:**
+- Who paid can keep showing everyone ("it won't be that many people").
+- Who was there should show the most recent people in two rows; if there are more, they're under Show all.
+- Let "Same people as X" be unticked.
+- Push the commits.
+
+**Made:**
+- **Two rows, measured:**
+  - Instead of a fixed 6, Who was there shows Me and as many of the most recent people as fit in two rows on this screen.
+  - Invisible copies of the chips (at the end of `<body>`, so they're never mistaken for the real ones) are measured ticked, with the check mark, so ticking people never pushes a chip onto a third row.
+  - `lib/rows.ts` works out how many fit. It's measured before the first paint and again when the width changes, such as a phone turning.
+  - Show all appears when more people are saved than fit.
+  - People found, added or picked from Show all get chips after the two rows, and anyone on the bill always keeps a chip.
+- **Same people as is a chip now:**
+  - It shows ticked while all its people are on the bill.
+  - Unticking it takes them all off the bill (and off any items), leaving their chips unticked.
+  - Screen readers hear "Took the 5 people from Ski trip off this bill."
+- **Pushed** e466166 and 0b8221e.
+- **Checks:**
+  - logic tests: fitting rows, a too-wide chip, a narrower screen keeping ticked people's chips, unticking a group;
+  - lint and a production build;
+  - all end-to-end checks. The 20-people check now covers exactly two rows of the most recent (Me, Josh, Julie, Jo, Mary Jones and Sam at 390px), still two rows with all of them ticked, fewer at 320px and the same ones back at 390px, and Same people as on, off and on;
+  - the accessibility audit: 0 issues, and 26 keyboard checks pass;
+  - a screenshot.
+
+**Pushed back:**
+- Six chips should be "two rows".
+- A group you can't take back.
