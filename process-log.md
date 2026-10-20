@@ -588,3 +588,14 @@ Also reflect these changes in `flows.md`.
 - **Pushed** after committing.
 
 **Pushed back:** Nothing.
+
+## Step 16, continued: First visit at a third of the way down (2026-10-19)
+
+**Asked:** Move the first-visit content higher, to about a third of the way down the page.
+
+**Made:**
+- The first-visit block ("Split a bill" and the two cards) is now centred on the line a third of the way down the screen. Flexible space above and below it splits one to two, so it holds on any phone height instead of sitting a little below the middle. The wider side margins stay.
+- `flows.md`: the Flow 1 wireframe note.
+- **Checks:** lint, build, and all 17 end-to-end checks. The placement check now requires the block's centre to sit 28–40% of the way down, with at least 32px margins. Screenshots at 844px and 667px tall both put it at about a third.
+
+**Pushed back:** It sat too low.

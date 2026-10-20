@@ -106,7 +106,7 @@ flowchart TD
 
 
 
-Split a bill                (a little below the middle of the screen,
+Split a bill                (centred about a third of the way down the screen,
                              nothing above it, wider side margins)
 
 [ One-time    A meal, ride, or anything once               ]
