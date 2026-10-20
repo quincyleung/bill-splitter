@@ -986,3 +986,21 @@ Also reflect these changes in `flows.md`.
   - a screenshot.
 
 **Pushed back:** deleting bills shouldn't feel like starting over.
+
+## Step 28: The date is vertically centred on iPhone (2026-10-20)
+
+**Asked:** The date fix worked, but the date now sits at the top inside the box. Centre it vertically.
+
+**Made:**
+- **The cause:** iOS's own date style centres the date with a flex box (items centred). Drawing the box like the others (`appearance: none`) dropped that, and the field's \`block\` class made it a plain block, so the date sat at the top.
+- **The fix:** on iPhone and iPad only, the date box is a flex box with its items centred again, plus a line as tall as the box (44px less the border) as a fallback.
+  - The rule now sits outside Tailwind's layers, so it wins over the field's \`block\` class. Inside the base layer it would lose to the utilities.
+  - Confirmed in the built CSS.
+- **Not tested on an iPhone here** (no iOS Simulator on this Mac). You confirmed the overflow fix on your phone.
+- **Checks:**
+  - a production build;
+  - all end-to-end checks;
+  - the accessibility audit: 0 issues, 27 keyboard checks pass;
+  - a desktop screenshot of the form, which looks unchanged.
+
+**Pushed back:** the date sitting at the top of its box.

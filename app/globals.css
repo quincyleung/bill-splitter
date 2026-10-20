@@ -84,21 +84,29 @@
     outline-offset: 2px;
   }
 
-  /* iPhone Safari draws date boxes natively and doesn't count their padding and border
-     inside the width, so a full-width date box pokes out past the right edge. Drawn
-     like the other boxes, it fits. (Only on iPhone and iPad: -webkit-touch-callout is
-     an iOS-only property, so desktop and Android keep their own date picker look.) */
-  @supports (-webkit-touch-callout: none) {
-    input[type="date"] {
-      -webkit-appearance: none;
-      appearance: none;
-      max-width: 100%;
-    }
-  }
-
   /* The date sits on the left, like the text in every other box (iOS centres it). */
   input[type="date"]::-webkit-date-and-time-value {
     text-align: left;
+  }
+}
+
+/*
+ * iPhone Safari draws date boxes natively and doesn't count their padding and border
+ * inside the width, so a full-width date box poked out past the right edge. Drawn like
+ * the other boxes (appearance: none) it fits, but then the date sits at the top of the
+ * box, so it's centred again the way iOS's own style does it (a flex box, items centred),
+ * with a line as tall as the box as a fallback. Only on iPhone and iPad
+ * (-webkit-touch-callout is iOS-only), so desktop and Android keep their own date
+ * picker look. Outside the layers, so it wins over the field's `block` class.
+ */
+@supports (-webkit-touch-callout: none) {
+  input[type="date"] {
+    -webkit-appearance: none;
+    appearance: none;
+    max-width: 100%;
+    display: flex;
+    align-items: center;
+    line-height: calc(2.75rem - 2px); /* the box's 44px, less its top and bottom border */
   }
 }
 
