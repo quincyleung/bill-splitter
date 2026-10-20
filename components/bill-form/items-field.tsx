@@ -10,7 +10,8 @@ import { TextField } from "@/components/ui/text-field";
 import { type Draft, type DraftItem, type Errors, errorKey, nameOf, newItem } from "@/lib/bill-draft";
 import { createId } from "@/lib/id";
 import type { Person } from "@/lib/model";
-import { DEFAULT_CURRENCY } from "@/lib/money";
+import { DEFAULT_CURRENCY, formatMoney, parseMoney } from "@/lib/money";
+import { ReceiptPaste } from "./receipt-paste";
 
 type ItemsFieldProps = {
   draft: Draft;
@@ -43,14 +44,23 @@ export function ItemsField({ draft, people, errors, setDraft, requestFocus, addI
 
   return (
     <FieldGroup legend="Items" error={errors.items}>
+      <ReceiptPaste draft={draft} setDraft={setDraft} requestFocus={requestFocus} />
       <ol className="space-y-3">
         {draft.items.map((item, index) => {
           const everyone = draft.ticked.length > 0 && draft.ticked.every((id) => item.personIds.includes(id));
+          const linePrice = parseMoney(item.price, DEFAULT_CURRENCY);
+          const perPerson = item.quantity && item.quantity > 1 && linePrice ? linePrice / item.quantity : null;
           return (
             <li key={item.key}>
               <Card>
                 <FieldGroup legend={`Item ${index + 1}`}>
                   <div className="space-y-4">
+                    {perPerson !== null && (
+                      <p className="type-small text-ink-muted">
+                        {item.quantity} × {formatMoney(Math.round(perPerson), DEFAULT_CURRENCY)} on the receipt: tick{" "}
+                        {item.quantity} people
+                      </p>
+                    )}
                     <TextField
                       id={`name-${item.key}`}
                       label="Name"

@@ -202,7 +202,8 @@ Who paid   (•) Me  ( ) Sam  ( ) Jo
 
 How to split   [✓ By item] [ Evenly ]
 
-Items   [ Paste receipt text ]  [ Type items ]
+Items
+  [Paste receipt text]  → Receipt text [ … ]  [Read receipt]
   Name   [ Burger ]
   Price  [ 18.00  ]
   Who had it  [Me] [Sam ✓] [Jo] [Everyone]
@@ -212,7 +213,7 @@ Items $84.00 · matches receipt subtotal
 
 Total paid, including tax and tip   $ USD [Change]
 [ 102.20 ]
-Receipt total $84.00 · [Use this]
+Receipt total $84.00. Add any extra tip you left. [Use this]
 Tax and tip $18.20 (22%)
 
 Who owes you
@@ -223,21 +224,24 @@ Who owes you
 ```
 
 - **Type items** adds a blank item: name, then price, then who had it.
-- **Paste receipt text** opens a box with help text: "On iPhone, open the receipt photo, long-press the text, tap Select All, then Copy." Then a **Read receipt** button. See "Reading a receipt" below.
+- **Paste receipt text** opens a box with help on copying the text, then **Read receipt** fills in the items. See "Reading a receipt" below.
 - A shared item (appetizer, a pitcher) gets ticked for several people, or for **Everyone**, and is split evenly between them.
 - Tax and tip (total paid minus the items) are spread in proportion to each person's item subtotal.
 - The summary at the bottom updates as I type. When someone else paid, it reads "You owe Sam $33.85", and the others' shares are shown for reference.
 
 ### Reading a receipt
 
-- **Items are found by their prices** (`$5.00`), not by line breaks, because the paste often arrives as one long line. Text without a price (order number, date, table) is ignored.
-- **A number before the name is the quantity.** "7 Deluxe Ayce Adult $223.93" becomes 7 × $31.99, with the hint "tick 7 people".
-- **Reading stops at Subtotal**, so suggested-tip lines ("18% Tip $61.41, You pay $402.56") aren't read as dishes.
-- **Subtotal, Tax, Tip/Gratuity and Total are read as labels.** Subtotal checks the items. Total is offered under Total paid ("Use this") but never filled in automatically, because most receipts print the total before tip.
-- **Translations** (e.g. 小锅) and other leftover text are dropped from names. Names are optional anyway.
-- **Read items are added below any items already there**, as normal rows I can edit, remove or add to. The pasted text stays in the box.
-- **Tested on one real receipt** (5 lines, with quantities, bilingual, gratuity included): every item and the subtotal came out right. Test a receipt without quantities before building the parser.
+Built in Step 16 (`lib/receipt.ts`). Everything happens on the phone; nothing is uploaded.
 
+- **Paste receipt text** sits at the top of Items (By item only). It opens a box labelled "Receipt text", with help: "On iPhone, open the receipt photo, press and hold the text, tap Select All, then Copy. On Android, use Google Lens to copy the text." Then **Read receipt**.
+- **Items are found by their prices** (`$5.00`, `223.93`, `$1,250.00`), not by line breaks, because the paste often arrives as one long line. Text without a price (order number, date, table) is ignored, and $0.00 lines (like "No onions") are skipped.
+- **A number before the name is the quantity:** "7 Deluxe Ayce Adult $223.93" or "2 x Beer $14.00". The item shows "7 × $31.99 on the receipt: tick 7 people", and a warning appears if a different number is ticked.
+- **Reading stops at the summary.** The summary starts at the first label followed by a price: Subtotal, Tax, GST, HST, VAT, Tip, Gratuity, Service charge, Total, Grand total, Amount due. So suggested-tip lines after the total ("18% Tip $61.41, You pay $402.56") are never read as dishes. An item merely named like a label ("Tip-top cake") isn't mistaken for it, because no price follows the label.
+- **Subtotal, Tax, Tip and Total are read as labels.** Subtotal checks the items: "Items add up to $250.00, but the receipt subtotal is $258.93. A line may be missing." Total is offered under Total paid ("Receipt total $341.15. Add any extra tip you left. [Use this]") but never filled in automatically, because most receipts print the total before tip.
+- **Names** are the words before the price, after any quantity. Translations after a price (e.g. 小锅) and leftover symbols are dropped. Names can be edited like any typed item.
+- **Read items are added below any items already there**, as normal items I can edit, remove or add to. An untouched blank first item is replaced. The pasted text stays in the box, even when switching between By item and Evenly. A message says what was found: "Found 5 items, subtotal $258.93. Check them, then tick who had each one."
+- **Errors:** an empty box gives "Paste the receipt text first, or type the items instead.", and text with no prices gives "Couldn't find any prices in that text. Check you copied the receipt, or type the items instead."
+- **Tested** on the real hot pot receipt (one line, bilingual, quantities, gratuity, suggested tips after the total), a line-by-line receipt with no $ signs or quantities, and one with "2 x", a $0.00 modifier, thousands and a percent before the tip.
 ### One-time, evenly: `/new/one-time`
 
 Fields: name, date (today), who was there, who paid, How to split (Evenly), then the amount and currency. Shares are amount ÷ people, with leftover cents going to whoever paid.

@@ -556,3 +556,35 @@ Also reflect these changes in `flows.md`.
 - The arch was odd.
 - "Welcome back" wasn't needed.
 - The first visit sat too high and too close to the edges.
+
+## Step 16: Paste receipt text (2026-10-19)
+
+**Asked:** As a more advanced feature, allow pasting receipt text, as we discussed in Step 2. Make sure the task is complete, then push.
+
+**Made:**
+- **Parser (`lib/receipt.ts`):**
+  - Finds items by their prices (with or without `$`, thousands commas), not by line breaks, because the phone's text recognition often pastes one long line.
+  - A number before a name is the quantity ("7 Deluxe Ayce Adult", "2 x Beer").
+  - $0.00 lines are skipped.
+  - Reading stops at the first summary label followed by a price (Subtotal, Tax, GST/HST/VAT, Tip, Gratuity, Service charge, Total, Grand total, Amount due), so suggested tips after the total are never read as dishes, and an item merely named like a label ("Tip-top cake") isn't mistaken for one.
+  - Subtotal, tax, tip and total are read from the summary.
+  - No lookbehind regex, so older iPhones' Safari can run it.
+- **In the form (By item):**
+  - "Paste receipt text" (a disclosure button) opens a "Receipt text" box with how-to-copy help for iPhone and Android. A new shared TextArea field has the same label, hint and error as the others.
+  - **Read receipt** adds the items below any already there and replaces an untouched blank first item. It confirms "Found 5 items, subtotal $258.93. Check them, then tick who had each one." and puts the cursor in the first item's name.
+  - The pasted text is kept in the bill's draft, so it survives switching between By item and Evenly.
+  - Errors: "Paste the receipt text first, or type the items instead." and "Couldn't find any prices in that text. Check you copied the receipt, or type the items instead."
+  - Items with a quantity show "7 × $31.99 on the receipt: tick 7 people", and quantities are saved with the bill.
+  - Under Total paid: "Receipt total $341.15. Add any extra tip you left. [Use this]". It's never filled in automatically.
+  - New warnings that don't block Save: "Deluxe Ayce Adult is for 7 people. You've ticked 2." and "Items add up to $X, but the receipt subtotal is $Y. A line may be missing."
+- **`flows.md`:** rewrote "Reading a receipt" to match what was built, and updated the meal wireframe and items rule.
+- **Checks:**
+  - lint and a clean build with TypeScript;
+  - new parser tests on the real hot pot receipt (5 items, quantities 1/2/1/3/7, subtotal $258.93, tax $30.43, gratuity $51.79, total $341.15) and three other layouts;
+  - tests for both new warnings and for saving quantities; all earlier logic and storage tests still pass;
+  - a new end-to-end step pasting the real receipt into a bill (both errors, 5 items named and priced, the "7 ×" note, Use this, both warnings, saved bill breakdown), for 17 end-to-end checks, all passing;
+  - a screenshot of the items after reading.
+- **Correction:** my earlier reports of "17 end-to-end checks" were one too many. There were 16 before this step's receipt check, and 17 now.
+- **Pushed** after committing.
+
+**Pushed back:** Nothing.

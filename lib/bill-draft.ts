@@ -17,7 +17,14 @@ export const PRESETS: Record<Preset, { split: SplitMethod; recurring: boolean }>
   recurring: { split: "even", recurring: true },
 };
 
-export type DraftItem = { key: string; price: string; name: string; personIds: string[] };
+export type DraftItem = {
+  key: string;
+  price: string;
+  name: string;
+  personIds: string[];
+  /** From a pasted receipt: "7 Deluxe Ayce Adult" is one line for 7 people. */
+  quantity?: number;
+};
 export type DraftPerson = { id: string; name: string };
 
 export type Draft = {
@@ -41,6 +48,10 @@ export type Draft = {
   pendingName: string;
   /** Set when this is the next bill of an existing recurring series ("Add Nov 1"). */
   seriesId?: string;
+  /** What's in the "Paste receipt text" box, kept as pasted. */
+  receiptText: string;
+  /** What the pasted receipt said, to check the items and offer its total. */
+  receipt?: { subtotal?: number; total?: number };
 };
 
 export function newItem(makeId: () => string): DraftItem {
@@ -62,6 +73,7 @@ export function newDraft(preset: Preset, today: string, makeId: () => string): D
     every: "",
     unit: "month",
     pendingName: "",
+    receiptText: "",
   };
 }
 
@@ -214,6 +226,16 @@ export function checkDraft(draft: Draft, people: Person[]): { errors: Errors; wa
             : `${name(id)} isn't on any item, so they owe $0. Tick them on an item or remove them.`,
         );
       }
+      for (const { item, personIds } of items) {
+        if (item.quantity && item.quantity > 1 && personIds.length > 0 && personIds.length !== item.quantity) {
+          warnings.push(`${item.name.trim() || "This line"} is for ${item.quantity} people. You've ticked ${personIds.length}.`);
+        }
+      }
+      if (draft.receipt?.subtotal !== undefined && subtotal !== draft.receipt.subtotal) {
+        warnings.push(
+          `Items add up to ${formatMoney(subtotal, DEFAULT_CURRENCY)}, but the receipt subtotal is ${formatMoney(draft.receipt.subtotal, DEFAULT_CURRENCY)}. A line may be missing.`,
+        );
+      }
       if (total !== null && total > subtotal && (total - subtotal) / subtotal > 0.4) {
         warnings.push(`Tax and tip come to ${Math.round(((total - subtotal) / subtotal) * 100)}% of the items. Check the total.`);
       }
@@ -289,7 +311,7 @@ export function saveDraft(data: AppData, draft: Draft, now: Date, makeId: () => 
       id: item.key,
       name: item.name.trim(),
       price: price!,
-      quantity: 1,
+      quantity: item.quantity ?? 1,
       personIds,
     }));
     bill = { ...base, kind: "meal", items };

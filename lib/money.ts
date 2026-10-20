@@ -51,3 +51,9 @@ export function parseMoney(input: string, currency: string): number | null {
   const amount = Number(whole) * 10 ** digits + Number(fraction.padEnd(digits, "0") || "0");
   return Number.isSafeInteger(amount) ? amount : null;
 }
+
+/** An amount as it would be typed into a money field: 3193 USD → "31.93", 2400 JPY → "2400". */
+export function toInputAmount(amount: number, currency: string): string {
+  const digits = minorDigits(currency);
+  return (amount / 10 ** digits).toFixed(digits);
+}

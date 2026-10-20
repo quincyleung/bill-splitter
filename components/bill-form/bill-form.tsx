@@ -31,7 +31,7 @@ import {
 import { todayIso } from "@/lib/dates";
 import { createId } from "@/lib/id";
 import { type AppData, ME } from "@/lib/model";
-import { DEFAULT_CURRENCY } from "@/lib/money";
+import { DEFAULT_CURRENCY, formatMoney, toInputAmount } from "@/lib/money";
 import { recurringStatuses } from "@/lib/recurring";
 import { updateData } from "@/lib/store";
 import { ItemsField } from "./items-field";
@@ -249,6 +249,22 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
         onChange={(event) => update({ total: event.target.value })}
         error={errors.total}
       />
+      {byItem && draft.receipt?.total !== undefined && (
+        <div className="-mt-3 flex flex-wrap items-center gap-x-3 gap-y-1">
+          <p className="type-small text-ink-muted">
+            Receipt total {formatMoney(draft.receipt.total, DEFAULT_CURRENCY)}. Add any extra tip you left.
+          </p>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              update({ total: toInputAmount(draft.receipt!.total!, DEFAULT_CURRENCY) });
+              requestFocus(byId(ids.total));
+            }}
+          >
+            Use this<span className="sr-only"> receipt total</span>
+          </Button>
+        </div>
+      )}
 
       {recurring && (
         <>
