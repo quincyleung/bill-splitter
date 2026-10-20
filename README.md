@@ -181,4 +181,5 @@ On Oct 20, 2026 I tried the live site (bill-splitter-iota-opal.vercel.app) as a 
   - "The total ($84.00) is less than the items ($84.50), so tax and tip can't be worked out. Check the total."
 
   Tax and tip are now always worked out against every item.
+- **Issue 2, items can be minimized.** A down arrow on the left of each item's title minimizes it to one line: the dish's name and its price ("▸ Salmon $24.00"). Five minimized items take about the space one open item used to. Tapping the line opens it again. If Save finds a problem in a minimized item, that item opens again, so the error isn't hidden.
 - **Issue 7, items are titled by name.** Each item card's title is the item's name once it has one ("Salmon"), and "Item 4" only until then. Its trash can reads "Delete Salmon" to screen readers.

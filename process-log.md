@@ -1116,3 +1116,26 @@ Also reflect these changes in `flows.md`.
   - a screenshot.
 
 **Pushed back:** the order of the two options.
+
+## Step 35: Items can be minimized to one line (issue 2) (2026-10-20)
+
+**Asked:** To fix issue 2 (typing items is long), add a down arrow on the left of each item that minimizes it to one line showing only the dish's name and price.
+
+**Made:**
+- **The title row is now a button:**
+  - It has a down arrow (a new `ChevronIcon`) on the left and the item's title.
+  - Tapping it minimizes the item to one line: the arrow turned to point right, the name, and the price on the right ("▸ Salmon $24.00"). Tapping again opens it.
+  - It's a standard disclosure: `aria-expanded`, so screen readers hear "Salmon $24.00, button, collapsed". Focus stays on it.
+  - The whole row is the tap target (44px tall).
+- **Minimized items hide their fields and trash can**, as asked ("only name and price"). Items start open, including ones read from a receipt.
+- **Save opens a minimized item with a problem** (`itemHasError`), so its error shows and focus can reach it. Items without problems stay minimized.
+- **Smaller changes:** the item's `<fieldset>` keeps its name for screen readers through FieldGroup's new `hideLegend`, which replaces `size="title"`. The trash can now sits in the title row, so Card no longer needs `relative`.
+- **README** ("Changes I made") and **`flows.md`** describe it.
+- **Checks:**
+  - a logic check for `itemHasError`, plus all logic tests;
+  - lint and a production build;
+  - all end-to-end checks. A new one covers: an open item with an arrow, fields and a trash can; minimizing it to "Pad Thai $16.00" with no fields or trash can, under 100px tall, with focus staying on the arrow; Save with a minimized unticked Salmon opening it and focusing inside it, while Pad Thai stays minimized; and opening Pad Thai again. One run failed because my test never named the bill, so the bill's Name took focus first; the app was right;
+  - the accessibility audit: 0 issues, with a new state for a minimized item. 33 keyboard checks pass, including Enter minimizing and Space opening, with focus staying;
+  - screenshots.
+
+**Pushed back:** items took too much room.

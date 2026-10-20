@@ -210,7 +210,9 @@ How to split   [ Evenly ] [✓ By item]
 
 Items
   [Paste receipt text]  → pop-up: Receipt text [ … ]  [Close] [Read receipt]
-  ┌ Item 1                                  [🗑] ┐   trash can: delete this item
+  ┌ ▸ Salmon                          $24.00 ┐   minimized: one line, name and price
+  └──────────────────────────────────────────┘
+  ┌ ▾ Item 2                                [🗑] ┐   open; trash can: delete this item
   │ NAME        [        ]                       │
   │ PRICE       [ 18.00  ]                       │
   │ WHO HAD IT  [Me] [Sam ✓] [Jo] [Everyone]     │
@@ -232,7 +234,8 @@ Who owes you
 
 - **Type items** adds a blank item: name, then price, then who had it.
 - **Each item is a card** titled by the item's name once it has one ("Salmon"), and **Item 1**, **Item 2**… until then, in the Lead style (Manrope 20px semibold), clearly above its small uppercase field labels (Name, Price, Who had it). So the cards can be scanned for a dish. Marcellus isn't used here, because its 1 looks like a Roman I.
-- **Deleting an item:** a **trash can** on the right of the item's title (when there's more than one item), named "Delete item 2" for screen readers. One tap deletes it; there's no confirmation, since nothing is saved yet. There's no button at the bottom of each item, so a long bill isn't a stack of buttons. Focus moves to Add item, and screen readers hear "Item 2 deleted."
+- **Minimizing an item:** the title row is a button with a down arrow on the left. Tapping it minimizes the item to one line, the arrow (pointing right), its name and its price ("▸ Salmon  $24.00"), so a long bill stays short. Tapping it again opens it. Items start open, including ones read from a receipt. A minimized item hides its fields and trash can. If Save finds a problem in a minimized item, that item opens again, so its error shows and focus can reach it. Screen readers hear "Salmon $24.00, button, collapsed".
+- **Deleting an item:** a **trash can** on the right of an open item's title (when there's more than one item), named "Delete Salmon" (or "Delete item 2") for screen readers. One tap deletes it; there's no confirmation, since nothing is saved yet. There's no button at the bottom of each item, so a long bill isn't a stack of buttons. Focus moves to Add item, and screen readers hear "Item 2 deleted."
 - **Paste receipt text** opens a pop-up with the box, help on copying the text, and **Read receipt**, which fills in the items and closes it. See "Reading a receipt" below.
 - A shared item (appetizer, a pitcher) gets ticked for several people, or for **Everyone**, and is split evenly between them.
 - Tax and tip (total paid minus the items) are spread in proportion to each person's item subtotal.

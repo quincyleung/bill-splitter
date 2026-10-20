@@ -25,6 +25,8 @@ export type DraftItem = {
   personIds: string[];
   /** From a pasted receipt: "7 Deluxe Ayce Adult" is one line for 7 people. */
   quantity?: number;
+  /** Minimized on the form to one line: its name and price. */
+  collapsed?: boolean;
 };
 export type DraftPerson = { id: string; name: string };
 
@@ -318,6 +320,11 @@ export const errorKey = {
   price: (key: string) => `price:${key}`,
   who: (key: string) => `who:${key}`,
 };
+
+/** Whether an item has a problem (its name, price or who had it), so a minimized one can be opened. */
+export function itemHasError(errors: Errors, key: string): boolean {
+  return [errorKey.name, errorKey.price, errorKey.who].some((field) => errors[field(key)] !== undefined);
+}
 
 export function checkDraft(draft: Draft, people: Person[]): { errors: Errors; warnings: string[] } {
   const errors: Errors = {};

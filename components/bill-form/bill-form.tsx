@@ -24,6 +24,7 @@ import {
   draftFromSeries,
   findPeople,
   isRecurring,
+  itemHasError,
   NEW_PERSON,
   nameOf,
   newDraft,
@@ -197,6 +198,13 @@ export function BillForm({ preset, data, seriesId, onSaved }: BillFormProps) {
       const message = `Couldn't save yet: ${problems} ${problems === 1 ? "thing needs" : "things need"} fixing. Moved to the first one.`;
       // A trailing space alternates so pressing Save again re-announces the same message.
       setSaveProblems((previous) => (previous === message ? message + " " : message));
+      // Open any minimized item with a problem, so its error shows and focus can reach it.
+      setDraft((current) => ({
+        ...current,
+        items: current.items.map((item) =>
+          item.collapsed && itemHasError(check.errors, item.key) ? { ...item, collapsed: false } : item,
+        ),
+      }));
       requestFocus(FIRST_INVALID);
       return;
     }

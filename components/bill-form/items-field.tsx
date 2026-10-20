@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { ChecklistDialog } from "@/components/ui/checklist-dialog";
 import { FieldGroup } from "@/components/ui/field-group";
 import { IconButton } from "@/components/ui/icon-button";
-import { TrashIcon } from "@/components/ui/icons";
+import { ChevronIcon, TrashIcon } from "@/components/ui/icons";
 import { MoneyField } from "@/components/ui/money-field";
 import { PersonChip } from "@/components/ui/person-chip";
 import { TextField } from "@/components/ui/text-field";
@@ -77,121 +77,145 @@ export function ItemsField({ draft, people, errors, setDraft, requestFocus, addI
           const everyone = draft.ticked.length > 0 && draft.ticked.every((id) => item.personIds.includes(id));
           const linePrice = parseMoney(item.price, DEFAULT_CURRENCY);
           const perPerson = item.quantity && item.quantity > 1 && linePrice ? linePrice / item.quantity : null;
+          const open = !item.collapsed;
+          const title = itemTitle(item, index);
+          const bodyId = `item-${item.key}`;
           return (
             <li key={item.key}>
               <Card>
-                {/* A trash can in the card's corner, beside the title: one tap deletes the item.
-                    Before the fields, so it's first in the tab order too. */}
-                {draft.items.length > 1 && (
-                  <div className="absolute top-3 right-2.5">
-                    <IconButton
-                      label={item.name.trim() ? `Delete ${item.name.trim()}` : `Delete item ${index + 1}`}
-                      icon={<TrashIcon />}
-                      onClick={() => removeItem(item.key, itemTitle(item, index))}
-                    />
-                  </div>
-                )}
-                {/* Titled by the item's name once it has one ("Salmon"), so the cards can be scanned. */}
-                <FieldGroup legend={itemTitle(item, index)} size="title">
-                  <div className="space-y-4">
-                    {perPerson !== null && (
-                      <p className="type-small text-ink-muted">
-                        {item.quantity} × {formatMoney(Math.round(perPerson), DEFAULT_CURRENCY)} on the receipt: tick{" "}
-                        {item.quantity} people
-                      </p>
+                {/* The title row: a down arrow and the item's name ("Salmon", or "Item 4" until it has
+                    one). Tapping it minimizes the item to one line, its name and price, and opens it
+                    again. When open, a trash can on the right deletes the item in one tap. */}
+                <div className="flex items-center gap-1">
+                  <button
+                    type="button"
+                    aria-expanded={open}
+                    aria-controls={open ? bodyId : undefined}
+                    onClick={() => updateItem(item.key, { collapsed: open })}
+                    className="press -my-2 -ml-2.5 flex min-h-11 min-w-0 flex-1 items-center gap-2 rounded-field px-2.5 text-left text-ink hover:bg-accent-soft"
+                  >
+                    <ChevronIcon className={`size-5 shrink-0 motion-safe:transition-transform ${open ? "" : "-rotate-90"}`} />
+                    <span className="type-lead min-w-0 flex-1 break-words">{title}</span>
+                    {!open && item.price.trim() && (
+                      <span className="type-row shrink-0">
+                        {linePrice !== null ? formatMoney(linePrice, DEFAULT_CURRENCY) : item.price.trim()}
+                      </span>
                     )}
-                    <TextField
-                      id={`name-${item.key}`}
-                      label="Name"
-                      value={item.name}
-                      onChange={(event) => updateItem(item.key, { name: event.target.value })}
-                      error={errors[errorKey.name(item.key)]}
-                      autoComplete="off"
-                    />
-                    <MoneyField
-                      id={`price-${item.key}`}
-                      label="Price"
-                      currency={DEFAULT_CURRENCY}
-                      value={item.price}
-                      onChange={(event) => updateItem(item.key, { price: event.target.value })}
-                      error={errors[errorKey.price(item.key)]}
-                    />
-                    <FieldGroup legend="Who had it" error={errors[errorKey.who(item.key)]}>
-                      {draft.ticked.length === 0 ? (
-                        <p className="text-ink-muted">Tick people under Who was there first.</p>
-                      ) : compact ? (
-                        <div className="flex flex-wrap gap-2">
-                          <Button
-                            id={`who-${item.key}`}
-                            variant="secondary"
-                            aria-haspopup="dialog"
-                            onClick={() => setPicking(item.key)}
-                          >
-                            {whoSummary(item)}
-                            {item.personIds.length > 0 && (
-                              <>
-                                <span aria-hidden="true" className="text-ink-muted">
-                                  ·
-                                </span>
-                                Change
-                              </>
-                            )}
-                          </Button>
-                          <PersonChip
-                            label="Everyone"
-                            checked={everyone}
-                            onChange={(on) => updateItem(item.key, { personIds: on ? [...draft.ticked] : [] })}
-                          />
-                          {picking === item.key && (
-                            <ChecklistDialog
-                              title={`Who had ${item.name.trim() || "this item"}`}
-                              options={pickOptions}
-                              selected={item.personIds}
-                              onToggle={(id, on) =>
-                                setDraft((current) => ({
-                                  ...current,
-                                  items: current.items.map((i) =>
-                                    i.key === item.key
-                                      ? { ...i, personIds: on ? [...i.personIds, id] : i.personIds.filter((p) => p !== id) }
-                                      : i,
-                                  ),
-                                }))
-                              }
-                              allLabel="Everyone"
-                              onAll={(on) => updateItem(item.key, { personIds: on ? [...draft.ticked] : [] })}
-                              onClose={() => {
-                                setPicking(null);
-                                document.getElementById(`who-${item.key}`)?.focus();
-                              }}
-                            />
+                  </button>
+                  {open && draft.items.length > 1 && (
+                    <div className="-my-2 -mr-2.5 shrink-0">
+                      <IconButton
+                        label={item.name.trim() ? `Delete ${item.name.trim()}` : `Delete item ${index + 1}`}
+                        icon={<TrashIcon />}
+                        onClick={() => removeItem(item.key, title)}
+                      />
+                    </div>
+                  )}
+                </div>
+                {open && (
+                  <div id={bodyId} className="mt-4">
+                    <FieldGroup legend={title} hideLegend>
+                      <div className="space-y-4">
+                        {perPerson !== null && (
+                          <p className="type-small text-ink-muted">
+                            {item.quantity} × {formatMoney(Math.round(perPerson), DEFAULT_CURRENCY)} on the receipt: tick{" "}
+                            {item.quantity} people
+                          </p>
+                        )}
+                        <TextField
+                          id={`name-${item.key}`}
+                          label="Name"
+                          value={item.name}
+                          onChange={(event) => updateItem(item.key, { name: event.target.value })}
+                          error={errors[errorKey.name(item.key)]}
+                          autoComplete="off"
+                        />
+                        <MoneyField
+                          id={`price-${item.key}`}
+                          label="Price"
+                          currency={DEFAULT_CURRENCY}
+                          value={item.price}
+                          onChange={(event) => updateItem(item.key, { price: event.target.value })}
+                          error={errors[errorKey.price(item.key)]}
+                        />
+                        <FieldGroup legend="Who had it" error={errors[errorKey.who(item.key)]}>
+                          {draft.ticked.length === 0 ? (
+                            <p className="text-ink-muted">Tick people under Who was there first.</p>
+                          ) : compact ? (
+                            <div className="flex flex-wrap gap-2">
+                              <Button
+                                id={`who-${item.key}`}
+                                variant="secondary"
+                                aria-haspopup="dialog"
+                                onClick={() => setPicking(item.key)}
+                              >
+                                {whoSummary(item)}
+                                {item.personIds.length > 0 && (
+                                  <>
+                                    <span aria-hidden="true" className="text-ink-muted">
+                                      ·
+                                    </span>
+                                    Change
+                                  </>
+                                )}
+                              </Button>
+                              <PersonChip
+                                label="Everyone"
+                                checked={everyone}
+                                onChange={(on) => updateItem(item.key, { personIds: on ? [...draft.ticked] : [] })}
+                              />
+                              {picking === item.key && (
+                                <ChecklistDialog
+                                  title={`Who had ${item.name.trim() || "this item"}`}
+                                  options={pickOptions}
+                                  selected={item.personIds}
+                                  onToggle={(id, on) =>
+                                    setDraft((current) => ({
+                                      ...current,
+                                      items: current.items.map((i) =>
+                                        i.key === item.key
+                                          ? { ...i, personIds: on ? [...i.personIds, id] : i.personIds.filter((p) => p !== id) }
+                                          : i,
+                                      ),
+                                    }))
+                                  }
+                                  allLabel="Everyone"
+                                  onAll={(on) => updateItem(item.key, { personIds: on ? [...draft.ticked] : [] })}
+                                  onClose={() => {
+                                    setPicking(null);
+                                    document.getElementById(`who-${item.key}`)?.focus();
+                                  }}
+                                />
+                              )}
+                            </div>
+                          ) : (
+                            <div className="flex flex-wrap gap-2">
+                              {draft.ticked.map((id) => (
+                                <PersonChip
+                                  key={id}
+                                  label={name(id)}
+                                  checked={item.personIds.includes(id)}
+                                  onChange={(on) =>
+                                    updateItem(item.key, {
+                                      personIds: on ? [...item.personIds, id] : item.personIds.filter((p) => p !== id),
+                                    })
+                                  }
+                                />
+                              ))}
+                              {draft.ticked.length > 1 && (
+                                <PersonChip
+                                  label="Everyone"
+                                  checked={everyone}
+                                  onChange={(on) => updateItem(item.key, { personIds: on ? [...draft.ticked] : [] })}
+                                />
+                              )}
+                            </div>
                           )}
-                        </div>
-                      ) : (
-                        <div className="flex flex-wrap gap-2">
-                          {draft.ticked.map((id) => (
-                            <PersonChip
-                              key={id}
-                              label={name(id)}
-                              checked={item.personIds.includes(id)}
-                              onChange={(on) =>
-                                updateItem(item.key, {
-                                  personIds: on ? [...item.personIds, id] : item.personIds.filter((p) => p !== id),
-                                })
-                              }
-                            />
-                          ))}
-                          {draft.ticked.length > 1 && (
-                            <PersonChip
-                              label="Everyone"
-                              checked={everyone}
-                              onChange={(on) => updateItem(item.key, { personIds: on ? [...draft.ticked] : [] })}
-                            />
-                          )}
-                        </div>
-                      )}
+                        </FieldGroup>
+                      </div>
                     </FieldGroup>
                   </div>
-                </FieldGroup>
+                )}
               </Card>
             </li>
           );

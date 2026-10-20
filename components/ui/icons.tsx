@@ -53,6 +53,15 @@ export function CheckboxIcon({ checked, className = "size-5 shrink-0" }: IconPro
   );
 }
 
+/** A down arrow (chevron), for opening and minimizing. Rotate it to point right when minimized. */
+export function ChevronIcon({ className = "size-5" }: IconProps) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" className={className}>
+      <path d="M5 7.5l5 5 5-5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 /** Three dots, for a "more options" button. */
 export function MoreIcon({ className = "size-6" }: IconProps) {
   return (
