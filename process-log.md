@@ -599,3 +599,24 @@ Also reflect these changes in `flows.md`.
 - **Checks:** lint, build, and all 17 end-to-end checks. The placement check now requires the block's centre to sit 28–40% of the way down, with at least 32px margins. Screenshots at 844px and 667px tall both put it at about a third.
 
 **Pushed back:** It sat too low.
+
+## Step 17: Delete a bill (2026-10-19)
+
+**Asked:** When I open a bill, let me delete it, with an "are you sure" before it's deleted.
+
+**Made:**
+- **Delete bill** is at the bottom of every bill page.
+  - Tapping it replaces the button with an inline question: "Delete Dinner at Aba? This can't be undone.", with a red **Delete bill** and **Cancel**.
+  - Focus moves into the question, and Cancel puts it back on "Delete bill".
+  - Deleting goes back to Home and shows "Deleted Dinner at Aba."
+  - If saving fails, the bill stays, with "Couldn't delete it. Try again."
+- **What gets deleted:** `withoutBill` (`lib/bills.ts`) removes the bill and drops a recurring series once its last bill is gone, so it doesn't stay "due". Saved people stay.
+- **A new `danger` button style:** Greek Summer's red `#B42318` with a darker hover, white text at 6.6:1 and 9:1. It's used only to confirm something that can't be undone.
+- **`flows.md`:** the Delete rule, a new error row, and the bill-page wireframes ("Edit comes later").
+- **Checks:**
+  - lint and build;
+  - a logic test for deleting, including dropping a series only when its last bill goes;
+  - a new end-to-end step: open Uber home, Delete bill, check the question and where focus goes, Cancel (nothing deleted, focus back), delete again, check the button is red, then confirm it lands on Home with the toast, the bill is gone from storage and from Recent bills.
+  - all 18 end-to-end checks pass.
+
+**Pushed back:** Nothing.

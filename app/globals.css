@@ -28,6 +28,7 @@
   --badge: #efcb5a;
   --on-badge: #14305c;
   --danger: #b42318;
+  --danger-hover: #8f1c13; /* white text on either is 6.5:1 or more */
   --success: #2f6b3a;
   --focus: #1d4e9e;
 }
@@ -53,6 +54,7 @@
   --color-badge: var(--badge);
   --color-on-badge: var(--on-badge);
   --color-danger: var(--danger);
+  --color-danger-hover: var(--danger-hover);
   --color-success: var(--success);
   --color-focus: var(--focus);
   --font-sans: var(--nf-manrope);

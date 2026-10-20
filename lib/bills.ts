@@ -1,4 +1,4 @@
-import { type Bill, ME, type Person, type Share } from "./model";
+import { type AppData, type Bill, ME, type Person, type Share } from "./model";
 import { formatMoney } from "./money";
 import { listNames, personName } from "./people";
 
@@ -51,4 +51,14 @@ export function billHeadline(bill: Bill, people: Person[]): string {
   if (unpaid.length === 0) return "All paid up";
   const total = unpaid.reduce((sum, s) => sum + s.amount, 0);
   return `${listNames(unpaid.map((s) => name(s.personId)))} ${unpaid.length === 1 ? "owes" : "owe"} you ${money(total)}`;
+}
+
+/**
+ * The data without this bill. A recurring series with no bills left goes too, so it
+ * doesn't linger on Home as "due". Saved people stay.
+ */
+export function withoutBill(data: AppData, billId: string): AppData {
+  const bills = data.bills.filter((b) => b.id !== billId);
+  const inUse = new Set(bills.flatMap((b) => (b.kind === "recurring" ? [b.recurringId] : [])));
+  return { ...data, bills, recurring: data.recurring.filter((r) => inUse.has(r.id)) };
 }

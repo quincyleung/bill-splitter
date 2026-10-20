@@ -1,6 +1,6 @@
 import type { ComponentProps } from "react";
 
-export type ButtonVariant = "primary" | "secondary";
+export type ButtonVariant = "primary" | "secondary" | "danger";
 
 type ButtonProps = Omit<ComponentProps<"button">, "className"> & {
   variant?: ButtonVariant;
@@ -14,6 +14,8 @@ const base =
 const variants: Record<ButtonVariant, string> = {
   primary: "bg-accent text-on-accent hover:bg-accent-hover active:bg-accent-pressed",
   secondary: "border border-field bg-surface text-ink hover:bg-accent-soft active:border-ink active:bg-soft-pressed",
+  /** Only for confirming something that can't be undone, like deleting a bill. */
+  danger: "bg-danger text-on-accent hover:bg-danger-hover active:bg-danger-hover",
 };
 
 /** Shared with ButtonLink so links that act like buttons look the same. */

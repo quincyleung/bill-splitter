@@ -279,7 +279,7 @@ Josh owes you $40.25
 │ …breakdown…                               │
 └───────────────────────────────────────────┘
 
-[Edit]  [Delete]
+[Delete bill]   (Edit comes later)
 ```
 
 When someone else paid:
@@ -296,7 +296,7 @@ You owe Sam $42.00
 └───────────────────────────────────────────┘
 Others' shares, between them and Sam: Jo $42.00
 
-[Edit]  [Delete]
+[Delete bill]   (Edit comes later)
 ```
 
 - **Each person has a card** with their share and how it was worked out. By item: their items (shared ones say "shared by 3" and show their part), the items subtotal, then their share of tax and tip with the rate ("Tax and tip (26% of items) +$12.16"). The lines add up to their share. Evenly: "$90.00 split 3 ways". My own share gets a card too, without the controls.
@@ -315,7 +315,7 @@ Others' shares, between them and Sam: Jo $42.00
   An even split reads "Uber home (Oct 19) / $24.80 split 2 ways / Your total: $12.40".
 - **Home's "Who owes you"** adds up what each person owes across all bills I paid (per currency, never converted), with the bills it's for as links: "Josh $70.25. For Dinner at Aba ($40.25), Uber home ($30.00)".
 - **Edit** opens `/bills/[id]/edit` with the same form, filled in. If a person already marked paid ends up with a different share, they go back to unpaid: "Sam's share changed from $40.25 to $43.10, so they're unpaid again."
-- **Delete** asks first: "Delete Dinner at Nopa? This can't be undone."
+- **Delete bill** sits at the bottom of the bill page. It asks first, inline: "Delete Dinner at Aba? This can't be undone.", with a red **Delete bill** and **Cancel**. Focus moves into the question, and back to "Delete bill" on Cancel. Deleting goes back to Home with "Deleted Dinner at Aba." If it was the only bill in a recurring series, the series goes too, so it doesn't stay "due". Saved people stay. Red is used only for this confirmation.
 
 ### States
 
@@ -355,6 +355,7 @@ Others' shares, between them and Sam: Jo $42.00
 | Repeats (custom) | Blank, or outside 1–52 weeks or 1–12 months | "Enter how often, like every 3 months." |
 | Save | Storage full or blocked | Shown near Save: "Couldn't save on this phone. Everything you typed is still here. Try again." |
 | Mark paid | Couldn't save | The box stays as it was, with "Couldn't save that. Try again." |
+| Delete bill | Couldn't save | The bill stays, with "Couldn't delete it. Try again." under the question. |
 
 **Warnings that don't block Save:**
 - "Jo isn't on any item, so they owe $0. Tick them on an item or remove them."
