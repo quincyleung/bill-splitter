@@ -67,7 +67,7 @@ Main task: add a bill → choose who was there, who paid and how to split it →
 
   Money is never in Marcellus (its numerals look very different). It takes the role of where it sits, always with even-width digits.
 - **Labels:** no question marks ("Who paid", not "Who paid?"), and no "(optional)": every field on a bill is needed, including each item's name.
-- **Examples:** a bill's Name and an item's Name show an example as faint text inside the box until I type: "e.g. Dinner at Aba" on a one-time bill, "e.g. Netflix" on a recurring one, and "Burger" for an item. The faint grey is the lightest that still meets AA (4.6:1 on white). Labels are always real labels; instructions that aren't examples ("The amount on your card slip, after tip") stay as a line under the label. There are no sample bills, because fake bills would mix into real balances.
+- **Examples:** a bill's Name shows an example as faint text inside the box until I type: "e.g. Dinner at Aba" on a one-time bill, "e.g. Netflix" on a recurring one. An item's Name has none (its error still says "like Burger"). The faint grey is the lightest that still meets AA (4.6:1 on white). Labels are always real labels; instructions that aren't examples ("The amount on your card slip, after tip") stay as a line under the label. There are no sample bills, because fake bills would mix into real balances.
 - **On Save:** errors appear next to their fields, focus moves to the first one, and nothing typed is cleared. When it saves, the loading screen shows for half a second and then the new bill opens. The form is reset only after it's out of sight, so it's never seen clearing. There's no "Saved" message: the bill is the confirmation.
 
 ## Reading the diagrams
@@ -210,8 +210,8 @@ How to split   [✓ By item] [ Evenly ]
 
 Items
   [Paste receipt text]  → pop-up: Receipt text [ … ]  [Close] [Read receipt]
-  ┌ Item 1                                  [⋯] ┐   ⋯ → Delete item
-  │ NAME        [ Burger ]                       │
+  ┌ Item 1                                  [🗑] ┐   trash can: delete this item
+  │ NAME        [        ]                       │
   │ PRICE       [ 18.00  ]                       │
   │ WHO HAD IT  [Me] [Sam ✓] [Jo] [Everyone]     │
   └──────────────────────────────────────────────┘
@@ -232,7 +232,7 @@ Who owes you
 
 - **Type items** adds a blank item: name, then price, then who had it.
 - **Each item is a card** titled **Item 1**, **Item 2**… in the Lead style (Manrope 20px semibold), clearly above its small uppercase field labels (Name, Price, Who had it). Marcellus isn't used here, because its 1 looks like a Roman I.
-- **Deleting an item:** ⋯ on the right of the item's title (when there's more than one item) opens a menu with a red **Delete item**, the same menu as a bill's ⋯. There's no button at the bottom of each item, so a long bill isn't a stack of buttons. Deleting needs no confirmation (nothing is saved yet); focus moves to Add item, and screen readers hear "Item 2 deleted."
+- **Deleting an item:** a **trash can** on the right of the item's title (when there's more than one item), named "Delete item 2" for screen readers. One tap deletes it; there's no confirmation, since nothing is saved yet. There's no button at the bottom of each item, so a long bill isn't a stack of buttons. Focus moves to Add item, and screen readers hear "Item 2 deleted."
 - **Paste receipt text** opens a pop-up with the box, help on copying the text, and **Read receipt**, which fills in the items and closes it. See "Reading a receipt" below.
 - A shared item (appetizer, a pitcher) gets ticked for several people, or for **Everyone**, and is split evenly between them.
 - Tax and tip (total paid minus the items) are spread in proportion to each person's item subtotal.

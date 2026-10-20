@@ -64,6 +64,15 @@ export function MoreIcon({ className = "size-6" }: IconProps) {
   );
 }
 
+/** A trash can, for deleting an item. */
+export function TrashIcon({ className = "size-6" }: IconProps) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" className={className}>
+      <path d="M4 7h16M10 11v6M14 11v6M5.5 7l1 12a2 2 0 002 2h7a2 2 0 002-2l1-12M9 7V4.5a1 1 0 011-1h4a1 1 0 011 1V7" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
 export function AlertIcon({ className = "size-5" }: IconProps) {
   return (
     <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor" className={className}>

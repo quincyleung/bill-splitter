@@ -927,3 +927,26 @@ Also reflect these changes in `flows.md`.
 **Pushed back:**
 - Too many buttons at the bottom of items.
 - Item titles that looked like field labels.
+
+## Step 25: A trash can to delete an item; no example in the item name (2026-10-20)
+
+**Asked:**
+- Instead of the ⋯ menu for deleting items, a trash icon.
+- Remove the example text ("Burger") inside an item's Name.
+
+**Made:**
+- **Trash can:** each item (when there's more than one) has a trash can on the right of its title.
+  - One tap deletes the item; there's no confirmation, since nothing is saved yet.
+  - Screen readers hear it as "Delete item 2", and "Item 2 deleted." afterwards. Focus moves to Add item.
+  - The trash can and the bill page's ⋯ are now the same shared round icon button (`components/ui/icon-button.tsx`), and `TrashIcon` was added.
+  - The bill page keeps its ⋯ menu.
+- **Item names** have no example text. The error still says "Name this item, like Burger."
+- **Checks:**
+  - lint and a production build;
+  - all end-to-end checks. The items check now covers no trash can on a single item, "Delete item 1/2/3" with an icon, deleting item 2 in one click, focus moving to Add item, renumbering, the announcement, and the item name having no example;
+  - the accessibility audit: 0 issues, with a 2-item state. 27 keyboard checks pass, including deleting an item by keyboard;
+  - a screenshot.
+
+**Pushed back:**
+- A menu was one tap too many for deleting an item.
+- The item name example wasn't needed.

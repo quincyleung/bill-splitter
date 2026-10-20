@@ -5,8 +5,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ChecklistDialog } from "@/components/ui/checklist-dialog";
 import { FieldGroup } from "@/components/ui/field-group";
+import { IconButton } from "@/components/ui/icon-button";
+import { TrashIcon } from "@/components/ui/icons";
 import { MoneyField } from "@/components/ui/money-field";
-import { MoreMenu } from "@/components/ui/more-menu";
 import { PersonChip } from "@/components/ui/person-chip";
 import { TextField } from "@/components/ui/text-field";
 import { type Draft, type DraftItem, type Errors, errorKey, nameOf, newItem } from "@/lib/bill-draft";
@@ -79,11 +80,15 @@ export function ItemsField({ draft, people, errors, setDraft, requestFocus, addI
           return (
             <li key={item.key}>
               <Card>
-                {/* ⋯ (Delete item) in the card's corner, beside the title. Before the fields,
-                    so it's first in the tab order too. */}
+                {/* A trash can in the card's corner, beside the title: one tap deletes the item.
+                    Before the fields, so it's first in the tab order too. */}
                 {draft.items.length > 1 && (
                   <div className="absolute top-3 right-2.5">
-                    <MoreMenu title={`item ${index + 1}`} deleteLabel="Delete item" onDelete={() => removeItem(item.key, index)} />
+                    <IconButton
+                      label={`Delete item ${index + 1}`}
+                      icon={<TrashIcon />}
+                      onClick={() => removeItem(item.key, index)}
+                    />
                   </div>
                 )}
                 <FieldGroup legend={`Item ${index + 1}`} size="title">
@@ -97,7 +102,6 @@ export function ItemsField({ draft, people, errors, setDraft, requestFocus, addI
                     <TextField
                       id={`name-${item.key}`}
                       label="Name"
-                      placeholder="Burger"
                       value={item.name}
                       onChange={(event) => updateItem(item.key, { name: event.target.value })}
                       error={errors[errorKey.name(item.key)]}

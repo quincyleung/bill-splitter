@@ -1,17 +1,18 @@
 "use client";
 
-// "More options" (⋯): a small menu on the right of a bill's name or an item's title,
-// holding the action that removes it (Delete bill, Delete item), in red. A disclosure:
+// "More options" (⋯): a small menu on the right of a bill's name, holding the action
+// that removes it (Delete bill), in red. A disclosure:
 // Enter or a tap opens it with focus on the action; Escape closes it (focus back on ⋯),
 // as do tapping outside and focus leaving it.
 
 import { type RefObject, useEffect, useId, useRef, useState } from "react";
+import { IconButton } from "./icon-button";
 import { MoreIcon } from "./icons";
 
 type MoreMenuProps = {
-  /** Read after "More options for", e.g. "Dinner at Aba" or "item 2". */
+  /** Read after "More options for", e.g. "Dinner at Aba". */
   title: string;
-  /** e.g. "Delete bill" or "Delete item". */
+  /** e.g. "Delete bill". */
   deleteLabel: string;
   onDelete: () => void;
   /** The ⋯ button, when focus needs to come back to it later (e.g. after a pop-up's Cancel). */
@@ -53,17 +54,14 @@ export function MoreMenu({ title, deleteLabel, onDelete, triggerRef }: MoreMenuP
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false);
       }}
     >
-      <button
+      <IconButton
         ref={buttonRef}
-        type="button"
+        label={`More options for ${title}`}
+        icon={<MoreIcon />}
         aria-expanded={open}
         aria-controls={menuId}
         onClick={() => setOpen(!open)}
-        className="press inline-flex size-11 items-center justify-center rounded-full text-ink hover:bg-accent-soft"
-      >
-        <MoreIcon />
-        <span className="sr-only">More options for {title}</span>
-      </button>
+      />
       <div
         id={menuId}
         hidden={!open}
