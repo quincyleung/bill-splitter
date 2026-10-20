@@ -53,6 +53,17 @@ export function CheckboxIcon({ checked, className = "size-5 shrink-0" }: IconPro
   );
 }
 
+/** Three dots, for a "more options" button. */
+export function MoreIcon({ className = "size-6" }: IconProps) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor" className={className}>
+      <circle cx="5" cy="12" r="2" />
+      <circle cx="12" cy="12" r="2" />
+      <circle cx="19" cy="12" r="2" />
+    </svg>
+  );
+}
+
 export function AlertIcon({ className = "size-5" }: IconProps) {
   return (
     <svg aria-hidden="true" viewBox="0 0 20 20" fill="currentColor" className={className}>

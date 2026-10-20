@@ -259,7 +259,7 @@ Fields: name ("Electricity"), date of this bill, amount and currency, roommates,
 When I paid:
 
 ```
-Dinner at Aba
+Dinner at Aba                                   [⋯]
 Oct 18 · $102.20 · You paid
 Josh owes you $40.25
 1 of 2 paid
@@ -279,8 +279,7 @@ Josh owes you $40.25
 │ …breakdown…                               │
 └───────────────────────────────────────────┘
 
-[      Back to Home      ]   (full width, the main action here)
-[Delete bill]              (below, apart; Edit comes later)
+[Share summary]  [Back to Home]   (⋯ beside the name has Delete bill; Edit comes later)
 ```
 
 When someone else paid:
@@ -297,8 +296,7 @@ You owe Sam $42.00
 └───────────────────────────────────────────┘
 Others' shares, between them and Sam: Jo $42.00
 
-[      Back to Home      ]   (full width, the main action here)
-[Delete bill]              (below, apart; Edit comes later)
+[Share summary]  [Back to Home]   (⋯ beside the name has Delete bill; Edit comes later)
 ```
 
 - **Each person has a card** with their share and how it was worked out. By item: their items (shared ones say "shared by 3" and show their part), the items subtotal, then their share of tax and tip with the rate ("Tax and tip (26% of items) +$12.16"). The lines add up to their share. Evenly: "$90.00 split 3 ways". My own share gets a card too, without the controls.
@@ -317,8 +315,20 @@ Others' shares, between them and Sam: Jo $42.00
   An even split reads "Uber home (Oct 19) / $24.80 split 2 ways / Your total: $12.40".
 - **Home's "Who owes you"** adds up what each person owes across all bills I paid (per currency, never converted), with the bills it's for as links: "Josh $70.25. For Dinner at Aba ($40.25), Uber home ($30.00)".
 - **Edit** opens `/bills/[id]/edit` with the same form, filled in. If a person already marked paid ends up with a different share, they go back to unpaid: "Sam's share changed from $40.25 to $43.10, so they're unpaid again."
-- **Back to Home** is a full-width blue button at the bottom of every bill page, the main next step once a bill's been checked. (The app name at the top also goes Home.)
-- **Delete bill** sits below Back to Home, with space between so they aren't mis-tapped. It asks first, inline: "Delete Dinner at Aba? This can't be undone.", with a red **Delete bill** and **Cancel**. Focus moves into the question, and back to "Delete bill" on Cancel. Deleting goes back to Home with "Deleted Dinner at Aba." If it was the only bill in a recurring series, the series goes too, so it doesn't stay "due". Saved people stay. Red is used only for this confirmation.
+- **At the bottom:** **Share summary** on the left and **Back to Home** (the blue main action) on the right, side by side. Share summary sends the whole bill to a group in one message: the bill, its total and who paid, then each person's share with their items (by item) and who has paid. On a phone it opens the share sheet, so it can go straight to the group chat. Where there's no share sheet, it copies the text ("Copied the summary. Paste it into your group chat."). For example:
+
+  ```
+  Dinner at Aba (Oct 5)
+  Total $78.40, paid by me
+
+  Josh: $58.16
+    Lamb shoulder $38.00, Mezze (shared by 3) $8.00, tax and tip $12.16
+  Julie: $10.11 (paid)
+    Mezze (shared by 3) $8.00, tax and tip $2.11
+  Me: $10.13 (paid the bill)
+    Mezze (shared by 3) $8.00, tax and tip $2.13
+  ```
+- **More options (⋯)** sits on the right of the bill's name. It opens a small menu with **Delete bill** (Escape or tapping outside closes it). Delete asks first, under the title: "Delete Dinner at Aba? This can't be undone.", with a red **Delete bill** and **Cancel**. Focus moves into the question, and back to ⋯ on Cancel. Deleting goes back to Home with "Deleted Dinner at Aba." If it was the only bill in a recurring series, the series goes too. Saved people stay. Red is used only for this confirmation.
 
 ### States
 

@@ -642,3 +642,39 @@ Also reflect these changes in `flows.md`.
 - **Checks:** lint, build, and all 18 end-to-end checks. The delete step now also checks that Back to Home links to `/`, sits above Delete bill at full width, and lands on Home. Screenshot of a bill page.
 
 **Pushed back:** Nothing.
+
+## Step 18: A ⋯ menu for Delete, and Share summary (2026-10-19)
+
+**Asked:**
+- Instead of Delete bill at the bottom, put three dots on the right of the bill's name that let you delete it.
+- At the bottom, add a button for sharing a summary with a group (the whole bill and what each person owes, instead of copying each person's message), with Back to Home on its right.
+
+**Made:**
+- **⋯ More options** sits on the right of the bill's name. It's a disclosure button, named "More options for Dinner at Aba" for screen readers.
+  - It opens a small menu with **Delete bill**, and focus goes to that item.
+  - Escape closes it and puts focus back on ⋯. Tapping outside, or tabbing away, also closes it.
+  - Delete bill opens the same "are you sure" question, now under the title. Cancel puts focus back on ⋯.
+  - The confirm button is still red, and deleting still goes Home with "Deleted …".
+  - The bottom Delete bill is gone.
+- **Share summary** is at the bottom left, with **Back to Home** (the blue main action) on its right.
+  - `groupSummary` (`lib/messages.ts`) writes one message for the group: the bill and date, "Total $78.40, paid by me", "Split evenly between 3" on even bills, then each person's share, with "(paid)" or "(paid the bill)" and their items with tax and tip on by-item bills. Me is listed last.
+  - It opens the phone's share sheet when there is one, so it can go straight to a group chat.
+  - Otherwise it copies the text and says "Copied the summary. Paste it into your group chat." Closing the share sheet isn't treated as an error.
+  - Each person's Copy message stays on their card.
+- New pieces: `components/bill-actions.tsx` (BillMenu, DeleteQuestion, ShareSummaryButton), `shareText` in `lib/clipboard.ts`, and a MoreIcon.
+- **Mistake I fixed along the way:** removing the old Delete bill code also cut the per-person share cards that followed it in the file. Lint caught it, and I restored them from the last commit.
+- **`flows.md`:** the bill-page rules (the bottom row, the group summary with an example, the ⋯ menu) and both wireframes.
+- **Checks:**
+  - lint and build;
+  - logic tests for the group summary on a by-item bill and on a recurring bill someone else paid;
+  - the bill-page end-to-end step, rewritten. It checks:
+    - the bottom row (Share summary left, Back to Home right, no Delete bill on the page);
+    - Share summary through a stubbed share sheet (exact text) and through the copy fallback (toast);
+    - Back to Home;
+    - ⋯ on the title's line, opening with focus on Delete bill, and Escape closing it with focus back;
+    - Delete opening the question, and Cancel returning focus to ⋯;
+    - a red confirm, then deleting goes Home and removes the bill.
+  - All 18 end-to-end checks pass. The copy fallback is clicked with a user gesture, as a real tap would be; headless Chrome holds clipboard writes that don't have one.
+  - A screenshot of the bill page.
+
+**Pushed back:** Delete was too prominent at the bottom. Sharing one message per person was tedious for a group.

@@ -1,6 +1,6 @@
 import { breakdownFor } from "./breakdown";
 import { formatDate } from "./dates";
-import type { Bill } from "./model";
+import { type Bill, ME, type Person } from "./model";
 import { formatMoney } from "./money";
 
 /**
@@ -28,5 +28,44 @@ export function shareMessage(bill: Bill, personId: string): string {
     lines.push(`${money(breakdown.total)} split ${breakdown.ways} ways`);
   }
   lines.push(`Your total: ${money(share)}`);
+  return lines.join("\n");
+}
+
+/**
+ * The whole bill for the group chat: the bill, its total and who paid, then each
+ * person's share (with their items on a by-item bill), and who has paid.
+ *
+ *   Dinner at Aba (Oct 5)
+ *   Total $78.40, paid by me
+ *
+ *   Josh: $58.16
+ *     Lamb shoulder $38.00, Mezze (shared by 3) $8.00, tax and tip $12.16
+ *   Julie: $10.11 (paid)
+ *     Mezze (shared by 3) $8.00, tax and tip $2.11
+ *   Me: $10.13 (paid the bill)
+ *     Mezze (shared by 3) $8.00, tax and tip $2.13
+ */
+export function groupSummary(bill: Bill, people: Person[]): string {
+  const money = (amount: number) => formatMoney(Math.round(amount), bill.currency);
+  const name = (id: string) => (id === ME ? "Me" : (people.find((p) => p.id === id)?.name ?? "Someone"));
+  const payer = bill.payerId === ME ? "me" : name(bill.payerId);
+  const lines = [`${bill.title} (${formatDate(bill.date)})`, `Total ${money(bill.total)}, paid by ${payer}`];
+  if (bill.kind !== "meal") lines.push(`Split evenly between ${bill.shares.length}`);
+  lines.push("");
+
+  // Everyone else first, me last.
+  const shares = [...bill.shares].sort((a, b) => Number(a.personId === ME) - Number(b.personId === ME));
+  for (const share of shares) {
+    const note = share.personId === bill.payerId ? " (paid the bill)" : share.paid ? " (paid)" : "";
+    lines.push(`${name(share.personId)}: ${money(share.amount)}${note}`);
+    const breakdown = breakdownFor(bill, share.personId);
+    if (breakdown.kind === "items" && breakdown.items.length > 0) {
+      const parts = breakdown.items.map(
+        (item) => `${item.name}${item.sharedBy > 1 ? ` (shared by ${item.sharedBy})` : ""} ${money(item.amount)}`,
+      );
+      if (breakdown.taxAndTip > 0) parts.push(`tax and tip ${money(breakdown.taxAndTip)}`);
+      lines.push(`  ${parts.join(", ")}`);
+    }
+  }
   return lines.join("\n");
 }

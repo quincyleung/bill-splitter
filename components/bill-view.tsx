@@ -1,7 +1,7 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { use, useEffect, useId, useRef, useState } from "react";
+import { use, useRef, useState } from "react";
+import { BillMenu, DeleteQuestion, ShareSummaryButton } from "@/components/bill-actions";
 import { LoadingShell } from "@/components/loading-shell";
 import { UnreadableNotice } from "@/components/unreadable-notice";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { AlertIcon } from "@/components/ui/icons";
 import { PageTitle } from "@/components/ui/page-title";
 import { showToast } from "@/components/ui/toast";
-import { billHeadline, trackedShares, withoutBill, withPaid } from "@/lib/bills";
+import { billHeadline, trackedShares, withPaid } from "@/lib/bills";
 import { breakdownFor } from "@/lib/breakdown";
 import { copyText } from "@/lib/clipboard";
 import { formatDate } from "@/lib/dates";
@@ -48,6 +48,8 @@ export function BillView({ params }: { params: Promise<{ id: string }> }) {
 
 function BillDetails({ bill, people, series }: { bill: Bill; people: Person[]; series?: RecurringBill }) {
   const [saveError, setSaveError] = useState<string | null>(null);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
   const name = (id: string) => personName(id, people);
   const money = (amount: number) => formatMoney(amount, bill.currency);
   const youPaid = bill.payerId === ME;
@@ -80,11 +82,23 @@ function BillDetails({ bill, people, series }: { bill: Bill; people: Person[]; s
 
   return (
     <>
-      <PageTitle>{bill.title}</PageTitle>
+      <div className="flex items-start justify-between gap-3">
+        <PageTitle>{bill.title}</PageTitle>
+        <BillMenu title={bill.title} onDelete={() => setConfirmingDelete(true)} triggerRef={menuButtonRef} />
+      </div>
       <p className="mt-1 text-ink-muted">
         {formatDate(bill.date)} · {money(bill.total)} · {youPaid ? "You paid" : `${name(bill.payerId)} paid`}
         {series && ` · Repeats ${frequencyLabel(series.frequency)}`}
       </p>
+      {confirmingDelete && (
+        <DeleteQuestion
+          bill={bill}
+          onCancel={() => {
+            setConfirmingDelete(false);
+            menuButtonRef.current?.focus();
+          }}
+        />
+      )}
 
       <p className="type-lead mt-6 text-ink">{headline}</p>
       {owed.length > 0 && (
@@ -132,94 +146,18 @@ function BillDetails({ bill, people, series }: { bill: Bill; people: Person[]; s
         </p>
       )}
 
-      {/* Done with this bill: the main next step is back to Home. Delete sits apart, below. */}
-      <div className="mt-10">
-        <ButtonLink href="/" fullWidth>
-          Back to Home
-        </ButtonLink>
-      </div>
-      <DeleteBill bill={bill} />
-    </>
-  );
-}
-
-/**
- * "Delete bill", then an inline "Delete Dinner at Aba? This can't be undone." with a red
- * Delete bill and Cancel. Deleting goes back to Home. Focus moves into the question when
- * it opens, and back to "Delete bill" on Cancel.
- */
-function DeleteBill({ bill }: { bill: Bill }) {
-  const router = useRouter();
-  const questionId = useId();
-  const [confirming, setConfirming] = useState(false);
-  const [focusTarget, setFocusTarget] = useState<"question" | "trigger" | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const questionRef = useRef<HTMLDivElement>(null);
-  const triggerRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (focusTarget === "question") questionRef.current?.focus();
-    if (focusTarget === "trigger") triggerRef.current?.focus();
-  }, [focusTarget, confirming]);
-
-  function remove() {
-    const result = updateData((data) => withoutBill(data, bill.id));
-    if (!result.ok) {
-      setError("Couldn't delete it. Try again.");
-      return;
-    }
-    showToast(`Deleted ${bill.title}.`);
-    router.push("/");
-  }
-
-  return (
-    <div className="mt-6">
-      {confirming ? (
-        <div
-          ref={questionRef}
-          tabIndex={-1}
-          role="group"
-          aria-labelledby={questionId}
-          className="rounded-card border border-danger bg-surface p-5 outline-none"
-        >
-          <p id={questionId} className="font-semibold text-ink">
-            Delete {bill.title}? This can&apos;t be undone.
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <Button variant="danger" onClick={remove}>
-              Delete bill
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                setConfirming(false);
-                setError(null);
-                setFocusTarget("trigger");
-              }}
-            >
-              Cancel
-            </Button>
-          </div>
-          {error && (
-            <p role="alert" className="type-small mt-3 flex items-start gap-2 font-semibold text-danger">
-              <AlertIcon className="mt-0.5 size-4 shrink-0" />
-              {error}
-            </p>
-          )}
+      {/* Share the whole bill with the group, or head back: Back to Home is the main next step. */}
+      <div className="mt-10 flex gap-3">
+        <div className="flex-1">
+          <ShareSummaryButton bill={bill} people={people} />
         </div>
-      ) : (
-        <Button
-          ref={triggerRef}
-          variant="secondary"
-          onClick={() => {
-            setConfirming(true);
-            setFocusTarget("question");
-          }}
-        >
-          Delete bill
-        </Button>
-      )}
-    </div>
+        <div className="flex-1">
+          <ButtonLink href="/" fullWidth>
+            Back to Home
+          </ButtonLink>
+        </div>
+      </div>
+    </>
   );
 }
 
