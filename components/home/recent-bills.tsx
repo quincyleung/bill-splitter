@@ -12,7 +12,7 @@ export function RecentBills({ bills, people, total }: { bills: Bill[]; people: P
       <div className="mt-3">
         {bills.length === 0 ? (
           <Card>
-            <p className="text-ink-muted">No bills right now. New ones will show here.</p>
+            <p className="text-ink-muted">No bills right now.</p>
           </Card>
         ) : (
           <BillList bills={bills} people={people} />

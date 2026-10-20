@@ -1040,3 +1040,15 @@ Also reflect these changes in `flows.md`.
   - a screenshot.
 
 **Pushed back:** the instruction line wasn't needed.
+
+## Step 31: Blank state just says "No bills right now." (2026-10-20)
+
+**Asked:** For the blank state, remove "New ones will show here." and just have "No bills right now."
+
+**Made:**
+- **The text:** Recent bills with no bills now says only "No bills right now." `flows.md` matches.
+- **Checks:**
+  - lint and a production build;
+  - all end-to-end checks. The deleted-every-bill check now also asserts the second sentence is gone.
+
+**Pushed back:** the second sentence wasn't needed.

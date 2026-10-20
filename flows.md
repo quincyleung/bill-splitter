@@ -458,7 +458,7 @@ RECENT BILLS                       (the 5 newest, latest at the top)
 See all 6 bills                    (→ /bills, by month)
 ```
 
-- **First visit or coming back:** Home is the first-visit screen (Flow 1) only when nothing has ever been saved: no bills, no people and no recurring bills. Once a bill has been saved, it's this one, even after every bill is deleted, because deleting keeps the people I split with. Then Recent bills says "No bills right now. New ones will show here." Only **Start fresh** (which clears everything) brings back the first visit. Until saved data is read, it shows the neutral shell, never the wrong one.
+- **First visit or coming back:** Home is the first-visit screen (Flow 1) only when nothing has ever been saved: no bills, no people and no recurring bills. Once a bill has been saved, it's this one, even after every bill is deleted, because deleting keeps the people I split with. Then Recent bills says "No bills right now." Only **Start fresh** (which clears everything) brings back the first visit. Until saved data is read, it shows the neutral shell, never the wrong one.
 - **Hierarchy:** a big "Bill Splitter" (Home's title) and one summary line. Next come the two big new-bill cards (the same as on a first visit; One-time is the Aegean-blue main action), so starting a bill always comes first. The sections below have quiet small-uppercase labels, and every list uses the same rows (Row type for names and amounts, Small for the second line), in this order: Who owes you and You owe (kept together), Recurring bills, Recent bills.
 - **Recent bills:** the 5 newest, latest at the top, each with who still owes on it ("Sam owes you $12.40"). If there are more, **See all N bills** opens `/bills`, every bill grouped by month, in the same rows.
 - **Who owes you:** one row per person: what they owe across all bills I paid, **how long** it's been unpaid (from their oldest unpaid bill: "since today", "for 3 days", "for 2 weeks", "for 2 months"; a month or more is in bold), and the bills it's for, as links with dates. Paid shares drop off.
@@ -472,7 +472,7 @@ See all 6 bills                    (→ /bills, by month)
 | Open bills | "Bill Splitter" with the sections above. |
 | Partly settled | Each bill shows "1 of 3 paid", and paid shares drop out of Who owes you. |
 | All settled | "Nobody owes anyone right now." The new-bill cards, Recurring bills and Recent bills stay. |
-| No bills left | After deleting every bill: still "Bill Splitter" (not the first visit), "Nobody owes anyone right now.", the new-bill cards, and Recent bills with "No bills right now. New ones will show here." |
+| No bills left | After deleting every bill: still "Bill Splitter" (not the first visit), "Nobody owes anyone right now.", the new-bill cards, and Recent bills with "No bills right now." |
 | Recurring due | "Add Oct 15" on that row and "1 recurring bill is due." in the summary. Before then, "Next Nov 1". |
 | Draft waiting | Later: an "Unfinished…" card. Discard asks first. |
 
