@@ -132,6 +132,12 @@ function BillDetails({ bill, people, series }: { bill: Bill; people: Person[]; s
         </p>
       )}
 
+      {/* Done with this bill: the main next step is back to Home. Delete sits apart, below. */}
+      <div className="mt-10">
+        <ButtonLink href="/" fullWidth>
+          Back to Home
+        </ButtonLink>
+      </div>
       <DeleteBill bill={bill} />
     </>
   );
@@ -167,7 +173,7 @@ function DeleteBill({ bill }: { bill: Bill }) {
   }
 
   return (
-    <div className="mt-10">
+    <div className="mt-6">
       {confirming ? (
         <div
           ref={questionRef}

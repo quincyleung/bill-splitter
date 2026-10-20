@@ -631,3 +631,14 @@ Also reflect these changes in `flows.md`.
 - **Checks:** lint, build, and all 18 end-to-end checks. The placement check now expects the centre 38–48% of the way down. Screenshots at both heights.
 
 **Pushed back:** A third of the way down was too high.
+
+## Step 17, continued: Back to Home on the bill page (2026-10-19)
+
+**Asked:** Add an option at the bottom of the bill to go back to the home page.
+
+**Made:**
+- Every bill page now ends with a full-width **Back to Home** (the blue main-action style, since going back is the main next step once a bill's been checked). **Delete bill** sits below it with space between, so the two aren't mis-tapped. The app name at the top still goes Home too.
+- `flows.md`: the bill-page wireframes and a Back to Home rule.
+- **Checks:** lint, build, and all 18 end-to-end checks. The delete step now also checks that Back to Home links to `/`, sits above Delete bill at full width, and lands on Home. Screenshot of a bill page.
+
+**Pushed back:** Nothing.
